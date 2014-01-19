@@ -26,6 +26,12 @@
     [super viewDidLoad];
 
     readings = [BRReadingManager readings];
+    assert( [readings count] == 365 );
+
+    NSDateFormatter *yearFormatter = [NSDateFormatter new];
+    yearFormatter.dateFormat = @"yyyy";
+    NSString *year = [yearFormatter stringFromDate:[NSDate date]];
+    self.navigationItem.title = year;
 }
 
 -(void) viewDidAppear:(BOOL)animated

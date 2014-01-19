@@ -16,8 +16,10 @@ static NSArray *readings = nil;
 {
     if( !readings ) {
         NSArray *r = [NSArray arrayWithContentsOfURL:[self fileURL]];
-        if( r )
-            readings = [self readingArrayFromDictionaryArray:r];
+        if( r ) {
+            NSArray *diskReadings = [self readingArrayFromDictionaryArray:r];
+            [self fixReadings:diskReadings];
+        }
         else
             [self resetReadings];
     }
@@ -27,7 +29,7 @@ static NSArray *readings = nil;
 
 +(NSArray*) readingArrayFromDictionaryArray:(NSArray*)dicts
 {
-    NSMutableArray *_readings = [NSMutableArray array];
+    NSMutableArray *_readings = [NSMutableArray arrayWithCapacity:[dicts count]];
     for( NSDictionary *dict in dicts ) {
         BRReading *reading = [[BRReading alloc] initWithDictionary:dict];
         [_readings addObject:reading];
@@ -38,7 +40,7 @@ static NSArray *readings = nil;
 
 +(NSArray*) dictionaryArrayFromReadingArray:(NSArray*)_readings
 {
-    NSMutableArray *dicts = [NSMutableArray array];
+    NSMutableArray *dicts = [NSMutableArray arrayWithCapacity:[_readings count]];
     for( BRReading *reading in _readings )
         [dicts addObject:[reading dictionaryRepresentation]];
     return [NSArray arrayWithArray:dicts];
@@ -64,6 +66,26 @@ static NSArray *readings = nil;
     readings = [self readingArrayFromDictionaryArray:r];
     [self save];
     return readings;
+}
+
+
++(void) fixReadings:(NSArray*)existingReadings
+{
+    NSArray *newReadings = [self newReadings];
+    newReadings = [self readingArrayFromDictionaryArray:newReadings];
+    assert( [existingReadings count] == [newReadings count] );
+
+    NSMutableArray *fixedReadings = [NSMutableArray arrayWithCapacity:[existingReadings count]];
+    for( NSInteger i = 0; i < [newReadings count]; i++ ) {
+        BRReading *nr = newReadings[i];
+        BRReading *er = existingReadings[i];
+        assert( [nr.day isEqualToString:er.day] );
+        nr.read = er.read;
+        [fixedReadings addObject:nr];
+    }
+
+    readings = [NSArray arrayWithArray:fixedReadings];
+    [self save];
 }
 
 
