@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="51r-4A-Hmk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4514" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="51r-4A-Hmk">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
     </dependencies>
@@ -23,32 +23,33 @@
         <scene sceneID="cZy-uY-4rS">
             <objects>
                 <tableViewController id="KHK-F6-h1y" customClass="BRViewController" sceneMemberID="viewController">
-                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="Jks-Qs-cru">
+                    <tableView key="view" opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="50" sectionHeaderHeight="22" sectionFooterHeight="22" id="Jks-Qs-cru">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <prototypes>
                             <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" id="yAT-n8-lV7" customClass="BRTableCell">
-                                <rect key="frame" x="0.0" y="86" width="320" height="44"/>
+                                <rect key="frame" x="0.0" y="86" width="320" height="50"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="yAT-n8-lV7" id="zoI-f0-Gh8">
-                                    <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A84-HT-qSJ">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS">
-                                                    <rect key="frame" x="139" y="11" width="161" height="21"/>
+                                                    <rect key="frame" x="139" y="10" width="161" height="30"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LhA-Rm-8G1">
-                                                    <rect key="frame" x="20" y="11" width="111" height="21"/>
+                                                    <rect key="frame" x="20" y="10" width="111" height="30"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                                    <color key="textColor" red="0.0" green="0.47843137254901957" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                             </subviews>
@@ -69,9 +70,14 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" id="9aK-Yt-aHC">
-                        <barButtonItem key="rightBarButtonItem" title="Reset" id="Wou-Sm-qSW">
+                        <barButtonItem key="leftBarButtonItem" title="Reset" id="Wou-Sm-qSW">
                             <connections>
                                 <action selector="resetReadings" destination="KHK-F6-h1y" id="nBm-ov-2cu"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Info" id="mWd-9X-P31">
+                            <connections>
+                                <segue destination="Qjp-iw-dnZ" kind="push" id="AOR-rl-R29"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -79,6 +85,55 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3Tg-9r-pTa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-4" y="259"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="l1D-7r-4g2">
+            <objects>
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="Qjp-iw-dnZ" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="VNs-Kp-ZFV"/>
+                        <viewControllerLayoutGuide type="bottom" id="BHf-JK-igD"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="JIi-ON-SE1">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QFp-yN-aIo">
+                                <rect key="frame" x="20" y="84" width="280" height="464"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <mutableString key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.
+
+This list of readings divides the Bible into seven sections, one for each day of the week. If January 1 were a Monday, the days would be as follows:
+
+Monday: Law (Gen. - Deut.)
+Tuesday: History (Joshua - Esther)
+Wednesday: Psalms
+Thursday: Poetry (Job, Prov. - Song)
+Friday: Prophecy (Isiah - Malachi)
+Saturday: Gospels (Matt. - Acts)
+Sunday: Letters (Romans - Rev.)
+
+Thus, if one were to read all the Mondays, then all the Tuesdays, then all the Wednesdays, etc., it would be roughly the equivalent of reading the Bible straight through. However, dividing it into sections provides variety from day to day in both the type of content and its length. This helps deter boredom and also allows one to catch up more easily if a day is missed, by combining two shorter readings together to make up for the lost day.
+
+The daily divisions have been tuned over the course of several years for both consistency and contiguity. Within a section, each day’s reading is approximately the same length throughout the year, subject to a few caveats. None of the chapters are broken across days (other than Psalm 119), and related neighboring chapters are kept together if practical. In general, drier sections of text, such as descriptions of the tabernacle or genealogies, are conglomerated into longer daily readings, while more poetic or narrative text, such as the psalms or the travels of the patriarchs, are separated for more individual attention.</mutableString>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="QFp-yN-aIo" firstAttribute="top" secondItem="JIi-ON-SE1" secondAttribute="top" constant="84" id="5c3-eJ-DtH"/>
+                            <constraint firstAttribute="trailing" secondItem="QFp-yN-aIo" secondAttribute="trailing" constant="20" id="7iX-84-2Sc"/>
+                            <constraint firstItem="QFp-yN-aIo" firstAttribute="leading" secondItem="JIi-ON-SE1" secondAttribute="leading" constant="20" id="YGn-WI-kLb"/>
+                            <constraint firstAttribute="bottom" secondItem="QFp-yN-aIo" secondAttribute="bottom" constant="20" id="t0e-zd-ysM"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="tyD-u0-hsF"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oeh-RA-ynM" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="502" y="259"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

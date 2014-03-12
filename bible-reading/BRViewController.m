@@ -19,6 +19,7 @@
 
 @end
 
+
 @implementation BRViewController
 
 -(void) viewDidLoad
@@ -32,6 +33,11 @@
     yearFormatter.dateFormat = @"yyyy";
     NSString *year = [yearFormatter stringFromDate:[NSDate date]];
     self.navigationItem.title = year;
+
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Readings"
+                                                                             style:UIBarButtonItemStylePlain
+                                                                            target:self.navigationController
+                                                                            action:@selector(popViewControllerAnimated:)];
 }
 
 -(void) viewDidAppear:(BOOL)animated

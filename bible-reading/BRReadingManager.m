@@ -126,7 +126,7 @@ static NSArray *readings = nil;
              @{@"day": @"Jan. 18", @"passage": @"Job 6-7"},
              @{@"day": @"Jan. 19", @"passage": @"Isa. 11-15"},
              @{@"day": @"Jan. 20", @"passage": @"Mat. 6-7"},
-             @{@"day": @"Jan. 21", @"passage": @"Rom. 8-9"},
+             @{@"day": @"Jan. 21", @"passage": @"Rom. 5-7"},
              @{@"day": @"Jan. 22", @"passage": @"Gen. 9-11"},
              @{@"day": @"Jan. 23", @"passage": @"Josh. 18-21"},
              @{@"day": @"Jan. 24", @"passage": @"Ps. 12-17"},
