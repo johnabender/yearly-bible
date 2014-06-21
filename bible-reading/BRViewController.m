@@ -10,7 +10,7 @@
 #import "BRReadingManager.h"
 #import "BRTableCell.h"
 
-@interface BRViewController ()
+@interface BRViewController () <UIAlertViewDelegate>
 {
     NSArray *readings;
 }
@@ -38,6 +38,13 @@
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self.navigationController
                                                                             action:@selector(popViewControllerAnimated:)];
+
+    UIBarButtonItem *toggleItem = [[UIBarButtonItem alloc] initWithTitle:@"  ^ "
+                                                                   style:UIBarButtonItemStylePlain
+                                                                  target:self
+                                                                  action:@selector(tapHandler)];
+    toggleItem.tintColor = [UIColor colorWithRed:1. green:0. blue:0. alpha:0.7];
+    self.navigationItem.leftBarButtonItems = @[self.navigationItem.leftBarButtonItem, toggleItem];
 }
 
 -(void) viewDidAppear:(BOOL)animated
@@ -77,7 +84,7 @@
     BRTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
 
     BRReading *day = readings[indexPath.row];
-    [cell populateWithReading:day];
+    [cell populateWithReading:day firstDay:[BRReadingManager firstDay]];
 
     return cell;
 }
@@ -87,6 +94,36 @@
 {
     readings = [BRReadingManager resetReadings];
     [self.tableView reloadData];
+}
+
+
+-(void) tapHandler
+{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Days to Shift"
+                                                    message:@"Enter number of days to shift."
+                                                   delegate:self
+                                          cancelButtonTitle:@"Cancel"
+                                          otherButtonTitles:@"Shift", nil];
+    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
+
+    UITextField *textField = [alert textFieldAtIndex:0];
+    textField.keyboardType = UIKeyboardTypeNumberPad;
+
+    [alert show];
+}
+
+
+#pragma mark - Alert view delegate
+
+-(void) alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    if( buttonIndex != alertView.cancelButtonIndex ) {
+        NSInteger shift = [[alertView textFieldAtIndex:0].text integerValue];
+        if( shift > 0 && shift < [readings count] ) {
+            readings = [BRReadingManager shiftReadings:shift];
+            [self.tableView reloadData];
+        }
+    }
 }
 
 @end

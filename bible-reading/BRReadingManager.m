@@ -11,6 +11,7 @@
 @implementation BRReadingManager
 
 static NSArray *readings = nil;
+static NSString *firstDay = nil;
 
 +(NSArray*) readings
 {
@@ -22,6 +23,8 @@ static NSArray *readings = nil;
         }
         else
             [self resetReadings];
+
+        [self updateFirstDay];
     }
 
     return readings;
@@ -69,17 +72,71 @@ static NSArray *readings = nil;
 }
 
 
++(NSArray*) shiftReadings:(NSInteger)offset
+{
+    assert( offset < [readings count] );
+    
+    NSMutableArray *newReadings = [NSMutableArray arrayWithCapacity:[readings count]];
+    NSArray *unshiftedReadings = [self readingArrayFromDictionaryArray:[self newReadings]];
+
+    NSInteger i = offset, j = 0;
+    for( ; i < [readings count]; i++, j++ ) {
+        BRReading *ur = unshiftedReadings[j];
+        BRReading *sr = readings[i];
+        BRReading *pr = readings[j];
+        ur.day = sr.day;
+        ur.read = pr.read;
+        [newReadings addObject:ur];
+    }
+    for( ; [newReadings count] < [readings count]; i++, j++ ) {
+        BRReading *ur = unshiftedReadings[j];
+        BRReading *sr = readings[i - [readings count]];
+        BRReading *pr = readings[j];
+        ur.day = sr.day;
+        ur.read = pr.read;
+        [newReadings addObject:ur];
+    }
+
+    readings = newReadings;
+    [self save];
+
+    return readings;
+}
+
+
 +(void) fixReadings:(NSArray*)existingReadings
 {
+    // update chapters to match what they are in code
+
     NSArray *newReadings = [self newReadings];
     newReadings = [self readingArrayFromDictionaryArray:newReadings];
     assert( [existingReadings count] == [newReadings count] );
 
     NSMutableArray *fixedReadings = [NSMutableArray arrayWithCapacity:[existingReadings count]];
-    for( NSInteger i = 0; i < [newReadings count]; i++ ) {
+    /*
+    NSInteger offset = 0;
+    BRReading *nr = newReadings[offset];
+    BRReading *er = existingReadings[0];
+    while( ![nr.day isEqualToString:er.day] ) {
+        offset++;
+        nr = newReadings[offset];
+    }
+     */
+
+    for( NSInteger i = 0; i < [existingReadings count]; i++ ) {
+        /*
+        if( offset + i < [newReadings count] )
+            nr = newReadings[offset + i];
+        else
+            nr = newReadings[offset + i - [newReadings count]];
+         */
         BRReading *nr = newReadings[i];
         BRReading *er = existingReadings[i];
-        assert( [nr.day isEqualToString:er.day] );
+        if( ![nr.day isEqualToString:er.day] ) {
+            readings = existingReadings;
+            return; // can't fix chapter if offset, because what reading matches?
+        }
+
         nr.read = er.read;
         [fixedReadings addObject:nr];
     }
@@ -100,6 +157,21 @@ static NSArray *readings = nil;
 {
     NSArray *dicts = [self dictionaryArrayFromReadingArray:readings];
     [dicts writeToURL:[self fileURL] atomically:YES];
+
+    [self updateFirstDay];
+}
+
+
++(void) updateFirstDay
+{
+    BRReading *first = readings[0];
+    firstDay = first.day;
+}
+
+
++(NSString*) firstDay
+{
+    return firstDay;
 }
 
 

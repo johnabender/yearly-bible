@@ -15,7 +15,11 @@
 
 +(NSArray*) resetReadings;
 
++(NSArray*) shiftReadings:(NSInteger)offset;
+
 +(void) readingWasRead:(BRReading*)reading;
 +(void) readingWasUnread:(BRReading*)reading;
+
++(NSString*) firstDay;
 
 @end

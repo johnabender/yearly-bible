@@ -21,6 +21,6 @@
     __weak IBOutlet UILabel *readingLabel;
 }
 
--(void) populateWithReading:(BRReading*)reading;
+-(void) populateWithReading:(BRReading*)reading firstDay:(NSString*)firstDay;
 
 @end

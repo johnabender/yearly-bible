@@ -15,34 +15,31 @@ static NSDateFormatter *inputFormatter = nil;
 static NSDateFormatter *mayFormatter = nil;
 static NSDateFormatter *outputFormatter = nil;
 static NSDateFormatter *yearFormatter = nil;
+static NSDateFormatter *firstFormatter = nil;
 
 static const CGFloat dragOvershoot = 60.;
 
--(void) checkFormatters
++(void) initialize
 {
-    if( inputFormatter == nil ) {
-        inputFormatter = [NSDateFormatter new];
-        inputFormatter.dateFormat = @"MMM. d yyyy";
-    }
-    if( mayFormatter == nil ) {
-        mayFormatter = [NSDateFormatter new];
-        mayFormatter.dateFormat = @"MMM d yyyy";
-    }
-    if( outputFormatter == nil ) {
-        outputFormatter = [NSDateFormatter new];
-        outputFormatter.dateFormat = @"EEE, MMM. d";
-    }
-    if( yearFormatter == nil ) {
-        yearFormatter = [NSDateFormatter new];
-        yearFormatter.dateFormat = @"yyyy";
-    }
+    inputFormatter = [NSDateFormatter new];
+    inputFormatter.dateFormat = @"MMM. d yyyy";
+
+    mayFormatter = [NSDateFormatter new];
+    mayFormatter.dateFormat = @"MMM d yyyy";
+
+    outputFormatter = [NSDateFormatter new];
+    outputFormatter.dateFormat = @"EEE, MMM. d";
+
+    yearFormatter = [NSDateFormatter new];
+    yearFormatter.dateFormat = @"yyyy";
+
+    firstFormatter = [NSDateFormatter new];
+    firstFormatter.dateFormat = @"HH:mm:ss yyyy MM dd";
 }
 
--(NSDate*) dateFromString:(NSString*)string
+-(NSDate*) dateFromString:(NSString*)string inYear:(NSString*)yearString
 {
-    NSDate *now = [NSDate date];
-    NSString *year = [yearFormatter stringFromDate:now];
-    NSString *combinedString = [NSString stringWithFormat:@"%@ %@", string, year];
+    NSString *combinedString = [NSString stringWithFormat:@"%@ %@", string, yearString];
 
     if( [string hasPrefix:@"May"] )
         return [mayFormatter dateFromString:combinedString];
@@ -50,14 +47,50 @@ static const CGFloat dragOvershoot = 60.;
         return [inputFormatter dateFromString:combinedString];
 }
 
--(void) populateWithReading:(BRReading*)reading_
+
+-(NSDate*) dateFromString:(NSString*)string yearOffset:(NSInteger)yearOffset firstDate:(NSDate*)firstDate
+{
+    NSDate *now = [NSDate date];
+    NSString *yearString = [yearFormatter stringFromDate:now];
+
+    NSDate *readingDate = [self dateFromString:string inYear:yearString];
+    if( yearOffset == 0 ) return readingDate;
+
+    NSInteger year = [[yearFormatter stringFromDate:readingDate] integerValue];
+    NSInteger yearInit = year;
+    if( (yearOffset > 0 && [readingDate timeIntervalSinceDate:now] < 0) ) {
+        year += yearOffset;
+    }
+    else if( (yearOffset < 0 && [readingDate timeIntervalSinceDate:firstDate] < 0) ) {
+        year -= yearOffset;
+    }
+    if( year == yearInit ) return readingDate; // save computation if no change
+
+    return [self dateFromString:string inYear:[NSString stringWithFormat:@"%d", year]];
+}
+
+-(void) populateWithReading:(BRReading*)reading_ firstDay:(NSString*)firstDay
 {
     reading = reading_;
     readingLabel.text = reading.passage;
 
-    [self checkFormatters];
-    NSDate *date = [self dateFromString:reading.day];
-    dateLabel.text = [outputFormatter stringFromDate:date];
+    NSDate *firstDate = [self dateFromString:firstDay yearOffset:0 firstDate:nil];
+    NSInteger yearOffset = 0;
+    if( [firstDate timeIntervalSinceNow] > 0 ) {
+        // first reading's date in current year is later than now,
+        // so it must refer to last year
+        yearOffset = 1;
+    }
+    else {
+        // first reading's date in current year is earlier than now,
+        // so when we reach Jan. 1, that's next year (unless Jan. 1 is first)
+        if( ![firstDay isEqualToString:@"Jan. 1"] )
+            yearOffset = -1;
+    }
+
+    NSDate *readingDate = [self dateFromString:reading.day yearOffset:yearOffset firstDate:firstDate];
+
+    dateLabel.text = [outputFormatter stringFromDate:readingDate];
 
     [self markReadOrUnread];
     [self performSelector:@selector(markReadOrUnread) withObject:nil afterDelay:0.];
@@ -150,11 +183,17 @@ static const CGFloat dragOvershoot = 60.;
 
 -(void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    /* if touch was cancelled, don't change state
     movingTouch = nil;
 
     [UIView animateWithDuration:0.2 animations:^{
         [self markReadOrUnread];
     }];
+     */
+
+    // probably touch cancelled because of scrolling or edge of screen,
+    // so pretend it's the same thing as a purposeful touch end
+    [self touchesEnded:touches withEvent:nil];
 }
 
 @end
