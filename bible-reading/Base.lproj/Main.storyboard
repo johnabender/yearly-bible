@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="51r-4A-Hmk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="51r-4A-Hmk">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
         <!--Navigation Controller-->
@@ -35,19 +36,16 @@
                                     <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="A84-HT-qSJ">
+                                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="A84-HT-qSJ">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
-                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS">
                                                     <rect key="frame" x="139" y="10" width="161" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LhA-Rm-8G1">
                                                     <rect key="frame" x="20" y="10" width="111" height="30"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                                     <color key="textColor" red="0.0" green="0.47843137254901957" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                                     <nil key="highlightedColor"/>
@@ -56,8 +54,16 @@
                                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
                                         </view>
                                     </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="bottomMargin" secondItem="A84-HT-qSJ" secondAttribute="bottom" constant="-9" id="EV5-yl-L4G"/>
+                                        <constraint firstItem="A84-HT-qSJ" firstAttribute="leading" secondItem="zoI-f0-Gh8" secondAttribute="leading" id="IMU-xM-kJ4"/>
+                                        <constraint firstAttribute="trailing" secondItem="A84-HT-qSJ" secondAttribute="trailing" id="Qqj-WL-Xfb"/>
+                                        <constraint firstItem="A84-HT-qSJ" firstAttribute="top" secondItem="zoI-f0-Gh8" secondAttribute="top" id="eok-Gn-QM4"/>
+                                    </constraints>
                                 </tableViewCellContentView>
                                 <connections>
+                                    <outlet property="containerLeadingConstraint" destination="IMU-xM-kJ4" id="KgK-OW-SHb"/>
+                                    <outlet property="containerTrailingConstraint" destination="Qqj-WL-Xfb" id="job-ew-r9n"/>
                                     <outlet property="dateLabel" destination="LhA-Rm-8G1" id="ST3-Qy-2gG"/>
                                     <outlet property="labelContainer" destination="A84-HT-qSJ" id="877-Wl-x0g"/>
                                     <outlet property="readingLabel" destination="Mg7-8h-qFS" id="6u8-Dl-bJv"/>
@@ -105,7 +111,6 @@
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QFp-yN-aIo">
                                 <rect key="frame" x="20" y="84" width="280" height="464"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <string key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.
 

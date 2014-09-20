@@ -13,12 +13,15 @@
 {
     BRReading *reading;
 
-    CGPoint touchOffset;
+    CGPoint touchStart;
     UITouch *movingTouch;
 
     __weak IBOutlet UIView *labelContainer;
     __weak IBOutlet UILabel *dateLabel;
     __weak IBOutlet UILabel *readingLabel;
+
+    __weak IBOutlet NSLayoutConstraint *containerLeadingConstraint;
+    __weak IBOutlet NSLayoutConstraint *containerTrailingConstraint;
 }
 
 -(void) populateWithReading:(BRReading*)reading firstDay:(NSString*)firstDay;

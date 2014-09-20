@@ -93,7 +93,6 @@ static const CGFloat dragOvershoot = 60.;
     dateLabel.text = [outputFormatter stringFromDate:readingDate];
 
     [self markReadOrUnread];
-    [self performSelector:@selector(markReadOrUnread) withObject:nil afterDelay:0.];
 }
 
 -(void) markReadOrUnread
@@ -106,15 +105,15 @@ static const CGFloat dragOvershoot = 60.;
 
 -(void) markUnread
 {
-    labelContainer.center = CGPointMake( self.frame.size.width/2.,
-                                         self.contentView.center.y );
+    containerLeadingConstraint.constant = 0.;
+    containerTrailingConstraint.constant = 0.;
     labelContainer.alpha = 1.;
 }
 
 -(void) markRead
 {
-    labelContainer.center = CGPointMake( self.frame.size.width/2. - dragOvershoot,
-                                         self.contentView.center.y );
+    containerLeadingConstraint.constant = -dragOvershoot;
+    containerTrailingConstraint.constant = -dragOvershoot;
     labelContainer.alpha = 0.25;
 }
 
@@ -123,10 +122,7 @@ static const CGFloat dragOvershoot = 60.;
 {
     if( movingTouch ) return;
     movingTouch = [touches anyObject];
-
-    CGPoint location = [movingTouch locationInView:labelContainer.superview];
-    touchOffset = CGPointMake( labelContainer.center.x - location.x,
-                               labelContainer.center.y - location.y );
+    touchStart = [movingTouch locationInView:labelContainer.superview];
 }
 
 -(void) touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
@@ -135,47 +131,55 @@ static const CGFloat dragOvershoot = 60.;
     if( ![touches containsObject:movingTouch] ) return;
 
     CGPoint location = [movingTouch locationInView:labelContainer.superview];
-    if( reading.read ) {
-        labelContainer.center = CGPointMake( MAX( location.x + touchOffset.x,
-                                                  -dragOvershoot ),
-                                            labelContainer.center.y );
-    }
-    else {
-        labelContainer.center = CGPointMake( MIN( location.x + touchOffset.x,
-                                                  self.frame.size.width/2. ),
-                                             labelContainer.center.y );
-    }
+    CGFloat distanceMoved = location.x - touchStart.x;
+    CGFloat newOffset;
+    if( reading.read )
+        newOffset = -dragOvershoot + distanceMoved;
+    else
+        newOffset = distanceMoved;
+    if( newOffset > 0. ) // rubber band right
+        newOffset /= 2.;
+    if( newOffset < -dragOvershoot ) // rubber band left
+        newOffset = -dragOvershoot - (-dragOvershoot - newOffset)/2.;
+    containerLeadingConstraint.constant = newOffset;
+    containerTrailingConstraint.constant = newOffset;
 }
 
 -(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
 {
+    if( !movingTouch ) return;
+    if( ![touches containsObject:movingTouch] ) return;
     movingTouch = nil;
 
     if( reading.read ) {
         // mark unread?
-        if( labelContainer.frame.origin.x < 0. ) {
+        if( containerLeadingConstraint.constant < 0. ) {
             [UIView animateWithDuration:0.2 animations:^{
                 [self markRead];
+                [self.contentView layoutIfNeeded];
             }];
         }
         else {
             [BRReadingManager readingWasUnread:reading];
             [UIView animateWithDuration:0.2 animations:^{
                 [self markUnread];
+                [self.contentView layoutIfNeeded];
             }];
         }
     }
     else {
         // mark read?
-        if( labelContainer.frame.origin.x < -dragOvershoot ) {
+        if( containerLeadingConstraint.constant <= -dragOvershoot ) {
             [BRReadingManager readingWasRead:reading];
             [UIView animateWithDuration:0.2 animations:^{
                 [self markRead];
+                [self.contentView layoutIfNeeded];
             }];
         }
         else {
             [UIView animateWithDuration:0.2 animations:^{
                 [self markUnread];
+                [self.contentView layoutIfNeeded];
             }];
         }
     }
@@ -183,17 +187,20 @@ static const CGFloat dragOvershoot = 60.;
 
 -(void) touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
 {
-    /* if touch was cancelled, don't change state
-    movingTouch = nil;
+    if( !movingTouch ) return;
+    if( ![touches containsObject:movingTouch] ) return;
 
-    [UIView animateWithDuration:0.2 animations:^{
+    /*
+    if( -[touchStartTime timeIntervalSinceNow] < 0.1 ) {
+        // if touch was cancelled very quickly, don't change state
+        movingTouch = nil;
         [self markReadOrUnread];
-    }];
-     */
-
-    // probably touch cancelled because of scrolling or edge of screen,
-    // so pretend it's the same thing as a purposeful touch end
-    [self touchesEnded:touches withEvent:nil];
+    }
+    else */{
+        // probably touch cancelled because of scrolling or edge of screen,
+        // so pretend it's the same thing as a purposeful touch end
+        [self touchesEnded:touches withEvent:nil];
+    }
 }
 
 @end
