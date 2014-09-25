@@ -10,9 +10,18 @@
 #import "BRReadingManager.h"
 #import "BRTableCell.h"
 
+enum {
+    alertNone,
+    alertResetting,
+    alertShifting
+};
+
+
 @interface BRViewController () <UIAlertViewDelegate>
 {
     NSArray *readings;
+
+    NSInteger alertState;
 }
 
 -(IBAction) resetReadings;
@@ -92,8 +101,13 @@
 
 -(IBAction) resetReadings
 {
-    readings = [BRReadingManager resetReadings];
-    [self.tableView reloadData];
+    [[[UIAlertView alloc] initWithTitle:@"Reset Readings?"
+                                message:nil
+                               delegate:self
+                      cancelButtonTitle:@"Cancel"
+                      otherButtonTitles:@"Reset", nil]
+     show];
+    alertState = alertResetting;
 }
 
 
@@ -110,6 +124,7 @@
     textField.keyboardType = UIKeyboardTypeNumberPad;
 
     [alert show];
+    alertState = alertShifting;
 }
 
 
@@ -118,12 +133,22 @@
 -(void) alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
     if( buttonIndex != alertView.cancelButtonIndex ) {
-        NSInteger shift = [[alertView textFieldAtIndex:0].text integerValue];
-        if( shift > 0 && shift < [readings count] ) {
-            readings = [BRReadingManager shiftReadings:shift];
-            [self.tableView reloadData];
+        switch( alertState ) {
+            case alertResetting:
+                readings = [BRReadingManager resetReadings];
+                [self.tableView reloadData];
+                break;
+            case alertShifting: {
+                NSInteger shift = [[alertView textFieldAtIndex:0].text integerValue];
+                if( shift > 0 && shift < [readings count] ) {
+                    readings = [BRReadingManager shiftReadings:shift];
+                    [self.tableView reloadData];
+                }
+            }
         }
     }
+
+    alertState = alertNone;
 }
 
 @end
