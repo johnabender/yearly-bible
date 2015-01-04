@@ -9,6 +9,11 @@
 #import <Foundation/Foundation.h>
 #import "BRReading.h"
 
+
+FOUNDATION_EXPORT NSString* const BRReadingSchedulePreference;
+FOUNDATION_EXPORT NSString* const BRNotificationCategory;
+
+
 @interface BRReadingManager : NSObject
 
 +(NSArray*) readings;
@@ -21,5 +26,7 @@
 +(void) readingWasUnread:(BRReading*)reading;
 
 +(NSString*) firstDay;
+
++(void) updateScheduledNotifications;
 
 @end

@@ -9,6 +9,7 @@
 #import "BRViewController.h"
 #import "BRReadingManager.h"
 #import "BRTableCell.h"
+#import "bible_reading-Swift.h"
 
 enum {
     alertNone,
@@ -38,11 +39,6 @@ enum {
     readings = [BRReadingManager readings];
     assert( [readings count] == 365 );
 
-    NSDateFormatter *yearFormatter = [NSDateFormatter new];
-    yearFormatter.dateFormat = @"yyyy";
-    NSString *year = [yearFormatter stringFromDate:[NSDate date]];
-    self.navigationItem.title = year;
-
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Readings"
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self.navigationController
@@ -59,6 +55,13 @@ enum {
 -(void) viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+
+    [self.tableView reloadData];
+
+    NSDateFormatter *yearFormatter = [NSDateFormatter new];
+    yearFormatter.dateFormat = @"yyyy";
+    NSString *year = [yearFormatter stringFromDate:[NSDate date]];
+    self.navigationItem.title = year;
 
     [self scrollToFirstUnread];
 }
@@ -77,6 +80,8 @@ enum {
     }
 }
 
+
+#pragma mark - Table view data source
 
 -(NSInteger) numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -99,6 +104,8 @@ enum {
 }
 
 
+#pragma mark - Action handlers
+
 -(IBAction) resetReadings
 {
     [[[UIAlertView alloc] initWithTitle:@"Reset Readings?"
@@ -108,6 +115,14 @@ enum {
                       otherButtonTitles:@"Reset", nil]
      show];
     alertState = alertResetting;
+}
+
+
+-(void) pushSettingsVC
+{
+    UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    BRSettingsViewController *settingsVC = [storyboard instantiateViewControllerWithIdentifier:@"BRSettingsViewController"];
+    [self.navigationController pushViewController:settingsVC animated:YES];
 }
 
 

@@ -7,6 +7,8 @@
 //
 
 #import "BRAppDelegate.h"
+#import "BRReadingManager.h"
+#import "bible_reading-Swift.h"
 
 @implementation BRAppDelegate
 
@@ -31,6 +33,7 @@
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    [BRReadingManager updateScheduledNotifications];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -41,6 +44,43 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+
+-(void) application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
+{
+    // If navigation is still on the settings VC and the user allowed notifications,
+    // then trigger the notifications scheduling UI.
+
+    if( [self.window.rootViewController isKindOfClass:[UINavigationController class]] ) {
+        UINavigationController *navVC = (UINavigationController*)self.window.rootViewController;
+        if( [navVC.topViewController class] == [BRSettingsViewController class] ) {
+            BRSettingsViewController *settingsVC = (BRSettingsViewController*)navVC.topViewController;
+            if( (notificationSettings.types & settingsVC.desiredFlags) != 0 ) {
+                [settingsVC pressedReminderButton];
+            }
+        }
+    }
+}
+
+-(void)        application:(UIApplication *)application
+handleActionWithIdentifier:(NSString *)identifier
+      forLocalNotification:(UILocalNotification *)notification
+         completionHandler:(void (^)())completionHandler
+{
+    // Currently, we only send one kind of local notification, from BRSettingsViewController.
+    // It's a daily reading reminder, and its only action is "mark as read" for that reading.
+
+    BRReading *readingToMark = [[BRReading alloc] initWithDictionary:notification.userInfo];
+
+    for( BRReading *reading in [BRReadingManager readings] ) {
+        if( [reading isEqual:readingToMark] ) {
+            [BRReadingManager readingWasRead:reading];
+            break;
+        }
+    }
+
+    completionHandler();
 }
 
 @end

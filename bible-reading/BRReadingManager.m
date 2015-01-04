@@ -8,10 +8,26 @@
 
 #import "BRReadingManager.h"
 
+
+NSString* const BRReadingSchedulePreference = @"BRReadingSchedulePreference";
+NSString* const BRNotificationCategory = @"BRReadingReminderCategory";
+
+
+static const NSTimeInterval dayInterval = 24.*60.*60.;
+
+
 @implementation BRReadingManager
 
 static NSArray *readings = nil;
 static NSString *firstDay = nil;
+static NSOperationQueue *scheduleQueue = nil;
+
++(void) initialize
+{
+    scheduleQueue = [NSOperationQueue new];
+    scheduleQueue.maxConcurrentOperationCount = 1;
+}
+
 
 +(NSArray*) readings
 {
@@ -155,10 +171,11 @@ static NSString *firstDay = nil;
 
 +(void) save
 {
-    NSArray *dicts = [self dictionaryArrayFromReadingArray:readings];
+    NSArray *dicts = [self dictionaryArrayFromReadingArray:[self readings]];
     [dicts writeToURL:[self fileURL] atomically:YES];
 
     [self updateFirstDay];
+    [self updateScheduledNotifications];
 }
 
 
@@ -172,6 +189,71 @@ static NSString *firstDay = nil;
 +(NSString*) firstDay
 {
     return firstDay;
+}
+
+
++(void) updateScheduledNotifications
+{
+    static const NSUInteger maxNotifications = 64; // iOS max is 64
+
+    [scheduleQueue cancelAllOperations];
+    [scheduleQueue addOperationWithBlock:^{
+        UIApplication *app = [UIApplication sharedApplication];
+        [app cancelAllLocalNotifications];
+
+        NSDate *noteDate = (NSDate*)[[NSUserDefaults standardUserDefaults] objectForKey:BRReadingSchedulePreference];
+        if( [noteDate isKindOfClass:[NSDate class]] ) {
+            NSDate *nextDate = [self nextScheduledDateForTime:noteDate];
+
+            NSMutableArray *notifications = [NSMutableArray arrayWithCapacity:maxNotifications];
+
+            for( BRReading *reading in [self readings] ) {
+                if( !reading.read ) {
+                    UILocalNotification *note = [UILocalNotification new];
+                    note.category = BRNotificationCategory;
+                    note.userInfo = [reading dictionaryRepresentation];
+                    note.alertBody = [NSString stringWithFormat:@"%@: %@", reading.day, reading.passage];
+                    note.fireDate = nextDate;
+
+                    [notifications addObject:note];
+                    if( [notifications count] == maxNotifications ) break;
+
+                    nextDate = [NSDate dateWithTimeInterval:dayInterval sinceDate:nextDate];
+                }
+            }
+
+            app.scheduledLocalNotifications = notifications;
+        }
+    }];
+}
+
++(NSDate*) nextScheduledDateForTime:(NSDate*)hourMinute
+{
+    static NSDateFormatter *dateFormatter = nil;
+    static NSDateFormatter *timeFormatter = nil;
+    static NSDateFormatter *scheduleFormatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        dateFormatter = [NSDateFormatter new];
+        dateFormatter.dateFormat = @"yyyy-MM-dd";
+        timeFormatter = [NSDateFormatter new];
+        timeFormatter.dateFormat = @"HH:mm";
+        scheduleFormatter = [NSDateFormatter new];
+        scheduleFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm";
+    });
+
+    NSString *date = [dateFormatter stringFromDate:[NSDate date]];
+    NSString *time = [timeFormatter stringFromDate:hourMinute];
+    NSString *scheduleString = [NSString stringWithFormat:@"%@T%@", date, time];
+    NSDate *scheduleDate = [scheduleFormatter dateFromString:scheduleString];
+    if( [scheduleDate timeIntervalSinceNow] < 5. ) {
+        // don't schedule less than 5 s in the future
+        NSDate *newDate = [NSDate dateWithTimeIntervalSinceNow:dayInterval];
+        date = [dateFormatter stringFromDate:newDate];
+        scheduleString = [NSString stringWithFormat:@"%@T%@", date, time];
+        scheduleDate = [scheduleFormatter dateFromString:scheduleString];
+    }
+    return scheduleDate;
 }
 
 
@@ -542,7 +624,7 @@ static NSString *firstDay = nil;
              @{@"day": @"Dec. 28", @"passage": @"Malachi"},
              @{@"day": @"Dec. 29", @"passage": @"Acts 27-28"},
              @{@"day": @"Dec. 30", @"passage": @"Rev. 20-22"},
-             @{@"day": @"Dec. 31", @"passage": @"Deut. 32-33"},
+             @{@"day": @"Dec. 31", @"passage": @"Deut. 32-34"},
              ];
 }
 

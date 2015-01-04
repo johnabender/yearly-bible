@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="51r-4A-Hmk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="51r-4A-Hmk">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <scenes>
@@ -75,9 +75,7 @@
                             <outlet property="delegate" destination="KHK-F6-h1y" id="UMe-tp-gec"/>
                         </connections>
                     </tableView>
-                    <toolbarItems>
-                        <barButtonItem title="Item" id="6uw-Xw-o6H"/>
-                    </toolbarItems>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" id="9aK-Yt-aHC">
                         <nil key="title"/>
                         <barButtonItem key="leftBarButtonItem" title="Reset" id="Wou-Sm-qSW">
@@ -85,32 +83,46 @@
                                 <action selector="resetReadings" destination="KHK-F6-h1y" id="nBm-ov-2cu"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title="Info" id="mWd-9X-P31">
+                        <barButtonItem key="rightBarButtonItem" title="Settings" id="mWd-9X-P31">
                             <connections>
-                                <segue destination="Qjp-iw-dnZ" kind="push" id="AOR-rl-R29"/>
+                                <segue destination="p54-sg-WgX" kind="push" id="fWL-wE-gaK"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3Tg-9r-pTa" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-4" y="259"/>
         </scene>
-        <!--View Controller-->
-        <scene sceneID="l1D-7r-4g2">
+        <!--Settings View Controller-->
+        <scene sceneID="ifw-NJ-s3d">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="Qjp-iw-dnZ" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="BRSettingsViewController" id="p54-sg-WgX" customClass="BRSettingsViewController" customModule="bible_reading" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="VNs-Kp-ZFV"/>
-                        <viewControllerLayoutGuide type="bottom" id="BHf-JK-igD"/>
+                        <viewControllerLayoutGuide type="top" id="NuJ-XN-eqy"/>
+                        <viewControllerLayoutGuide type="bottom" id="sNN-Os-hFK"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="JIi-ON-SE1">
+                    <view key="view" contentMode="scaleToFill" id="lJ3-lV-kh6">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QFp-yN-aIo">
-                                <rect key="frame" x="20" y="84" width="280" height="464"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WmK-Dk-ZOx">
+                                <rect key="frame" x="16" y="72" width="142" height="30"/>
+                                <state key="normal" title="Schedule Reminders">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="pressedReminderButton" destination="p54-sg-WgX" eventType="touchUpInside" id="s7F-iz-czH"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RhN-iR-0aa">
+                                <rect key="frame" x="166" y="76" width="138" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QFp-yN-aIo">
+                                <rect key="frame" x="16" y="110" width="288" height="438"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                                 <string key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.
 
@@ -131,19 +143,59 @@ The daily divisions have been tuned over the course of several years for both co
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-                        <constraints>
-                            <constraint firstItem="QFp-yN-aIo" firstAttribute="top" secondItem="JIi-ON-SE1" secondAttribute="top" constant="84" id="5c3-eJ-DtH"/>
-                            <constraint firstAttribute="trailing" secondItem="QFp-yN-aIo" secondAttribute="trailing" constant="20" id="7iX-84-2Sc"/>
-                            <constraint firstItem="QFp-yN-aIo" firstAttribute="leading" secondItem="JIi-ON-SE1" secondAttribute="leading" constant="20" id="YGn-WI-kLb"/>
-                            <constraint firstAttribute="bottom" secondItem="QFp-yN-aIo" secondAttribute="bottom" constant="20" id="t0e-zd-ysM"/>
-                        </constraints>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <navigationItem key="navigationItem" id="tyD-u0-hsF"/>
+                    <navigationItem key="navigationItem" id="otN-Zj-l7v"/>
+                    <connections>
+                        <outlet property="scheduleButton" destination="WmK-Dk-ZOx" id="t0A-C5-o2P"/>
+                        <outlet property="scheduleLabel" destination="RhN-iR-0aa" id="Jf2-35-x0M"/>
+                    </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="oeh-RA-ynM" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Jqs-Bc-RtA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="502" y="259"/>
+            <point key="canvasLocation" x="512" y="259"/>
+        </scene>
+        <!--Date Picker View Controller-->
+        <scene sceneID="VRv-67-wQS">
+            <objects>
+                <viewController storyboardIdentifier="BRDatePicker" id="2Zl-Ek-E40" customClass="BRDatePickerViewController" customModule="bible_reading" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="Ejk-UG-xLg"/>
+                        <viewControllerLayoutGuide type="bottom" id="wro-X9-oEg"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="S0p-Yr-pSc">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <datePicker contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="38B-fv-x6N">
+                                <rect key="frame" x="0.0" y="406" width="320" height="162"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <date key="date" timeIntervalSinceReferenceDate="442021993.91247398">
+                                    <!--2015-01-03 23:53:13 +0000-->
+                                </date>
+                            </datePicker>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="NuT-or-GIQ">
+                                <rect key="frame" x="0.0" y="362" width="320" height="44"/>
+                                <items>
+                                    <barButtonItem title="Choose reminder time" style="plain" id="DmU-pL-9fn"/>
+                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="Hen-cY-nQU"/>
+                                    <barButtonItem style="done" systemItem="done" id="ah2-2R-wOp">
+                                        <connections>
+                                            <action selector="pressedDoneButton" destination="2Zl-Ek-E40" id="Ygb-Kw-x1A"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <connections>
+                        <outlet property="datePicker" destination="38B-fv-x6N" id="jKY-Un-m5M"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="T5H-aU-LnO" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="952" y="259"/>
         </scene>
     </scenes>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

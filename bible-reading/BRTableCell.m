@@ -66,7 +66,7 @@ static const CGFloat dragOvershoot = 60.;
     }
     if( year == yearInit ) return readingDate; // save computation if no change
 
-    return [self dateFromString:string inYear:[NSString stringWithFormat:@"%d", year]];
+    return [self dateFromString:string inYear:[NSString stringWithFormat:@"%d", (int)year]];
 }
 
 -(void) populateWithReading:(BRReading*)reading_ firstDay:(NSString*)firstDay

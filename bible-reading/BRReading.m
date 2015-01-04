@@ -32,4 +32,14 @@
     return [NSDictionary dictionaryWithDictionary:dict];
 }
 
+-(BOOL) isEqual:(BRReading*)other
+{
+    return ([self.day isEqualToString:other.day] && [self.passage isEqualToString:other.passage]);
+}
+
+-(NSString*) description
+{
+    return [NSString stringWithFormat:@"%@: %@ [%c]", self.day, self.passage, self.read? 'x' : ' '];
+}
+
 @end
