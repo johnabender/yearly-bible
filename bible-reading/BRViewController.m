@@ -36,9 +36,6 @@ enum {
 {
     [super viewDidLoad];
 
-    readings = [BRReadingManager readings];
-    assert( [readings count] == 365 );
-
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Readings"
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self.navigationController
@@ -52,9 +49,13 @@ enum {
     self.navigationItem.leftBarButtonItems = @[self.navigationItem.leftBarButtonItem, toggleItem];
 }
 
--(void) viewDidAppear:(BOOL)animated
+
+-(void) viewWillAppear:(BOOL)animated
 {
-    [super viewDidAppear:animated];
+    [super viewWillAppear:animated];
+
+    readings = [BRReadingManager readings];
+    assert( [readings count] == 365 );
 
     [self.tableView reloadData];
 
@@ -62,6 +63,12 @@ enum {
     yearFormatter.dateFormat = @"yyyy";
     NSString *year = [yearFormatter stringFromDate:[NSDate date]];
     self.navigationItem.title = year;
+}
+
+
+-(void) viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
 
     [self scrollToFirstUnread];
 }

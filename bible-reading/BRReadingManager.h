@@ -14,9 +14,18 @@ FOUNDATION_EXPORT NSString* const BRReadingSchedulePreference;
 FOUNDATION_EXPORT NSString* const BRNotificationCategory;
 
 
+typedef NS_ENUM(NSInteger, BRReadingType) {
+    BRReadingTypeSequential,
+    BRReadingTypeTopical
+};
+
+
 @interface BRReadingManager : NSObject
 
 +(NSArray*) readings;
+
++(BRReadingType) readingType;
++(void) setReadingType:(BRReadingType)newType;
 
 +(NSArray*) resetReadings;
 

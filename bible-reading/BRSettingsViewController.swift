@@ -13,12 +13,17 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
     @IBOutlet var scheduleButton: UIButton?
     @IBOutlet var scheduleLabel: UILabel?
 
+    @IBOutlet var orderControl: UISegmentedControl?
+    @IBOutlet var topicalText: UITextView?
+    @IBOutlet var sequentialText: UITextView?
+
     let desiredFlags = UIUserNotificationType.Sound | UIUserNotificationType.Alert
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         self.updateButtonTitle()
+        self.updateExplanatoryText()
     }
 
     override func viewWillAppear(animated: Bool) {
@@ -34,22 +39,24 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
     }
 
     func updateButtonTitle() {
+        var wasSet = false
         if scheduleButton != nil {
             if self.isSchedulePrefSet() {
-                scheduleButton!.setTitle("Stop Reminders", forState: UIControlState.Normal)
-
                 if let savedDate: AnyObject = NSUserDefaults.standardUserDefaults().objectForKey(BRReadingSchedulePreference)? {
                     if let scheduleDate = savedDate as? NSDate {
+                        wasSet = true
+                        scheduleButton!.setTitle("Stop Reminders", forState: UIControlState.Normal)
                         let timeFormatter = NSDateFormatter()
                         timeFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
                         let scheduleString = timeFormatter.stringFromDate(scheduleDate)
                         scheduleLabel!.text = NSString(format: "Daily at %@", scheduleString)
                     }
                 }
-            } else {
-                scheduleButton!.setTitle("Schedule Reminders", forState: UIControlState.Normal)
-                scheduleLabel!.text = ""
             }
+        }
+        if !wasSet {
+            scheduleButton!.setTitle("Schedule Reminders", forState: UIControlState.Normal)
+            scheduleLabel!.text = ""
         }
     }
 
@@ -95,5 +102,23 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
         NSUserDefaults.standardUserDefaults().setObject(date, forKey: BRReadingSchedulePreference)
         BRReadingManager.updateScheduledNotifications()
         self.updateButtonTitle()
+    }
+
+    @IBAction func changedOrderSelection() {
+        BRReadingManager.setReadingType(BRReadingType(rawValue: orderControl!.selectedSegmentIndex)!)
+        self.updateExplanatoryText()
+    }
+
+    func updateExplanatoryText() {
+        switch BRReadingManager.readingType() {
+        case .Sequential:
+            topicalText!.hidden = true
+            sequentialText!.hidden = false
+            orderControl!.selectedSegmentIndex = 0 // should cast the readingType, but Swift
+        case .Topical:
+            topicalText!.hidden = false
+            sequentialText!.hidden = true
+            orderControl!.selectedSegmentIndex = 1
+        }
     }
 }
