@@ -34,24 +34,17 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
         super.didReceiveMemoryWarning()
     }
 
-    func isSchedulePrefSet() -> Bool {
-        return NSUserDefaults.standardUserDefaults().objectForKey(BRReadingSchedulePreference) != nil
-    }
-
     func updateButtonTitle() {
         var wasSet = false
         if scheduleButton != nil {
-            if self.isSchedulePrefSet() {
-                if let savedDate: AnyObject = NSUserDefaults.standardUserDefaults().objectForKey(BRReadingSchedulePreference)? {
-                    if let scheduleDate = savedDate as? NSDate {
-                        wasSet = true
-                        scheduleButton!.setTitle("Stop Reminders", forState: UIControlState.Normal)
-                        let timeFormatter = NSDateFormatter()
-                        timeFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
-                        let scheduleString = timeFormatter.stringFromDate(scheduleDate)
-                        scheduleLabel!.text = NSString(format: "Daily at %@", scheduleString)
-                    }
-                }
+            if BRReadingManager.isReadingScheduleSet() {
+                let savedDate = BRReadingManager.readingSchedule()
+                wasSet = true
+                scheduleButton!.setTitle("Stop Reminders", forState: UIControlState.Normal)
+                let timeFormatter = NSDateFormatter()
+                timeFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
+                let scheduleString = timeFormatter.stringFromDate(savedDate)
+                scheduleLabel!.text = NSString(format: "Daily at %@", scheduleString)
             }
         }
         if !wasSet {
@@ -61,8 +54,8 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
     }
 
     @IBAction func pressedReminderButton() {
-        if self.isSchedulePrefSet() {
-            NSUserDefaults.standardUserDefaults().removeObjectForKey(BRReadingSchedulePreference)
+        if BRReadingManager.isReadingScheduleSet() {
+            BRReadingManager.setReadingSchedule(nil)
             BRReadingManager.updateScheduledNotifications()
             self.updateButtonTitle()
         } else {
@@ -99,7 +92,7 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
 
     func datePickerSelectedDate(date: NSDate) {
         self.dismissViewControllerAnimated(true, completion: nil)
-        NSUserDefaults.standardUserDefaults().setObject(date, forKey: BRReadingSchedulePreference)
+        BRReadingManager.setReadingSchedule(date)
         BRReadingManager.updateScheduledNotifications()
         self.updateButtonTitle()
     }

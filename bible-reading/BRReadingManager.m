@@ -68,18 +68,42 @@ static NSOperationQueue *scheduleQueue = nil;
 }
 
 
+#pragma mark - Reading type
+
 +(BRReadingType) readingType
 {
-    return (BRReadingType)[[NSUserDefaults standardUserDefaults] integerForKey:BRReadingSchedulePreference];
+    return (BRReadingType)[[NSUserDefaults standardUserDefaults] integerForKey:BRReadingTypePreference];
 }
 
 +(void) setReadingType:(BRReadingType)newType
 {
     if( newType != [self readingType] ) {
         readings = nil;
-        [[NSUserDefaults standardUserDefaults] setInteger:newType forKey:BRReadingSchedulePreference];
+        [[NSUserDefaults standardUserDefaults] setInteger:newType forKey:BRReadingTypePreference];
     }
 }
+
+
+#pragma mark - Reading schedule
+
++(BOOL) isReadingScheduleSet
+{
+    return ([self readingSchedule] != nil);
+}
+
++(NSDate*) readingSchedule
+{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:BRReadingSchedulePreference];
+}
+
++(void) setReadingSchedule:(NSDate*)scheduleDate
+{
+    if( scheduleDate == nil )
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:BRReadingSchedulePreference];
+    else
+        [[NSUserDefaults standardUserDefaults] setObject:scheduleDate forKey:BRReadingSchedulePreference];
+}
+
 
 
 +(void) readingWasRead:(BRReading*)reading
