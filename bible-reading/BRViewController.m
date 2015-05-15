@@ -18,12 +18,14 @@ enum {
 };
 
 
-@interface BRViewController () <UIAlertViewDelegate>
+@interface BRViewController () <UIAlertViewDelegate, UITableViewDataSource, UITableViewDelegate>
 {
     NSArray *readings;
 
     NSInteger alertState;
 }
+
+@property (nonatomic, weak) IBOutlet UITableView *tableView;
 
 -(IBAction) resetReadings;
 
@@ -36,7 +38,7 @@ enum {
 {
     [super viewDidLoad];
 
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Readings"
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@" Readings"
                                                                              style:UIBarButtonItemStylePlain
                                                                             target:self.navigationController
                                                                             action:@selector(popViewControllerAnimated:)];
@@ -111,12 +113,27 @@ enum {
 }
 
 
+#pragma mark - Table view delegate
+
+-(CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+    return 64.;
+}
+
+-(UIView*) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
+{
+    UIView *v = [[UIView alloc] initWithFrame:CGRectMake( 0., 0., self.view.frame.size.width, 64. )];
+    v.backgroundColor = [UIColor clearColor];
+    return v;
+}
+
+
 #pragma mark - Action handlers
 
 -(IBAction) resetReadings
 {
     [[[UIAlertView alloc] initWithTitle:@"Reset Readings?"
-                                message:nil
+                                message:@"Mark all readings unread and remove calendar shift."
                                delegate:self
                       cancelButtonTitle:@"Cancel"
                       otherButtonTitles:@"Reset", nil]
@@ -135,8 +152,19 @@ enum {
 
 -(void) tapHandler
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Days to Shift"
-                                                    message:@"Enter number of days to shift."
+    NSUInteger dayOfYear = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierISO8601]
+                            ordinalityOfUnit:NSCalendarUnitDay
+                            inUnit:NSCalendarUnitYear
+                            forDate:[NSDate date]];
+    NSString *suffix = @"th";
+    if( dayOfYear % 10 == 1 ) suffix = @"st";
+    else if( dayOfYear % 10 == 2 ) suffix = @"nd";
+    else if( dayOfYear % 10 == 3 ) suffix = @"rd";
+    NSString *message = [NSString stringWithFormat:@"You can slide the calendar to start reading any day of the year. For example, today is the %d%@ day of the year, so to start reading today, you could shift the calendar by %d days.\n\nEnter number of days to shift.",
+                         (int)dayOfYear, suffix, (int)dayOfYear - 1];
+
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Shift Calendar"
+                                                    message:message
                                                    delegate:self
                                           cancelButtonTitle:@"Cancel"
                                           otherButtonTitles:@"Shift", nil];
@@ -144,6 +172,7 @@ enum {
 
     UITextField *textField = [alert textFieldAtIndex:0];
     textField.keyboardType = UIKeyboardTypeNumberPad;
+    textField.text = [NSString stringWithFormat:@"%d", (int)dayOfYear - 1];
 
     [alert show];
     alertState = alertShifting;

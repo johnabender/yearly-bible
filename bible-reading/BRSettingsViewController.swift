@@ -44,7 +44,7 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
                 let timeFormatter = NSDateFormatter()
                 timeFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
                 let scheduleString = timeFormatter.stringFromDate(savedDate)
-                scheduleLabel!.text = NSString(format: "Daily at %@", scheduleString)
+                scheduleLabel!.text = String(format: "Daily at %@", scheduleString)
             }
         }
         if !wasSet {
@@ -85,7 +85,7 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
     func scheduleReminder() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let vc: AnyObject! = storyboard.instantiateViewControllerWithIdentifier("BRDatePicker")
-        let datePickerVC = vc as BRDatePickerViewController
+        let datePickerVC = vc as! BRDatePickerViewController
         datePickerVC.delegate = self
         self.presentViewController(datePickerVC, animated: true, completion: nil)
     }

@@ -205,7 +205,7 @@ static NSOperationQueue *scheduleQueue = nil;
 +(NSURL*) fileURL:(BRReadingType)readingType
 {
     NSURL *documentsPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-    NSString *fileName = [NSString stringWithFormat:@"My Readings %d.plist", [self readingType]];
+    NSString *fileName = [NSString stringWithFormat:@"My Readings %d.plist", ((int)[self readingType])];
     return [documentsPath URLByAppendingPathComponent:fileName];
 }
 
@@ -235,7 +235,7 @@ static NSOperationQueue *scheduleQueue = nil;
 
 +(void) updateScheduledNotifications
 {
-    static const NSUInteger maxNotifications = 7; // iOS max is 64
+    static const NSUInteger maxNotifications = 64; // iOS max is 64
 
     [scheduleQueue cancelAllOperations];
     [scheduleQueue addOperationWithBlock:^{

@@ -15,6 +15,13 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
+
+    //for( NSString *name in [UIFont familyNames] ) DLog( @"%@", name );
+    UIFont *navFont = [UIFont fontWithName:@"Freebooter Script" size:20.];
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}];
+    [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}
+                                                forState:UIControlStateNormal];
+
     return YES;
 }
 							

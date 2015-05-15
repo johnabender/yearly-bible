@@ -28,7 +28,8 @@ static const CGFloat dragOvershoot = 60.;
     mayFormatter.dateFormat = @"MMM d yyyy";
 
     outputFormatter = [NSDateFormatter new];
-    outputFormatter.dateFormat = @"EEE, MMM. d";
+    outputFormatter.dateFormat = @"EEE., MMM. d";
+    // need May output formatter, without period
 
     yearFormatter = [NSDateFormatter new];
     yearFormatter.dateFormat = @"yyyy";
@@ -36,6 +37,7 @@ static const CGFloat dragOvershoot = 60.;
     firstFormatter = [NSDateFormatter new];
     firstFormatter.dateFormat = @"HH:mm:ss yyyy MM dd";
 }
+
 
 -(NSDate*) dateFromString:(NSString*)string inYear:(NSString*)yearString
 {
@@ -113,7 +115,7 @@ static const CGFloat dragOvershoot = 60.;
 -(void) markRead
 {
     containerLeadingConstraint.constant = -dragOvershoot;
-    containerTrailingConstraint.constant = -dragOvershoot;
+    containerTrailingConstraint.constant = dragOvershoot;
     labelContainer.alpha = 0.25;
 }
 
@@ -142,7 +144,7 @@ static const CGFloat dragOvershoot = 60.;
     if( newOffset < -dragOvershoot ) // rubber band left
         newOffset = -dragOvershoot - (-dragOvershoot - newOffset)/2.;
     containerLeadingConstraint.constant = newOffset;
-    containerTrailingConstraint.constant = newOffset;
+    containerTrailingConstraint.constant = -newOffset;
 }
 
 -(void) touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
