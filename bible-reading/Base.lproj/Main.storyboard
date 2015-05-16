@@ -134,19 +134,24 @@
                             <constraint firstAttribute="bottom" secondItem="vDA-Vg-K87" secondAttribute="bottom" id="nM0-ia-XOG"/>
                         </constraints>
                     </view>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" id="9aK-Yt-aHC">
                         <nil key="title"/>
-                        <barButtonItem key="leftBarButtonItem" title=" Reset" id="Wou-Sm-qSW">
+                        <barButtonItem key="backBarButtonItem" title=" Readings" id="yy8-Rw-MNW"/>
+                        <barButtonItem key="leftBarButtonItem" title=" Reset   " id="Wou-Sm-qSW">
+                            <color key="tintColor" red="0.94509803921568625" green="0.34509803921568627" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <action selector="resetReadings" destination="BNg-m8-Fbl" id="Eph-rF-kSJ"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title=" Settings" id="mWd-9X-P31">
+                            <color key="tintColor" red="0.94509803921568625" green="0.34509803921568627" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <segue destination="p54-sg-WgX" kind="push" id="fWL-wE-gaK"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="tableView" destination="Jks-Qs-cru" id="MJL-zE-qpS"/>
                     </connections>

@@ -38,16 +38,13 @@ enum {
 {
     [super viewDidLoad];
 
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@" Readings"
-                                                                             style:UIBarButtonItemStylePlain
-                                                                            target:self.navigationController
-                                                                            action:@selector(popViewControllerAnimated:)];
-
-    UIBarButtonItem *toggleItem = [[UIBarButtonItem alloc] initWithTitle:@"  ^ "
+    UIBarButtonItem *toggleItem = [[UIBarButtonItem alloc] initWithTitle:@"  Shift   "
                                                                    style:UIBarButtonItemStylePlain
                                                                   target:self
                                                                   action:@selector(tapHandler)];
-    toggleItem.tintColor = [UIColor colorWithRed:1. green:0. blue:0. alpha:0.7];
+    // Note, this color is ever so slightly different than the one specified for the
+    // nav items in the storyboard. They're calibrated to render identically.
+    toggleItem.tintColor = [UIColor colorWithRed:0.92 green:0.255 blue:0.027 alpha:1.];
     self.navigationItem.leftBarButtonItems = @[self.navigationItem.leftBarButtonItem, toggleItem];
 }
 
