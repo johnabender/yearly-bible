@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		C3200E0B1B05A97600F957DD /* BRMarginLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = C3200E0A1B05A97600F957DD /* BRMarginLabel.m */; };
+		C3200E0D1B0708E400F957DD /* GenBasR.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3200E0C1B0708D400F957DD /* GenBasR.ttf */; };
 		C326EB5E188328160003A1F0 /* BRReading.m in Sources */ = {isa = PBXBuildFile; fileRef = C326EB5D188328160003A1F0 /* BRReading.m */; };
 		C32E921B1A58DE9800A486B6 /* BRDatePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32E921A1A58DE9800A486B6 /* BRDatePickerViewController.swift */; };
 		C33F6E3E1880CF6700D9AA77 /* BRTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C33F6E3D1880CF6700D9AA77 /* BRTableCell.m */; };
@@ -46,6 +47,7 @@
 /* Begin PBXFileReference section */
 		C3200E091B05A97600F957DD /* BRMarginLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRMarginLabel.h; sourceTree = "<group>"; };
 		C3200E0A1B05A97600F957DD /* BRMarginLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRMarginLabel.m; sourceTree = "<group>"; };
+		C3200E0C1B0708D400F957DD /* GenBasR.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GenBasR.ttf; sourceTree = "<group>"; };
 		C326EB5C188328160003A1F0 /* BRReading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRReading.h; sourceTree = "<group>"; };
 		C326EB5D188328160003A1F0 /* BRReading.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRReading.m; sourceTree = "<group>"; };
 		C32E921A1A58DE9800A486B6 /* BRDatePickerViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRDatePickerViewController.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 			isa = PBXGroup;
 			children = (
 				C3EC1ECD1AF6F146006DA656 /* freebooterscript.ttf */,
+				C3200E0C1B0708D400F957DD /* GenBasR.ttf */,
 				C341C20A1A9908DC005E951C /* Launch Screen.xib */,
 				C38E66541AF6695000EC5EDB /* bg@2x.png */,
 				C38E66551AF6695000EC5EDB /* bg@3x.png */,
@@ -272,6 +275,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3200E0D1B0708E400F957DD /* GenBasR.ttf in Resources */,
 				C3EC1ECE1AF6F377006DA656 /* freebooterscript.ttf in Resources */,
 				C38E66571AF6695000EC5EDB /* bg@3x.png in Resources */,
 				C3FBEA50187A56840040D082 /* Images.xcassets in Resources */,

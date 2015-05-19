@@ -22,16 +22,12 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        let font = UIFont(name: "Gentium Basic", size:15.0)!
+        orderControl?.setTitleTextAttributes([NSFontAttributeName: font], forState: .Normal)
+        //UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName: font], forState: .Normal)
+
         self.updateButtonTitle()
         self.updateExplanatoryText()
-    }
-
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
     }
 
     func updateButtonTitle() {

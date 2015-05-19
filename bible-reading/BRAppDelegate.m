@@ -19,8 +19,9 @@
     //for( NSString *name in [UIFont familyNames] ) DLog( @"%@", name );
     UIFont *navFont = [UIFont fontWithName:@"Freebooter Script" size:20.];
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}];
-    [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}
-                                                forState:UIControlStateNormal];
+    [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
+     setTitleTextAttributes:@{NSFontAttributeName: navFont}
+     forState:UIControlStateNormal];
 
     return YES;
 }

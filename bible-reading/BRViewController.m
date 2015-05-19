@@ -72,6 +72,14 @@ enum {
     [self scrollToFirstUnread];
 }
 
+-(void) changeFont
+{
+    DLog();
+    UIFont *navFont = [UIFont fontWithName:@"Freebooter Script" size:20.];
+    [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}
+                                                forState:UIControlStateNormal];
+}
+
 
 -(void) scrollToFirstUnread
 {
