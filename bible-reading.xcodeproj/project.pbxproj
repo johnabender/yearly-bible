@@ -13,10 +13,13 @@
 		C32E921B1A58DE9800A486B6 /* BRDatePickerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32E921A1A58DE9800A486B6 /* BRDatePickerViewController.swift */; };
 		C33F6E3E1880CF6700D9AA77 /* BRTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C33F6E3D1880CF6700D9AA77 /* BRTableCell.m */; };
 		C341C20B1A9908DC005E951C /* Launch Screen.xib in Resources */ = {isa = PBXBuildFile; fileRef = C341C20A1A9908DC005E951C /* Launch Screen.xib */; };
+		C368E39D1B127C7C00BF4230 /* cover@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C368E39B1B127C7C00BF4230 /* cover@2x.png */; };
+		C368E39E1B127C7C00BF4230 /* cover@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C368E39C1B127C7C00BF4230 /* cover@3x.png */; };
 		C36A76FD1A2259FB00E4FD35 /* BRSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36A76FC1A2259FB00E4FD35 /* BRSettingsViewController.swift */; };
 		C38E66561AF6695000EC5EDB /* bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C38E66541AF6695000EC5EDB /* bg@2x.png */; };
 		C38E66571AF6695000EC5EDB /* bg@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C38E66551AF6695000EC5EDB /* bg@3x.png */; };
-		C3EC1ECE1AF6F377006DA656 /* freebooterscript.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3EC1ECD1AF6F146006DA656 /* freebooterscript.ttf */; };
+		C3BB3FDB1B12861200446061 /* BRCoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C3BB3FDA1B12861200446061 /* BRCoverViewController.m */; };
+		C3DA6B1E1B1232C3007DFE9F /* HenryMorganHand.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3DA6B1D1B1232C3007DFE9F /* HenryMorganHand.ttf */; };
 		C3FBEA38187A56840040D082 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3FBEA37187A56840040D082 /* Foundation.framework */; };
 		C3FBEA3A187A56840040D082 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3FBEA39187A56840040D082 /* CoreGraphics.framework */; };
 		C3FBEA3C187A56840040D082 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3FBEA3B187A56840040D082 /* UIKit.framework */; };
@@ -54,11 +57,15 @@
 		C33F6E3C1880CF6700D9AA77 /* BRTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRTableCell.h; sourceTree = "<group>"; };
 		C33F6E3D1880CF6700D9AA77 /* BRTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRTableCell.m; sourceTree = "<group>"; };
 		C341C20A1A9908DC005E951C /* Launch Screen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = "Launch Screen.xib"; sourceTree = "<group>"; };
+		C368E39B1B127C7C00BF4230 /* cover@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "cover@2x.png"; path = "assets/cover@2x.png"; sourceTree = SOURCE_ROOT; };
+		C368E39C1B127C7C00BF4230 /* cover@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "cover@3x.png"; path = "assets/cover@3x.png"; sourceTree = SOURCE_ROOT; };
 		C36A76FB1A2259FB00E4FD35 /* bible-reading-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "bible-reading-Bridging-Header.h"; sourceTree = "<group>"; };
 		C36A76FC1A2259FB00E4FD35 /* BRSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRSettingsViewController.swift; sourceTree = "<group>"; };
 		C38E66541AF6695000EC5EDB /* bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bg@2x.png"; path = "assets/bg@2x.png"; sourceTree = SOURCE_ROOT; };
 		C38E66551AF6695000EC5EDB /* bg@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bg@3x.png"; path = "assets/bg@3x.png"; sourceTree = SOURCE_ROOT; };
-		C3EC1ECD1AF6F146006DA656 /* freebooterscript.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = freebooterscript.ttf; sourceTree = "<group>"; };
+		C3BB3FD91B12861200446061 /* BRCoverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRCoverViewController.h; sourceTree = "<group>"; };
+		C3BB3FDA1B12861200446061 /* BRCoverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRCoverViewController.m; sourceTree = "<group>"; };
+		C3DA6B1D1B1232C3007DFE9F /* HenryMorganHand.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = HenryMorganHand.ttf; sourceTree = "<group>"; };
 		C3FBEA34187A56840040D082 /* bible-reading.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "bible-reading.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C3FBEA37187A56840040D082 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		C3FBEA39187A56840040D082 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -142,6 +149,8 @@
 				C3FBEA46187A56840040D082 /* BRAppDelegate.h */,
 				C3FBEA47187A56840040D082 /* BRAppDelegate.m */,
 				C3FBEA49187A56840040D082 /* Main.storyboard */,
+				C3BB3FD91B12861200446061 /* BRCoverViewController.h */,
+				C3BB3FDA1B12861200446061 /* BRCoverViewController.m */,
 				C3FBEA4C187A56840040D082 /* BRViewController.h */,
 				C3FBEA4D187A56840040D082 /* BRViewController.m */,
 				C36A76FC1A2259FB00E4FD35 /* BRSettingsViewController.swift */,
@@ -164,11 +173,13 @@
 		C3FBEA3E187A56840040D082 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				C3EC1ECD1AF6F146006DA656 /* freebooterscript.ttf */,
+				C3DA6B1D1B1232C3007DFE9F /* HenryMorganHand.ttf */,
 				C3200E0C1B0708D400F957DD /* GenBasR.ttf */,
 				C341C20A1A9908DC005E951C /* Launch Screen.xib */,
 				C38E66541AF6695000EC5EDB /* bg@2x.png */,
 				C38E66551AF6695000EC5EDB /* bg@3x.png */,
+				C368E39B1B127C7C00BF4230 /* cover@2x.png */,
+				C368E39C1B127C7C00BF4230 /* cover@3x.png */,
 				C3FBEA3F187A56840040D082 /* bible-reading-Info.plist */,
 				C3FBEA40187A56840040D082 /* InfoPlist.strings */,
 				C3FBEA43187A56840040D082 /* main.m */,
@@ -276,9 +287,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3200E0D1B0708E400F957DD /* GenBasR.ttf in Resources */,
-				C3EC1ECE1AF6F377006DA656 /* freebooterscript.ttf in Resources */,
 				C38E66571AF6695000EC5EDB /* bg@3x.png in Resources */,
+				C3DA6B1E1B1232C3007DFE9F /* HenryMorganHand.ttf in Resources */,
 				C3FBEA50187A56840040D082 /* Images.xcassets in Resources */,
+				C368E39D1B127C7C00BF4230 /* cover@2x.png in Resources */,
+				C368E39E1B127C7C00BF4230 /* cover@3x.png in Resources */,
 				C341C20B1A9908DC005E951C /* Launch Screen.xib in Resources */,
 				C3FBEA42187A56840040D082 /* InfoPlist.strings in Resources */,
 				C3FBEA4B187A56840040D082 /* Main.storyboard in Resources */,
@@ -303,6 +316,7 @@
 			files = (
 				C326EB5E188328160003A1F0 /* BRReading.m in Sources */,
 				C3FBEA4E187A56840040D082 /* BRViewController.m in Sources */,
+				C3BB3FDB1B12861200446061 /* BRCoverViewController.m in Sources */,
 				C3200E0B1B05A97600F957DD /* BRMarginLabel.m in Sources */,
 				C3FBEA48187A56840040D082 /* BRAppDelegate.m in Sources */,
 				C33F6E3E1880CF6700D9AA77 /* BRTableCell.m in Sources */,

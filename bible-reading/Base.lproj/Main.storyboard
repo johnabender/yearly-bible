@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7702" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="51r-4A-Hmk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14D136" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="Izj-FN-QYw">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7701"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <customFonts key="customFonts">
@@ -11,18 +11,64 @@
             <string>GentiumBasic</string>
             <string>GentiumBasic</string>
         </mutableArray>
-        <mutableArray key="freebooterscript.ttf">
-            <string>FreebooterScript</string>
-            <string>FreebooterScript</string>
+        <mutableArray key="HenryMorganHand.ttf">
+            <string>HenryMorganHand</string>
+            <string>HenryMorganHand</string>
         </mutableArray>
     </customFonts>
     <scenes>
+        <!--Cover View Controller-->
+        <scene sceneID="PdD-qI-MJq">
+            <objects>
+                <viewController id="Izj-FN-QYw" customClass="BRCoverViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="E25-Jg-Vkd"/>
+                        <viewControllerLayoutGuide type="bottom" id="Off-bt-e1e"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="4S2-76-IiP">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d3W-cO-dF2">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <connections>
+                                    <segue destination="51r-4A-Hmk" kind="embed" id="MPx-ar-Ggh"/>
+                                </connections>
+                            </containerView>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cover.png" translatesAutoresizingMaskIntoConstraints="NO" id="NJY-Rq-bn5">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="d3W-cO-dF2" firstAttribute="leading" secondItem="4S2-76-IiP" secondAttribute="leading" id="5Xf-8n-q4w"/>
+                            <constraint firstItem="NJY-Rq-bn5" firstAttribute="leading" secondItem="4S2-76-IiP" secondAttribute="leading" id="KeT-t5-waT"/>
+                            <constraint firstAttribute="bottom" secondItem="d3W-cO-dF2" secondAttribute="bottom" id="NIU-cb-lb2"/>
+                            <constraint firstAttribute="trailing" secondItem="d3W-cO-dF2" secondAttribute="trailing" id="flX-nX-D1F"/>
+                            <constraint firstItem="NJY-Rq-bn5" firstAttribute="top" secondItem="4S2-76-IiP" secondAttribute="top" id="jcv-G5-7hC"/>
+                            <constraint firstItem="d3W-cO-dF2" firstAttribute="top" secondItem="4S2-76-IiP" secondAttribute="top" id="ll2-Ja-6zD"/>
+                            <constraint firstAttribute="trailing" secondItem="NJY-Rq-bn5" secondAttribute="trailing" id="tcY-Rs-E6Z"/>
+                            <constraint firstAttribute="bottom" secondItem="NJY-Rq-bn5" secondAttribute="bottom" id="uvz-LX-Lya"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="coverView" destination="NJY-Rq-bn5" id="7UE-FA-A4F"/>
+                        <outlet property="leftConstraint" destination="KeT-t5-waT" id="vlU-h0-g1w"/>
+                        <outlet property="rightConstraint" destination="tcY-Rs-E6Z" id="wfX-x4-Ecu"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="hJt-I1-S98" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-987" y="259"/>
+        </scene>
         <!--Navigation Controller-->
         <scene sceneID="SSJ-02-cal">
             <objects>
                 <navigationController definesPresentationContext="YES" id="51r-4A-Hmk" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="gxY-Nl-Lea">
+                    <navigationBar key="navigationBar" opaque="NO" contentMode="scaleToFill" id="gxY-Nl-Lea">
                         <autoresizingMask key="autoresizingMask"/>
+                        <color key="tintColor" red="0.94509803920000002" green="0.34509803919999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <color key="barTintColor" red="0.90980392156862744" green="0.87450980392156863" blue="0.7686274509803922" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                     </navigationBar>
                     <connections>
                         <segue destination="BNg-m8-Fbl" kind="relationship" relationship="rootViewController" id="HRD-U8-zYg"/>
@@ -79,18 +125,18 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
                                                     <subviews>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS" customClass="BRMarginLabel">
-                                                            <rect key="frame" x="158" y="8" width="142" height="35"/>
-                                                            <fontDescription key="fontDescription" name="FreebooterScript" family="Freebooter Script" pointSize="20"/>
+                                                            <rect key="frame" x="158" y="7" width="142" height="37"/>
+                                                            <fontDescription key="fontDescription" name="HenryMorganHand" family="HenryMorganHand" pointSize="28"/>
                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LhA-Rm-8G1" customClass="BRMarginLabel">
-                                                            <rect key="frame" x="20" y="8" width="130" height="35"/>
+                                                            <rect key="frame" x="20" y="7" width="130" height="37"/>
                                                             <constraints>
-                                                                <constraint firstAttribute="height" constant="35" id="6bi-GW-IUi"/>
+                                                                <constraint firstAttribute="height" constant="37" id="6bi-GW-IUi"/>
                                                                 <constraint firstAttribute="width" constant="130" id="wW9-An-xkl"/>
                                                             </constraints>
-                                                            <fontDescription key="fontDescription" name="FreebooterScript" family="Freebooter Script" pointSize="20"/>
+                                                            <fontDescription key="fontDescription" name="HenryMorganHand" family="HenryMorganHand" pointSize="28"/>
                                                             <color key="textColor" red="0.42338570441988954" green="0.36888513975198239" blue="0.26798787865909685" alpha="0.90000000000000002" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
@@ -143,15 +189,15 @@
                     <toolbarItems/>
                     <navigationItem key="navigationItem" id="9aK-Yt-aHC">
                         <nil key="title"/>
-                        <barButtonItem key="backBarButtonItem" title=" Readings" id="yy8-Rw-MNW"/>
-                        <barButtonItem key="leftBarButtonItem" title=" Reset   " id="Wou-Sm-qSW">
-                            <color key="tintColor" red="0.94509803921568625" green="0.34509803921568627" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <barButtonItem key="backBarButtonItem" title=" Readings" id="yy8-Rw-MNW">
+                            <color key="tintColor" red="0.94509803920000002" green="0.34509803919999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        </barButtonItem>
+                        <barButtonItem key="leftBarButtonItem" title=" Reset  " id="Wou-Sm-qSW">
                             <connections>
                                 <action selector="resetReadings" destination="BNg-m8-Fbl" id="Eph-rF-kSJ"/>
                             </connections>
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title=" Settings" id="mWd-9X-P31">
-                            <color key="tintColor" red="0.94509803921568625" green="0.34509803921568627" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             <connections>
                                 <segue destination="p54-sg-WgX" kind="push" id="fWL-wE-gaK"/>
                             </connections>
@@ -178,25 +224,29 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="7Gc-pF-cVf">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WmK-Dk-ZOx">
-                                <rect key="frame" x="16" y="72" width="142" height="30"/>
+                                <rect key="frame" x="16" y="72" width="132" height="30"/>
                                 <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
                                 <state key="normal" title="Schedule Reminders">
+                                    <color key="titleColor" red="0.94509803920000002" green="0.34509803919999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
                                     <action selector="pressedReminderButton" destination="p54-sg-WgX" eventType="touchUpInside" id="s7F-iz-czH"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RhN-iR-0aa">
-                                <rect key="frame" x="166" y="76" width="138" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Reminder date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RhN-iR-0aa">
+                                <rect key="frame" x="156" y="76" width="148" height="21"/>
                                 <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QFp-yN-aIo">
                                 <rect key="frame" x="16" y="146" width="288" height="402"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <string key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.
 
 This list of readings divides the Bible into seven sections, one for each day of the week. If January 1 were a Monday, the days would be as follows:
@@ -221,13 +271,14 @@ The daily divisions have been tuned over the course of several years for both co
                                     <segment title="Sequential"/>
                                     <segment title="Topical"/>
                                 </segments>
+                                <color key="tintColor" red="0.94509803920000002" green="0.34509803919999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <connections>
                                     <action selector="changedOrderSelection" destination="p54-sg-WgX" eventType="valueChanged" id="HvP-X7-c4A"/>
                                 </connections>
                             </segmentedControl>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bx5-Si-eEK">
                                 <rect key="frame" x="16" y="146" width="288" height="402"/>
-                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                                 <string key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.</string>
                                 <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -236,10 +287,14 @@ The daily divisions have been tuned over the course of several years for both co
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="bottom" secondItem="QFp-yN-aIo" secondAttribute="bottom" constant="20" id="8B5-yT-bWW"/>
+                            <constraint firstAttribute="trailing" secondItem="7Gc-pF-cVf" secondAttribute="trailing" id="M4E-NO-VWO"/>
                             <constraint firstItem="QFp-yN-aIo" firstAttribute="leading" secondItem="lJ3-lV-kh6" secondAttribute="leading" constant="16" id="NF6-9b-NsL"/>
                             <constraint firstAttribute="trailing" secondItem="QFp-yN-aIo" secondAttribute="trailing" constant="16" id="Pwc-6W-DeJ"/>
                             <constraint firstItem="Bx5-Si-eEK" firstAttribute="leading" secondItem="lJ3-lV-kh6" secondAttribute="leading" constant="16" id="QMN-lD-lTE"/>
                             <constraint firstItem="QFp-yN-aIo" firstAttribute="top" secondItem="lJ3-lV-kh6" secondAttribute="top" constant="146" id="Un1-RZ-9wG"/>
+                            <constraint firstItem="7Gc-pF-cVf" firstAttribute="leading" secondItem="lJ3-lV-kh6" secondAttribute="leading" id="XZJ-E2-7LH"/>
+                            <constraint firstAttribute="bottom" secondItem="7Gc-pF-cVf" secondAttribute="bottom" id="bLL-BG-Qpi"/>
+                            <constraint firstItem="7Gc-pF-cVf" firstAttribute="top" secondItem="lJ3-lV-kh6" secondAttribute="top" id="c3V-J9-bQI"/>
                             <constraint firstAttribute="bottom" secondItem="Bx5-Si-eEK" secondAttribute="bottom" constant="20" id="la5-ND-MxM"/>
                             <constraint firstItem="Bx5-Si-eEK" firstAttribute="top" secondItem="lJ3-lV-kh6" secondAttribute="top" constant="146" id="rPP-Zj-AUh"/>
                             <constraint firstAttribute="trailing" secondItem="Bx5-Si-eEK" secondAttribute="trailing" constant="16" id="rsV-K9-D28"/>
@@ -270,44 +325,61 @@ The daily divisions have been tuned over the course of several years for both co
                         <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="38B-fv-x6N">
-                                <rect key="frame" x="0.0" y="406" width="320" height="162"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mDp-4H-EwO">
+                                <rect key="frame" x="0.0" y="362" width="320" height="206"/>
+                                <subviews>
+                                    <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NuT-or-GIQ">
+                                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="QoI-s4-iJz"/>
+                                        </constraints>
+                                        <items>
+                                            <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="4cd-cb-pRG"/>
+                                            <barButtonItem title="Choose reminder time" style="plain" id="DmU-pL-9fn"/>
+                                            <barButtonItem style="plain" systemItem="flexibleSpace" id="Hen-cY-nQU"/>
+                                            <barButtonItem style="done" systemItem="done" id="ah2-2R-wOp">
+                                                <connections>
+                                                    <action selector="pressedDoneButton" destination="2Zl-Ek-E40" id="0oN-wy-R7E"/>
+                                                </connections>
+                                            </barButtonItem>
+                                            <barButtonItem width="10" style="plain" systemItem="fixedSpace" id="EjK-bN-vgx"/>
+                                        </items>
+                                        <color key="tintColor" red="0.94509803920000002" green="0.34509803919999998" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                    </toolbar>
+                                    <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="38B-fv-x6N">
+                                        <rect key="frame" x="0.0" y="44" width="320" height="162"/>
+                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="162" id="gwZ-hq-cns"/>
+                                        </constraints>
+                                        <date key="date" timeIntervalSinceReferenceDate="442021993.91247398">
+                                            <!--2015-01-03 23:53:13 +0000-->
+                                        </date>
+                                    </datePicker>
+                                </subviews>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="162" id="gwZ-hq-cns"/>
+                                    <constraint firstAttribute="height" constant="206" id="BJb-XU-qoW"/>
+                                    <constraint firstItem="38B-fv-x6N" firstAttribute="leading" secondItem="mDp-4H-EwO" secondAttribute="leading" id="Dyj-5p-7EM"/>
+                                    <constraint firstAttribute="trailing" secondItem="NuT-or-GIQ" secondAttribute="trailing" id="LLZ-QQ-yuV"/>
+                                    <constraint firstItem="NuT-or-GIQ" firstAttribute="leading" secondItem="mDp-4H-EwO" secondAttribute="leading" id="QAf-LR-aFI"/>
+                                    <constraint firstItem="38B-fv-x6N" firstAttribute="top" secondItem="NuT-or-GIQ" secondAttribute="bottom" id="iBo-OI-4CB"/>
+                                    <constraint firstAttribute="trailing" secondItem="38B-fv-x6N" secondAttribute="trailing" id="l4S-Tw-ZpS"/>
+                                    <constraint firstAttribute="bottom" secondItem="38B-fv-x6N" secondAttribute="bottom" id="mh3-Io-iNF"/>
                                 </constraints>
-                                <date key="date" timeIntervalSinceReferenceDate="442021993.91247398">
-                                    <!--2015-01-03 23:53:13 +0000-->
-                                </date>
-                            </datePicker>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NuT-or-GIQ">
-                                <rect key="frame" x="0.0" y="362" width="320" height="44"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="44" id="aUl-wS-nMd"/>
-                                </constraints>
-                                <items>
-                                    <barButtonItem title="Choose reminder time" style="plain" id="DmU-pL-9fn"/>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="Hen-cY-nQU"/>
-                                    <barButtonItem style="done" systemItem="done" id="ah2-2R-wOp">
-                                        <connections>
-                                            <action selector="pressedDoneButton" destination="2Zl-Ek-E40" id="Ygb-Kw-x1A"/>
-                                        </connections>
-                                    </barButtonItem>
-                                </items>
-                            </toolbar>
+                            </view>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="0.59999999999999998" colorSpace="calibratedRGB"/>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="38B-fv-x6N" secondAttribute="bottom" id="2AJ-qp-QHU"/>
-                            <constraint firstAttribute="trailing" secondItem="NuT-or-GIQ" secondAttribute="trailing" id="LI6-Eu-RPo"/>
-                            <constraint firstItem="38B-fv-x6N" firstAttribute="top" secondItem="NuT-or-GIQ" secondAttribute="bottom" id="Wyr-Ct-gpR"/>
-                            <constraint firstItem="38B-fv-x6N" firstAttribute="leading" secondItem="S0p-Yr-pSc" secondAttribute="leading" id="ppS-0S-YT3"/>
-                            <constraint firstAttribute="trailing" secondItem="38B-fv-x6N" secondAttribute="trailing" id="ruZ-c9-ZQF"/>
-                            <constraint firstItem="NuT-or-GIQ" firstAttribute="leading" secondItem="S0p-Yr-pSc" secondAttribute="leading" id="sLo-8y-I6D"/>
+                            <constraint firstAttribute="bottom" secondItem="mDp-4H-EwO" secondAttribute="bottom" id="4xf-vD-K1L"/>
+                            <constraint firstItem="mDp-4H-EwO" firstAttribute="leading" secondItem="S0p-Yr-pSc" secondAttribute="leading" id="Dsa-qt-UsT"/>
+                            <constraint firstAttribute="trailing" secondItem="mDp-4H-EwO" secondAttribute="trailing" id="zRH-X3-KLd"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bottomOffsetConstraint" destination="4xf-vD-K1L" id="f4S-GP-ROG"/>
                         <outlet property="datePicker" destination="38B-fv-x6N" id="jKY-Un-m5M"/>
+                        <outlet property="heightConstraint" destination="BJb-XU-qoW" id="KtP-vj-Kip"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="T5H-aU-LnO" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -317,6 +389,7 @@ The daily divisions have been tuned over the course of several years for both co
     </scenes>
     <resources>
         <image name="bg.png" width="320" height="568"/>
+        <image name="cover.png" width="375" height="666"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>

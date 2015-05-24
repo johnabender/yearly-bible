@@ -11,7 +11,7 @@
 @implementation BRMarginLabel
 
 // http://stackoverflow.com/questions/20985085
-static const CGFloat GUTTER = 9.0; // make this large enough to accommodate the largest font in your app
+static const CGFloat GUTTER = 2.0; // make this large enough to accommodate the largest font in your app
 
 - (void)drawRect:(CGRect)rect
 {

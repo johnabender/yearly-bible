@@ -14,34 +14,42 @@ protocol BRDatePickerDelegate {
 
 class BRDatePickerViewController: UIViewController {
 
-    var delegate : BRDatePickerDelegate? = nil
+    var delegate : BRDatePickerDelegate?
+
+    @IBOutlet var bottomOffsetConstraint: NSLayoutConstraint?
+    @IBOutlet var heightConstraint: NSLayoutConstraint?
 
     @IBOutlet var datePicker: UIDatePicker?
 
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
+    func presentInView(view: UIView) {
+        view.addSubview(self.view)
+        view.addConstraints([NSLayoutConstraint(item: view, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: view, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: view, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1, constant: 0),
+            NSLayoutConstraint(item: view, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1, constant: 0)])
 
-        if animated {
-            self.view.backgroundColor = UIColor.clearColor()
-            UIView.animateWithDuration(0.25, animations: { () -> Void in
-                self.view.backgroundColor = UIColor.whiteColor()
-            }, completion: nil)
-        }
+        self.view.alpha = 0
+        bottomOffsetConstraint?.constant = -heightConstraint!.constant
+        self.view.layoutIfNeeded()
+
+        UIView.animateWithDuration(0.3, animations: { () -> Void in
+            self.view.alpha = 1
+            self.bottomOffsetConstraint?.constant = 0
+            self.view.layoutIfNeeded()
+        })
     }
 
-    override func viewWillDisappear(animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        if animated {
-            UIView.animateWithDuration(0.25, animations: { () -> Void in
-                self.view.backgroundColor = UIColor.clearColor()
-            }, completion: nil)
-        }
+    func dismiss() {
+        UIView.animateWithDuration(0.3, animations: { () -> Void in
+            self.bottomOffsetConstraint?.constant = -self.heightConstraint!.constant
+            self.view.alpha = 0
+            self.view.layoutIfNeeded()
+        }, completion: { (completed: Bool) -> Void in
+            self.view.removeFromSuperview()
+        })
     }
 
     @IBAction func pressedDoneButton() {
-        if delegate != nil {
-            delegate!.datePickerSelectedDate(datePicker!.date)
-        }
+        delegate?.datePickerSelectedDate(datePicker!.date)
     }
 }

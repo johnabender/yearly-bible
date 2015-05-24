@@ -17,6 +17,8 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
     @IBOutlet var topicalText: UITextView?
     @IBOutlet var sequentialText: UITextView?
 
+    var datePickerVC: BRDatePickerViewController?
+
     let desiredFlags = UIUserNotificationType.Sound | UIUserNotificationType.Alert
 
     override func viewDidLoad() {
@@ -24,7 +26,6 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
 
         let font = UIFont(name: "Gentium Basic", size:15.0)!
         orderControl?.setTitleTextAttributes([NSFontAttributeName: font], forState: .Normal)
-        //UIBarButtonItem.appearance().setTitleTextAttributes([NSFontAttributeName: font], forState: .Normal)
 
         self.updateButtonTitle()
         self.updateExplanatoryText()
@@ -81,13 +82,15 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
     func scheduleReminder() {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let vc: AnyObject! = storyboard.instantiateViewControllerWithIdentifier("BRDatePicker")
-        let datePickerVC = vc as! BRDatePickerViewController
-        datePickerVC.delegate = self
-        self.presentViewController(datePickerVC, animated: true, completion: nil)
+        datePickerVC = vc as? BRDatePickerViewController
+        datePickerVC?.delegate = self
+        datePickerVC?.presentInView(self.navigationController!.view)
     }
 
     func datePickerSelectedDate(date: NSDate) {
-        self.dismissViewControllerAnimated(true, completion: nil)
+        datePickerVC?.dismiss()
+        datePickerVC = nil
+
         BRReadingManager.setReadingSchedule(date)
         BRReadingManager.updateScheduledNotifications()
         self.updateButtonTitle()
