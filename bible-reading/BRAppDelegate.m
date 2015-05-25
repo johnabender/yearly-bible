@@ -17,7 +17,7 @@
     // Override point for customization after application launch.
 
 //    for( NSString *name in [UIFont familyNames] ) DLog( @"%@", name );
-    UIFont *navFont = [UIFont fontWithName:@"HenryMorganHand" size:28.];
+    UIFont *navFont = [UIFont fontWithName:@"Gentium Basic" size:17.];
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}];
     [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}

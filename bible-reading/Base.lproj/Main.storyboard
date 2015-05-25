@@ -125,16 +125,16 @@
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
                                                     <subviews>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS" customClass="BRMarginLabel">
-                                                            <rect key="frame" x="158" y="7" width="142" height="37"/>
+                                                            <rect key="frame" x="173" y="5" width="127" height="41"/>
                                                             <fontDescription key="fontDescription" name="HenryMorganHand" family="HenryMorganHand" pointSize="28"/>
                                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="calibratedRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LhA-Rm-8G1" customClass="BRMarginLabel">
-                                                            <rect key="frame" x="20" y="7" width="130" height="37"/>
+                                                            <rect key="frame" x="20" y="5" width="145" height="41"/>
                                                             <constraints>
-                                                                <constraint firstAttribute="height" constant="37" id="6bi-GW-IUi"/>
-                                                                <constraint firstAttribute="width" constant="130" id="wW9-An-xkl"/>
+                                                                <constraint firstAttribute="height" constant="41" id="6bi-GW-IUi"/>
+                                                                <constraint firstAttribute="width" constant="145" id="wW9-An-xkl"/>
                                                             </constraints>
                                                             <fontDescription key="fontDescription" name="HenryMorganHand" family="HenryMorganHand" pointSize="28"/>
                                                             <color key="textColor" red="0.42338570441988954" green="0.36888513975198239" blue="0.26798787865909685" alpha="0.90000000000000002" colorSpace="calibratedRGB"/>

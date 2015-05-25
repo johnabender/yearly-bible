@@ -14,6 +14,7 @@
 static NSDateFormatter *inputFormatter = nil;
 static NSDateFormatter *mayFormatter = nil;
 static NSDateFormatter *outputFormatter = nil;
+static NSDateFormatter *mayOutputFormatter = nil;
 static NSDateFormatter *yearFormatter = nil;
 static NSDateFormatter *firstFormatter = nil;
 
@@ -29,7 +30,9 @@ static const CGFloat dragOvershoot = 60.;
 
     outputFormatter = [NSDateFormatter new];
     outputFormatter.dateFormat = @"EEE., MMM. d";
-    // need May output formatter, without period
+
+    mayOutputFormatter = [NSDateFormatter new];
+    mayOutputFormatter.dateFormat = @"EEE., MMM d";
 
     yearFormatter = [NSDateFormatter new];
     yearFormatter.dateFormat = @"yyyy";
@@ -92,7 +95,10 @@ static const CGFloat dragOvershoot = 60.;
 
     NSDate *readingDate = [self dateFromString:reading.day yearOffset:yearOffset firstDate:firstDate];
 
-    dateLabel.text = [outputFormatter stringFromDate:readingDate];
+    if( [reading.day hasPrefix:@"May"] )
+        dateLabel.text = [mayOutputFormatter stringFromDate:readingDate];
+    else
+        dateLabel.text = [outputFormatter stringFromDate:readingDate];
 
     [self markReadOrUnread];
 }

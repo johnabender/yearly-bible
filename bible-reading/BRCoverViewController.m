@@ -37,6 +37,21 @@
         a.duration = 0.3;
         a.delegate = self;
         [coverView.layer addAnimation:a forKey:@"openCover"];
+
+        UIView *edge = [[UIView alloc] initWithFrame:CGRectMake( self.view.frame.size.width - 10.,
+                                                                 0.,
+                                                                 20.,
+                                                                 coverView.frame.size.height )];
+        edge.backgroundColor = [UIColor colorWithRed:177./255. green:104./255. blue:18./255 alpha:1.];
+//        edge.backgroundColor = [UIColor greenColor];
+        edge.layer.anchorPoint = CGPointMake( 0., 0.5 );
+        [coverView addSubview:edge];
+
+        CABasicAnimation *e = [CABasicAnimation animationWithKeyPath:@"transform"];
+        e.fromValue = [NSValue valueWithCATransform3D:CATransform3DMakeRotation( M_PI/2., 0., 1., 0. )];
+        e.toValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+        e.duration = a.duration;
+        [edge.layer addAnimation:e forKey:@"openCover"];
     }
 }
 
