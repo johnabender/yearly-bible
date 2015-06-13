@@ -10,4 +10,6 @@
 
 @interface BRCoverViewController : UIViewController
 
+@property (nonatomic, weak) IBOutlet UIView *navContainer;
+
 @end

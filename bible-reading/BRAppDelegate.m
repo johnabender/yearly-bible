@@ -60,13 +60,10 @@
     // If navigation is still on the settings VC and the user allowed notifications,
     // then trigger the notifications scheduling UI.
 
-    if( [self.window.rootViewController isKindOfClass:[UINavigationController class]] ) {
-        UINavigationController *navVC = (UINavigationController*)self.window.rootViewController;
-        if( [navVC.topViewController class] == [BRSettingsViewController class] ) {
-            BRSettingsViewController *settingsVC = (BRSettingsViewController*)navVC.topViewController;
-            if( (notificationSettings.types & settingsVC.desiredFlags) != 0 ) {
-                [settingsVC pressedReminderButton];
-            }
+    if( [_navController.topViewController class] == [BRSettingsViewController class] ) {
+        BRSettingsViewController *settingsVC = (BRSettingsViewController*)_navController.topViewController;
+        if( (notificationSettings.types & settingsVC.desiredFlags) != 0 ) {
+            [settingsVC pressedReminderButton];
         }
     }
 }

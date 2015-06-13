@@ -11,5 +11,6 @@
 @interface BRAppDelegate : UIResponder <UIApplicationDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
+@property (nonatomic, weak) UINavigationController *navController;
 
 @end

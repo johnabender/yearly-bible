@@ -7,6 +7,7 @@
 //
 
 #import "BRViewController.h"
+#import "BRAppDelegate.h"
 #import "BRReadingManager.h"
 #import "BRTableCell.h"
 #import "bible_reading-Swift.h"
@@ -43,6 +44,8 @@ enum {
                                                                   target:self
                                                                   action:@selector(tapHandler)];
     self.navigationItem.leftBarButtonItems = @[self.navigationItem.leftBarButtonItem, toggleItem];
+
+    ((BRAppDelegate*)[[UIApplication sharedApplication] delegate]).navController = self.navigationController;
 }
 
 

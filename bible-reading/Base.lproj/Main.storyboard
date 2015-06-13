@@ -54,6 +54,7 @@
                     <connections>
                         <outlet property="coverView" destination="NJY-Rq-bn5" id="7UE-FA-A4F"/>
                         <outlet property="leftConstraint" destination="KeT-t5-waT" id="vlU-h0-g1w"/>
+                        <outlet property="navContainer" destination="d3W-cO-dF2" id="UKT-n9-epL"/>
                         <outlet property="rightConstraint" destination="tcY-Rs-E6Z" id="wfX-x4-Ecu"/>
                     </connections>
                 </viewController>
