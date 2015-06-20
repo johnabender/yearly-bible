@@ -46,6 +46,20 @@ enum {
     self.navigationItem.leftBarButtonItems = @[self.navigationItem.leftBarButtonItem, toggleItem];
 
     ((BRAppDelegate*)[[UIApplication sharedApplication] delegate]).navController = self.navigationController;
+
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appWillEnterForeground:)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
+
+    [self performSelector:@selector(scrollToFirstUnread) withObject:nil afterDelay:0.5];
+}
+
+-(void) didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
 
@@ -53,28 +67,30 @@ enum {
 {
     [super viewWillAppear:animated];
 
+    [self initializeViewForAppearance];
+}
+
+-(void) appWillEnterForeground:(NSNotification*)note
+{
+    [self initializeViewForAppearance];
+}
+
+-(void) initializeViewForAppearance
+{
     readings = [BRReadingManager readings];
     assert( [readings count] == 365 );
-
-    [self.tableView reloadData];
 
     NSDateFormatter *yearFormatter = [NSDateFormatter new];
     yearFormatter.dateFormat = @"yyyy";
     NSString *year = [yearFormatter stringFromDate:[NSDate date]];
     self.navigationItem.title = year;
+
+    [_tableView reloadData];
 }
 
-
--(void) viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-
-    [self scrollToFirstUnread];
-}
 
 -(void) changeFont
 {
-    DLog();
     UIFont *navFont = [UIFont fontWithName:@"Freebooter Script" size:20.];
     [[UIBarButtonItem appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}
                                                 forState:UIControlStateNormal];
