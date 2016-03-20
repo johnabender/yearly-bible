@@ -35,13 +35,16 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
         var wasSet = false
         if scheduleButton != nil {
             if BRReadingManager.isReadingScheduleSet() {
-                let savedDate = BRReadingManager.readingSchedule()
-                wasSet = true
-                scheduleButton!.setTitle("Stop Reminders", forState: UIControlState.Normal)
-                let timeFormatter = NSDateFormatter()
-                timeFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
-                let scheduleString = timeFormatter.stringFromDate(savedDate)
-                scheduleLabel!.text = String(format: "Daily at %@", scheduleString)
+                let dateFormatter = NSDateFormatter()
+                dateFormatter.dateFormat = "HH:mm"
+                if let savedDate = dateFormatter.dateFromString(BRReadingManager.readingSchedule()) {
+                    wasSet = true
+                    let timeFormatter = NSDateFormatter()
+                    timeFormatter.timeStyle = NSDateFormatterStyle.ShortStyle
+                    let scheduleString = timeFormatter.stringFromDate(savedDate)
+                    scheduleLabel!.text = String(format: "Daily at %@", scheduleString)
+                    scheduleButton!.setTitle("Stop Reminders", forState: UIControlState.Normal)
+                }
             }
         }
         if !wasSet {
@@ -91,7 +94,7 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
         datePickerVC?.dismiss()
         datePickerVC = nil
 
-        BRReadingManager.setReadingSchedule(date)
+        BRReadingManager.setReadingScheduleWithDate(date)
         BRReadingManager.updateScheduledNotifications()
         self.updateButtonTitle()
     }

@@ -28,8 +28,9 @@ typedef NS_ENUM(NSInteger, BRReadingType) {
 +(void) setReadingType:(BRReadingType)newType;
 
 +(BOOL) isReadingScheduleSet;
-+(NSDate*) readingSchedule;
-+(void) setReadingSchedule:(NSDate*)scheduleDate;
++(NSString*) readingSchedule;
++(void) setReadingSchedule:(NSString*)scheduleTime;
++(void) setReadingScheduleWithDate:(NSDate*)scheduleDate;
 
 +(NSArray*) resetReadings;
 

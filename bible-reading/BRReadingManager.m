@@ -9,7 +9,9 @@
 #import "BRReadingManager.h"
 
 
-NSString* const BRReadingSchedulePreference = @"BRReadingSchedulePreference";
+NSString* const BRReadingSchedulePreference = @"BRReadingSchedulePreference"; // deprecated in v2.0.3
+NSString* const BRReadingScheduleTimePreference = @"BRReadingScheduleTimePreference";
+
 NSString* const BRNotificationCategory = @"BRReadingReminderCategory";
 
 static NSString* const BRReadingTypePreference = @"BRReadingTypePreference";
@@ -23,11 +25,15 @@ static const NSTimeInterval dayInterval = 24.*60.*60.;
 static NSArray *readings = nil;
 static NSString *firstDay = nil;
 static NSOperationQueue *scheduleQueue = nil;
+static NSDateFormatter *scheduleTimeFormatter = nil;
 
 +(void) initialize
 {
     scheduleQueue = [NSOperationQueue new];
     scheduleQueue.maxConcurrentOperationCount = 1;
+
+    scheduleTimeFormatter = [NSDateFormatter new];
+    scheduleTimeFormatter.dateFormat = @"HH:mm";
 }
 
 
@@ -91,19 +97,33 @@ static NSOperationQueue *scheduleQueue = nil;
     return ([self readingSchedule] != nil);
 }
 
-+(NSDate*) readingSchedule
++(NSString*) readingSchedule
 {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:BRReadingSchedulePreference];
+    NSString *scheduleTime = [[NSUserDefaults standardUserDefaults] objectForKey:BRReadingScheduleTimePreference];
+    if( [scheduleTime isKindOfClass:[NSString class]] )
+        return scheduleTime;
+
+    NSDate *legacyDate = [[NSUserDefaults standardUserDefaults] objectForKey:BRReadingSchedulePreference];
+    if( [legacyDate isKindOfClass:[NSDate class]] )
+        return [scheduleTimeFormatter stringFromDate:legacyDate];
+
+    return nil;
 }
 
-+(void) setReadingSchedule:(NSDate*)scheduleDate
++(void) setReadingSchedule:(NSString*)scheduleTime
 {
-    if( scheduleDate == nil )
-        [[NSUserDefaults standardUserDefaults] removeObjectForKey:BRReadingSchedulePreference];
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:BRReadingSchedulePreference];
+
+    if( scheduleTime == nil )
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:BRReadingScheduleTimePreference];
     else
-        [[NSUserDefaults standardUserDefaults] setObject:scheduleDate forKey:BRReadingSchedulePreference];
+        [[NSUserDefaults standardUserDefaults] setObject:scheduleTime forKey:BRReadingScheduleTimePreference];
 }
 
++(void) setReadingScheduleWithDate:(NSDate*)scheduleDate
+{
+    [self setReadingSchedule:[scheduleTimeFormatter stringFromDate:scheduleDate]];
+}
 
 
 +(void) readingWasRead:(BRReading*)reading
@@ -235,67 +255,66 @@ static NSOperationQueue *scheduleQueue = nil;
 
 +(void) updateScheduledNotifications
 {
-    static const NSUInteger maxNotifications = 64; // iOS max is 64
+    static const NSUInteger maxNotifications = 64; // iOS 8 max is 64
 
     [scheduleQueue cancelAllOperations];
     [scheduleQueue addOperationWithBlock:^{
         UIApplication *app = [UIApplication sharedApplication];
         [app cancelAllLocalNotifications];
 
-        NSDate *noteDate = (NSDate*)[[NSUserDefaults standardUserDefaults] objectForKey:BRReadingSchedulePreference];
-        if( [noteDate isKindOfClass:[NSDate class]] ) {
-            // choose reading
-            BRReading *reading = nil;
-            for( reading in [self readings] )
-                if( !reading.read )
-                    break;
-            if( reading == nil )
-                reading = [self readings][0];
+        if( [self readingSchedule] == nil ) return;
 
-            // notify repeatedly
-            NSDate *nextDate = [self nextScheduledDateForTime:noteDate];
-            NSMutableArray *notifications = [NSMutableArray arrayWithCapacity:maxNotifications];
+        // choose reading
+        BRReading *reading = nil;
+        for( reading in [self readings] )
+            if( !reading.read )
+                break;
+        if( reading == nil )
+            reading = [self readings][0];
 
-            for( NSInteger i = 0; i < maxNotifications; i++ ) {
-                UILocalNotification *note = [UILocalNotification new];
-                note.category = BRNotificationCategory;
-                note.userInfo = [reading dictionaryRepresentation];
-                note.alertBody = [NSString stringWithFormat:@"%@: %@", reading.day, reading.passage];
-                note.fireDate = nextDate;
-                [notifications addObject:note];
+        // notify repeatedly
+        NSDate *nextDate = [self nextScheduledDateForTime:[self readingSchedule]];
+        NSMutableArray *notifications = [NSMutableArray arrayWithCapacity:maxNotifications];
 
-                nextDate = [NSDate dateWithTimeInterval:dayInterval sinceDate:nextDate];
-            }
+        for( NSInteger i = 0; i < maxNotifications; i++ ) {
+            UILocalNotification *note = [UILocalNotification new];
+            note.category = BRNotificationCategory;
+            note.userInfo = [reading dictionaryRepresentation];
+            note.alertBody = [NSString stringWithFormat:@"%@: %@", reading.day, reading.passage];
+            note.fireDate = nextDate;
+            DLog( @"scheduled at %@", nextDate );
+            [notifications addObject:note];
 
-            app.scheduledLocalNotifications = notifications;
+            nextDate = [NSDate dateWithTimeInterval:dayInterval sinceDate:nextDate];
         }
+
+        app.scheduledLocalNotifications = notifications;
     }];
 }
 
-+(NSDate*) nextScheduledDateForTime:(NSDate*)hourMinute
++(NSDate*) nextScheduledDateForTime:(NSString*)hourMinute
 {
     static NSDateFormatter *dateFormatter = nil;
-    static NSDateFormatter *timeFormatter = nil;
     static NSDateFormatter *scheduleFormatter = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         dateFormatter = [NSDateFormatter new];
         dateFormatter.dateFormat = @"yyyy-MM-dd";
-        timeFormatter = [NSDateFormatter new];
-        timeFormatter.dateFormat = @"HH:mm";
         scheduleFormatter = [NSDateFormatter new];
         scheduleFormatter.dateFormat = @"yyyy-MM-dd'T'HH:mm";
     });
 
+    if( hourMinute == nil )
+        hourMinute = @"12:00"; // default to noon, not midnight
+
     NSString *date = [dateFormatter stringFromDate:[NSDate date]];
-    NSString *time = [timeFormatter stringFromDate:hourMinute];
-    NSString *scheduleString = [NSString stringWithFormat:@"%@T%@", date, time];
+    NSString *scheduleString = [NSString stringWithFormat:@"%@T%@", date, hourMinute];
     NSDate *scheduleDate = [scheduleFormatter dateFromString:scheduleString];
     if( [scheduleDate timeIntervalSinceNow] < 5. ) {
         // don't schedule less than 5 s in the future
         NSDate *newDate = [NSDate dateWithTimeIntervalSinceNow:dayInterval];
         date = [dateFormatter stringFromDate:newDate];
-        scheduleString = [NSString stringWithFormat:@"%@T%@", date, time];
+        scheduleString = [NSString stringWithFormat:@"%@T%@", date, hourMinute];
         scheduleDate = [scheduleFormatter dateFromString:scheduleString];
     }
     return scheduleDate;
@@ -715,7 +734,7 @@ static NSOperationQueue *scheduleQueue = nil;
                      @{@"day": @"Feb. 7", @"passage": @"Num. 4-6"},
                      @{@"day": @"Feb. 8", @"passage": @"Num. 7-8"},
                      @{@"day": @"Feb. 9", @"passage": @"Num. 9-11"},
-                     @{@"day": @"Feb. 10", @"passage": @"Num. 12-13"},
+                     @{@"day": @"Feb. 10", @"passage": @"Num. 12-14"},
                      @{@"day": @"Feb. 11", @"passage": @"Num. 15-18"},
                      @{@"day": @"Feb. 12", @"passage": @"Num. 19-21"},
                      @{@"day": @"Feb. 13", @"passage": @"Num. 22-24"},
