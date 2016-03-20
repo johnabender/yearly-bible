@@ -19,7 +19,7 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
 
     var datePickerVC: BRDatePickerViewController?
 
-    let desiredFlags = UIUserNotificationType.Sound | UIUserNotificationType.Alert
+    let desiredFlags: UIUserNotificationType = [UIUserNotificationType.Sound, UIUserNotificationType.Alert]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -57,7 +57,7 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
             self.updateButtonTitle()
         } else {
             let curSettings = UIApplication.sharedApplication().currentUserNotificationSettings()
-            if curSettings.types & desiredFlags == UIUserNotificationType(0) {
+            if curSettings?.types.intersect(desiredFlags) == UIUserNotificationType(rawValue: 0) {
                 self.registerForNotifications()
             } else {
                 self.scheduleReminder()
@@ -70,11 +70,11 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
         category.identifier = BRNotificationCategory
         let action = UIMutableUserNotificationAction()
         action.identifier = "BRMarkReadAction"
-        action.title = "Mark Read"
+        action.title = "Mark as Read"
         action.activationMode = UIUserNotificationActivationMode.Background
         category.setActions([action], forContext: UIUserNotificationActionContext.Default)
         category.setActions([action], forContext: UIUserNotificationActionContext.Minimal)
-        let desiredCategories = NSSet().setByAddingObject(category)
+        let desiredCategories = NSSet(array: [category]) as? Set<UIUserNotificationCategory>
         let newSettings = UIUserNotificationSettings(forTypes: desiredFlags, categories: desiredCategories)
         UIApplication.sharedApplication().registerUserNotificationSettings(newSettings)
     }

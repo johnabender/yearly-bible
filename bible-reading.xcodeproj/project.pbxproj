@@ -251,6 +251,8 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = BR;
+				LastSwiftMigration = 0720;
+				LastSwiftUpdateCheck = 0720;
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Bender Systems";
 				TargetAttributes = {
