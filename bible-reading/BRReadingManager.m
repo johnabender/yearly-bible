@@ -259,9 +259,6 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 
     [scheduleQueue cancelAllOperations];
     [scheduleQueue addOperationWithBlock:^{
-        UIApplication *app = [UIApplication sharedApplication];
-        [app cancelAllLocalNotifications];
-
         if( [self readingSchedule] == nil ) return;
 
         // choose reading
@@ -288,7 +285,11 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
             nextDate = [NSDate dateWithTimeInterval:dayInterval sinceDate:nextDate];
         }
 
-        app.scheduledLocalNotifications = notifications;
+        [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+            UIApplication *app = [UIApplication sharedApplication];
+            [app cancelAllLocalNotifications];
+            app.scheduledLocalNotifications = notifications;
+        }];
     }];
 }
 

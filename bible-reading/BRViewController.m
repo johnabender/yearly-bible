@@ -134,21 +134,6 @@ enum {
 }
 
 
-#pragma mark - Table view delegate
-
--(CGFloat) tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
-{
-    return 64.;
-}
-
--(UIView*) tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
-{
-    UIView *v = [[UIView alloc] initWithFrame:CGRectMake( 0., 0., self.view.frame.size.width, 64. )];
-    v.backgroundColor = [UIColor clearColor];
-    return v;
-}
-
-
 #pragma mark - Action handlers
 
 -(IBAction) resetReadings

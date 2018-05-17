@@ -22,6 +22,9 @@
     [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}
      forState:UIControlStateNormal];
+    [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
+     setTitleTextAttributes:@{NSFontAttributeName: navFont}
+     forState:UIControlStateHighlighted];
 
     return YES;
 }

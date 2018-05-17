@@ -23,16 +23,16 @@ class BRDatePickerViewController: UIViewController {
 
     func presentInView(view: UIView) {
         view.addSubview(self.view)
-        view.addConstraints([NSLayoutConstraint(item: view, attribute: .Leading, relatedBy: .Equal, toItem: self.view, attribute: .Leading, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: view, attribute: .Trailing, relatedBy: .Equal, toItem: self.view, attribute: .Trailing, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: view, attribute: .Top, relatedBy: .Equal, toItem: self.view, attribute: .Top, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: view, attribute: .Bottom, relatedBy: .Equal, toItem: self.view, attribute: .Bottom, multiplier: 1, constant: 0)])
+        view.addConstraints([NSLayoutConstraint(item: view, attribute: .leading, relatedBy: .equal, toItem: self.view, attribute: .leading, multiplier: 1, constant: 0),
+                             NSLayoutConstraint(item: view, attribute: .trailing, relatedBy: .equal, toItem: self.view, attribute: .trailing, multiplier: 1, constant: 0),
+                             NSLayoutConstraint(item: view, attribute: .top, relatedBy: .equal, toItem: self.view, attribute: .top, multiplier: 1, constant: 0),
+                             NSLayoutConstraint(item: view, attribute: .bottom, relatedBy: .equal, toItem: self.view, attribute: .bottom, multiplier: 1, constant: 0)])
 
         self.view.alpha = 0
         bottomOffsetConstraint?.constant = -heightConstraint!.constant
         self.view.layoutIfNeeded()
 
-        UIView.animateWithDuration(0.3, animations: { () -> Void in
+        UIView.animate(withDuration: 0.3, animations: { () -> Void in
             self.view.alpha = 1
             self.bottomOffsetConstraint?.constant = 0
             self.view.layoutIfNeeded()
@@ -40,7 +40,7 @@ class BRDatePickerViewController: UIViewController {
     }
 
     func dismiss() {
-        UIView.animateWithDuration(0.3, animations: { () -> Void in
+        UIView.animate(withDuration: 0.3, animations: { () -> Void in
             self.bottomOffsetConstraint?.constant = -self.heightConstraint!.constant
             self.view.alpha = 0
             self.view.layoutIfNeeded()
@@ -50,6 +50,6 @@ class BRDatePickerViewController: UIViewController {
     }
 
     @IBAction func pressedDoneButton() {
-        delegate?.datePickerSelectedDate(datePicker!.date)
+        delegate?.datePickerSelectedDate(date: datePicker!.date as NSDate)
     }
 }
