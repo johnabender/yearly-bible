@@ -4,8 +4,7 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>HenryMorganHand.ttf</string>
-		<string>AquilineTwo.ttf</string>
+		<string>Kingthings_Foundation.ttf</string>
 		<string>GenBasR.ttf</string>
 	</array>
 	<key>CFBundleDevelopmentRegion</key>

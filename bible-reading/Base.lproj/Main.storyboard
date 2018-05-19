@@ -13,15 +13,6 @@
         <array key="GenBasR.ttf">
             <string>GentiumBasic</string>
         </array>
-        <array key="Helvetica.ttc">
-            <string>Helvetica</string>
-        </array>
-        <array key="HenryMorganHand.ttf">
-            <string>HenryMorganHand</string>
-        </array>
-        <array key="AquilineTwo.ttf">
-            <string>AquilineTwo</string>
-        </array>
     </customFonts>
     <scenes>
         <!--Cover View Controller-->
@@ -134,19 +125,19 @@
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="A84-HT-qSJ">
                                                     <rect key="frame" x="0.0" y="0.0" width="375" height="48"/>
                                                     <subviews>
-                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS" customClass="BRMarginLabel">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS">
                                                             <rect key="frame" x="173" y="4" width="182" height="41"/>
-                                                            <fontDescription key="fontDescription" name="AquilineTwo" family="AquilineTwo" pointSize="20"/>
-                                                            <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
+                                                            <fontDescription key="fontDescription" name="Kingthings Foundation" family="Kingthings Foundation" pointSize="16"/>
+                                                            <color key="textColor" red="0.42352941176470588" green="0.36862745098039218" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
-                                                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LhA-Rm-8G1" customClass="BRMarginLabel">
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LhA-Rm-8G1">
                                                             <rect key="frame" x="20" y="4" width="145" height="41"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="41" id="6bi-GW-IUi"/>
                                                                 <constraint firstAttribute="width" constant="145" id="wW9-An-xkl"/>
                                                             </constraints>
-                                                            <fontDescription key="fontDescription" name="AquilineTwo" family="AquilineTwo" pointSize="28"/>
+                                                            <fontDescription key="fontDescription" name="Kingthings Foundation" family="Kingthings Foundation" pointSize="16"/>
                                                             <color key="textColor" red="0.42338570441988954" green="0.36888513975198239" blue="0.26798787865909685" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
@@ -267,7 +258,7 @@ Monday: Law (Gen. - Deut.)
 Tuesday: History (Joshua - Esther)
 Wednesday: Psalms
 Thursday: Poetry (Job, Prov. - Song)
-Friday: Prophecy (Isiah - Malachi)
+Friday: Prophecy (Isaiah - Malachi)
 Saturday: Gospels (Matt. - Acts)
 Sunday: Letters (Romans - Rev.)
 
