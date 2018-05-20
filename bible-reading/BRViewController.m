@@ -191,16 +191,22 @@ enum {
 {
     if( buttonIndex != alertView.cancelButtonIndex ) {
         switch( alertState ) {
-            case alertResetting:
+            case alertResetting: {
                 readings = [BRReadingManager resetReadings];
-                [self.tableView reloadData];
+                [NSOperationQueue.mainQueue addOperationWithBlock:^{
+                    [self.tableView reloadData];
+                }];
                 break;
+            }
             case alertShifting: {
                 NSInteger shift = [[alertView textFieldAtIndex:0].text integerValue];
                 if( shift > 0 && shift < [readings count] ) {
                     readings = [BRReadingManager shiftReadings:shift];
-                    [self.tableView reloadData];
+                    [NSOperationQueue.mainQueue addOperationWithBlock:^{
+                        [self.tableView reloadData];
+                    }];
                 }
+                break;
             }
         }
     }

@@ -211,4 +211,9 @@ static const CGFloat dragOvershoot = 60.;
     }
 }
 
+-(NSString*) description
+{
+    return [NSString stringWithFormat:@"%@ %@", dateLabel.text, readingLabel.text];
+}
+
 @end

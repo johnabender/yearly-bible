@@ -31,6 +31,13 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
         self.updateExplanatoryText()
     }
 
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+
+        self.topicalText?.setContentOffset(.zero, animated: false)
+        self.sequentialText?.setContentOffset(.zero, animated: false)
+    }
+
     func updateButtonTitle() {
         var wasSet = false
         if scheduleButton != nil {
