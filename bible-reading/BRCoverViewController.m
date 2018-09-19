@@ -9,7 +9,7 @@
 #import "BRCoverViewController.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface BRCoverViewController()
+@interface BRCoverViewController() <CAAnimationDelegate>
 {
     __weak IBOutlet UIImageView *coverView;
     __weak IBOutlet NSLayoutConstraint *leftConstraint;

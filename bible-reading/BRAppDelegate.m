@@ -6,6 +6,8 @@
 //  Copyright (c) 2014 Bender Systems. All rights reserved.
 //
 
+#import <UserNotifications/UserNotifications.h>
+
 #import "BRAppDelegate.h"
 #import "BRReadingManager.h"
 #import "bible_reading-Swift.h"
@@ -19,16 +21,16 @@
 //    for( NSString *name in [UIFont familyNames] ) DLog( @"%@", name );
     UIFont *navFont = [UIFont fontWithName:@"Gentium Basic" size:17.];
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}];
-    [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
+    [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}
      forState:UIControlStateNormal];
-    [[UIBarButtonItem appearanceWhenContainedIn:[UINavigationBar class], nil]
+    [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}
      forState:UIControlStateHighlighted];
 
     return YES;
 }
-							
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -55,40 +57,6 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
-}
-
-
--(void) application:(UIApplication *)application didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
-{
-    // If navigation is still on the settings VC and the user allowed notifications,
-    // then trigger the notifications scheduling UI.
-
-    if( [_navController.topViewController class] == [BRSettingsViewController class] ) {
-        BRSettingsViewController *settingsVC = (BRSettingsViewController*)_navController.topViewController;
-        if( (notificationSettings.types & settingsVC.desiredFlags) != 0 ) {
-            [settingsVC pressedReminderButton];
-        }
-    }
-}
-
--(void)        application:(UIApplication *)application
-handleActionWithIdentifier:(NSString *)identifier
-      forLocalNotification:(UILocalNotification *)notification
-         completionHandler:(void (^)())completionHandler
-{
-    // Currently, we only send one kind of local notification, from BRSettingsViewController.
-    // It's a daily reading reminder, and its only action is "mark as read" for that reading.
-
-    BRReading *readingToMark = [[BRReading alloc] initWithDictionary:notification.userInfo];
-
-    for( BRReading *reading in [BRReadingManager readings] ) {
-        if( [reading isEqual:readingToMark] ) {
-            [BRReadingManager readingWasRead:reading];
-            break;
-        }
-    }
-
-    completionHandler();
 }
 
 @end

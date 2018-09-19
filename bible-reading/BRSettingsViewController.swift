@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import UserNotifications
 
 class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
 
@@ -19,13 +20,11 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
 
     var datePickerVC: BRDatePickerViewController?
 
-    @objc let desiredFlags: UIUserNotificationType = [UIUserNotificationType.sound, UIUserNotificationType.alert]
-
     override func viewDidLoad() {
         super.viewDidLoad()
 
         let font = UIFont(name: "Gentium Basic", size:15.0)!
-        orderControl?.setTitleTextAttributes([NSAttributedStringKey.font: font], for: .normal)
+        orderControl?.setTitleTextAttributes([NSAttributedString.Key.font: font], for: .normal)
 
         self.updateButtonTitle()
         self.updateExplanatoryText()
@@ -50,12 +49,12 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
                     timeFormatter.timeStyle = DateFormatter.Style.short
                     let scheduleString = timeFormatter.string(from: savedDate)
                     scheduleLabel!.text = String(format: "Daily at %@", scheduleString)
-                    scheduleButton!.setTitle("Stop Reminders", for: UIControlState.normal)
+                    scheduleButton!.setTitle("Stop Reminders", for: UIControl.State.normal)
                 }
             }
         }
         if !wasSet {
-            scheduleButton!.setTitle("Schedule Reminders", for: UIControlState.normal)
+            scheduleButton!.setTitle("Schedule Reminders", for: UIControl.State.normal)
             scheduleLabel!.text = ""
         }
     }
@@ -66,27 +65,29 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
             BRReadingManager.updateScheduledNotifications()
             self.updateButtonTitle()
         } else {
-            let curSettings = UIApplication.shared.currentUserNotificationSettings
-            if curSettings?.types.intersection(desiredFlags) == UIUserNotificationType(rawValue: 0) {
-                self.registerForNotifications()
-            } else {
-                self.scheduleReminder()
+            UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+                switch settings.authorizationStatus {
+                case .notDetermined:
+                    self.registerForNotifications()
+                case .authorized:
+                    DispatchQueue.main.async {
+                        self.scheduleReminder()
+                    }
+                default:
+                    break
+                }
             }
         }
     }
 
     func registerForNotifications() {
-        let category = UIMutableUserNotificationCategory()
-        category.identifier = BRNotificationCategory
-        let action = UIMutableUserNotificationAction()
-        action.identifier = "BRMarkReadAction"
-        action.title = "Mark as Read"
-        action.activationMode = UIUserNotificationActivationMode.background
-        category.setActions([action], for: UIUserNotificationActionContext.default)
-        category.setActions([action], for: UIUserNotificationActionContext.minimal)
-        let desiredCategories = NSSet(array: [category]) as? Set<UIUserNotificationCategory>
-        let newSettings = UIUserNotificationSettings(types: desiredFlags, categories: desiredCategories)
-        UIApplication.shared.registerUserNotificationSettings(newSettings)
+        UNUserNotificationCenter.current().requestAuthorization(options: [.sound, .alert]) { (granted: Bool, error: Error?) in
+            if granted && error == nil {
+                DispatchQueue.main.async {
+                    self.pressedReminderButton()
+                }
+            }
+        }
     }
 
     func scheduleReminder() {
@@ -101,7 +102,7 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
         datePickerVC?.dismiss()
         datePickerVC = nil
 
-        BRReadingManager.setReadingScheduleWith(date as Date!)
+        BRReadingManager.setReadingScheduleWith(date as Date)
         BRReadingManager.updateScheduledNotifications()
         self.updateButtonTitle()
     }
@@ -121,8 +122,6 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
             topicalText!.isHidden = false
             sequentialText!.isHidden = true
             orderControl!.selectedSegmentIndex = 1
-        default:
-            break
         }
     }
 }

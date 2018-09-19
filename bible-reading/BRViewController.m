@@ -12,18 +12,10 @@
 #import "BRTableCell.h"
 #import "bible_reading-Swift.h"
 
-enum {
-    alertNone,
-    alertResetting,
-    alertShifting
-};
 
-
-@interface BRViewController () <UIAlertViewDelegate, UITableViewDataSource, UITableViewDelegate>
+@interface BRViewController () <UITableViewDataSource, UITableViewDelegate>
 {
     NSArray *readings;
-
-    NSInteger alertState;
 }
 
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
@@ -42,7 +34,7 @@ enum {
     UIBarButtonItem *toggleItem = [[UIBarButtonItem alloc] initWithTitle:@"  Shift  "
                                                                    style:UIBarButtonItemStylePlain
                                                                   target:self
-                                                                  action:@selector(tapHandler)];
+                                                                  action:@selector(shiftReadings)];
     self.navigationItem.leftBarButtonItems = @[self.navigationItem.leftBarButtonItem, toggleItem];
 
     ((BRAppDelegate*)[[UIApplication sharedApplication] delegate]).navController = self.navigationController;
@@ -138,13 +130,26 @@ enum {
 
 -(IBAction) resetReadings
 {
-    [[[UIAlertView alloc] initWithTitle:@"Reset Readings?"
-                                message:@"Unmarks all readings and removes calendar shift."
-                               delegate:self
-                      cancelButtonTitle:@"Cancel"
-                      otherButtonTitles:@"Reset", nil]
-     show];
-    alertState = alertResetting;
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Reset Readings?"
+                                                                   message:@"Unmarks all readings and removes calendar shift."
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Reset"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction * _Nonnull action)
+    {
+        self->readings = [BRReadingManager resetReadings];
+        [NSOperationQueue.mainQueue addOperationWithBlock:^{
+            [self dismissViewControllerAnimated:YES completion:nil];
+            [self.tableView reloadData];
+        }];
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                              style:UIAlertActionStyleCancel
+                                            handler:^(UIAlertAction * _Nonnull action)
+    {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }]];
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 
@@ -156,7 +161,7 @@ enum {
 }
 
 
--(void) tapHandler
+-(void) shiftReadings
 {
     NSUInteger dayOfYear = [[NSCalendar calendarWithIdentifier:NSCalendarIdentifierISO8601]
                             ordinalityOfUnit:NSCalendarUnitDay
@@ -169,49 +174,34 @@ enum {
     NSString *message = [NSString stringWithFormat:@"You can shift the calendar to start reading any day of the year. For example, today is the %d%@ day of the year, so to start reading today, you could shift the calendar by %d days.\n\nEnter number of days to shift.",
                          (int)dayOfYear, suffix, (int)dayOfYear - 1];
 
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Shift Calendar"
-                                                    message:message
-                                                   delegate:self
-                                          cancelButtonTitle:@"Cancel"
-                                          otherButtonTitles:@"Shift", nil];
-    alert.alertViewStyle = UIAlertViewStylePlainTextInput;
-
-    UITextField *textField = [alert textFieldAtIndex:0];
-    textField.keyboardType = UIKeyboardTypeNumberPad;
-    textField.text = [NSString stringWithFormat:@"%d", (int)dayOfYear - 1];
-
-    [alert show];
-    alertState = alertShifting;
-}
-
-
-#pragma mark - Alert view delegate
-
--(void) alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    if( buttonIndex != alertView.cancelButtonIndex ) {
-        switch( alertState ) {
-            case alertResetting: {
-                readings = [BRReadingManager resetReadings];
-                [NSOperationQueue.mainQueue addOperationWithBlock:^{
-                    [self.tableView reloadData];
-                }];
-                break;
-            }
-            case alertShifting: {
-                NSInteger shift = [[alertView textFieldAtIndex:0].text integerValue];
-                if( shift > 0 && shift < [readings count] ) {
-                    readings = [BRReadingManager shiftReadings:shift];
-                    [NSOperationQueue.mainQueue addOperationWithBlock:^{
-                        [self.tableView reloadData];
-                    }];
-                }
-                break;
-            }
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Shift Calendar"
+                                                                   message:message
+                                                            preferredStyle:UIAlertControllerStyleAlert];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Shift"
+                                              style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction * _Nonnull action)
+    {
+        NSInteger shift = [alert.textFields[0].text integerValue];
+        if( shift > 0 && shift < [self->readings count] ) {
+            self->readings = [BRReadingManager shiftReadings:shift];
+            [NSOperationQueue.mainQueue addOperationWithBlock:^{
+                [self dismissViewControllerAnimated:YES completion:nil];
+                [self.tableView reloadData];
+            }];
         }
-    }
-
-    alertState = alertNone;
+    }]];
+    [alert addAction:[UIAlertAction actionWithTitle:@"Cancel"
+                                              style:UIAlertActionStyleCancel
+                                            handler:^(UIAlertAction * _Nonnull action)
+    {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }]];
+    [alert addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        textField.keyboardType = UIKeyboardTypeNumberPad;
+        textField.text = [NSString stringWithFormat:@"%d", (int)dayOfYear - 1];
+    }];
+    [self presentViewController:alert animated:YES completion:nil];
 }
+
 
 @end

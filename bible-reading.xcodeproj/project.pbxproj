@@ -253,6 +253,7 @@
 				TargetAttributes = {
 					C3FBEA33187A56840040D082 = {
 						DevelopmentTeam = 4FF5GW8T44;
+						LastSwiftMigration = 1000;
 					};
 					C3FBEA54187A56840040D082 = {
 						TestTargetID = C3FBEA33187A56840040D082;
@@ -488,6 +489,7 @@
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "bible-reading/bible-reading-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 4.2;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -508,6 +510,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "bible-reading/bible-reading-Bridging-Header.h";
+				SWIFT_VERSION = 4.2;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

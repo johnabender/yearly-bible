@@ -7,11 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UserNotifications/UserNotifications.h>
+
 #import "BRReading.h"
 
 
 FOUNDATION_EXPORT NSString* const BRReadingSchedulePreference;
+
 FOUNDATION_EXPORT NSString* const BRNotificationCategory;
+FOUNDATION_EXPORT NSString* const BRNotificationActionMarkRead;
 
 
 typedef NS_ENUM(NSInteger, BRReadingType) {
@@ -20,7 +24,9 @@ typedef NS_ENUM(NSInteger, BRReadingType) {
 };
 
 
-@interface BRReadingManager : NSObject
+@interface BRReadingManager : NSObject <UNUserNotificationCenterDelegate>
+
++(BRReadingManager*) sharedReadingManager;
 
 +(NSArray*) readings;
 
