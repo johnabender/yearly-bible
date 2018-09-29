@@ -27,6 +27,7 @@ typedef NS_ENUM(NSInteger, BRReadingType) {
 @interface BRReadingManager : NSObject <UNUserNotificationCenterDelegate>
 
 +(BRReadingManager*) sharedReadingManager;
+-(void) registerForNotifications;
 
 +(NSArray*) readings;
 

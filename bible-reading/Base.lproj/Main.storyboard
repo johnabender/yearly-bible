@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Izj-FN-QYw">
-    <device id="retina4_0" orientation="portrait">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Izj-FN-QYw">
+    <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,17 +20,17 @@
             <objects>
                 <viewController id="Izj-FN-QYw" customClass="BRCoverViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="4S2-76-IiP">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d3W-cO-dF2">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <connections>
                                     <segue destination="51r-4A-Hmk" kind="embed" id="MPx-ar-Ggh"/>
                                 </connections>
                             </containerView>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="cover.png" translatesAutoresizingMaskIntoConstraints="NO" id="NJY-Rq-bn5">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                             </imageView>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -56,14 +55,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hJt-I1-S98" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-987" y="259"/>
+            <point key="canvasLocation" x="-1579.2" y="232.98350824587709"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="SSJ-02-cal">
             <objects>
                 <navigationController definesPresentationContext="YES" id="51r-4A-Hmk" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" opaque="NO" contentMode="scaleToFill" id="gxY-Nl-Lea">
-                        <rect key="frame" x="0.0" y="20" width="320" height="44"/>
+                        <rect key="frame" x="0.0" y="44" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="tintColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <color key="barTintColor" red="0.88685071468353271" green="0.84777486324310303" blue="0.71936297416687012" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -74,32 +73,32 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hgc-MQ-BNb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-483" y="259"/>
+            <point key="canvasLocation" x="-772.79999999999995" y="232.98350824587709"/>
         </scene>
         <!--View Controller-->
         <scene sceneID="mUA-3O-3cQ">
             <objects>
                 <viewController id="BNg-m8-Fbl" customClass="BRViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Tl1-vS-CNl">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="vDA-Vg-K87">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                             </imageView>
                             <tableView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="50" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Jks-Qs-cru">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="spacng dummy" textLabel="Qsr-5p-L70" style="IBUITableViewCellStyleDefault" id="3pB-BF-Sge" customClass="BRTableCell">
-                                        <rect key="frame" x="0.0" y="22" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="22" width="375" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="3pB-BF-Sge" id="FJL-Sp-Vce">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="49.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="49.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Qsr-5p-L70">
-                                                    <rect key="frame" x="15" y="0.0" width="290" height="49.5"/>
+                                                    <rect key="frame" x="15" y="0.0" width="345" height="49.666666666666664"/>
                                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                                     <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -110,23 +109,23 @@
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" id="yAT-n8-lV7" customClass="BRTableCell">
-                                        <rect key="frame" x="0.0" y="72" width="320" height="50"/>
+                                        <rect key="frame" x="0.0" y="72" width="375" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="yAT-n8-lV7" id="zoI-f0-Gh8">
-                                            <rect key="frame" x="0.0" y="0.0" width="320" height="49.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="49.666666666666664"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="A84-HT-qSJ">
                                                     <rect key="frame" x="0.0" y="0.0" width="320" height="48"/>
                                                     <subviews>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS">
-                                                            <rect key="frame" x="173" y="4" width="127" height="41"/>
+                                                            <rect key="frame" x="173" y="3.6666666666666679" width="127" height="41"/>
                                                             <fontDescription key="fontDescription" name="Kingthings Foundation" family="Kingthings Foundation" pointSize="16"/>
                                                             <color key="textColor" red="0.42352941176470588" green="0.36862745098039218" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LhA-Rm-8G1">
-                                                            <rect key="frame" x="20" y="4" width="145" height="41"/>
+                                                            <rect key="frame" x="20" y="3.6666666666666679" width="145" height="41"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="41" id="6bi-GW-IUi"/>
                                                                 <constraint firstAttribute="width" constant="145" id="wW9-An-xkl"/>
@@ -193,7 +192,7 @@
                                 <action selector="resetReadings" destination="BNg-m8-Fbl" id="Eph-rF-kSJ"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title=" Settings" id="mWd-9X-P31">
+                        <barButtonItem key="rightBarButtonItem" title=" Settings" style="plain" id="mWd-9X-P31">
                             <connections>
                                 <segue destination="p54-sg-WgX" kind="push" id="fWL-wE-gaK"/>
                             </connections>
@@ -206,21 +205,21 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="N0c-Km-9EE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="36" y="259"/>
+            <point key="canvasLocation" x="57.600000000000001" y="232.98350824587709"/>
         </scene>
         <!--Settings View Controller-->
         <scene sceneID="ifw-NJ-s3d">
             <objects>
                 <viewController storyboardIdentifier="BRSettingsViewController" id="p54-sg-WgX" customClass="BRSettingsViewController" customModule="bible_reading" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lJ3-lV-kh6">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="7Gc-pF-cVf">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WmK-Dk-ZOx">
-                                <rect key="frame" x="16" y="74" width="126" height="30"/>
+                                <rect key="frame" x="16" y="98" width="126" height="30"/>
                                 <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
                                 <state key="normal" title="Schedule Reminders">
                                     <color key="titleColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -231,13 +230,13 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reminder date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RhN-iR-0aa">
-                                <rect key="frame" x="152" y="80.5" width="90.5" height="17.5"/>
+                                <rect key="frame" x="152" y="104.33333333333333" width="90.666666666666686" height="17.333333333333329"/>
                                 <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QFp-yN-aIo">
-                                <rect key="frame" x="16" y="152" width="288" height="362"/>
+                                <rect key="frame" x="16" y="176" width="343" height="543"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <string key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.
 
@@ -258,7 +257,7 @@ The daily divisions have been tuned over the course of several years for both co
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dcw-QI-Cb0">
-                                <rect key="frame" x="16" y="114" width="157" height="29"/>
+                                <rect key="frame" x="16" y="138" width="157" height="29"/>
                                 <segments>
                                     <segment title="Sequential"/>
                                     <segment title="Topical"/>
@@ -269,7 +268,7 @@ The daily divisions have been tuned over the course of several years for both co
                                 </connections>
                             </segmentedControl>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bx5-Si-eEK">
-                                <rect key="frame" x="16" y="152" width="288" height="362"/>
+                                <rect key="frame" x="16" y="176" width="343" height="543"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <string key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.</string>
                                 <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
@@ -299,32 +298,35 @@ The daily divisions have been tuned over the course of several years for both co
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="BOr-1A-RfR"/>
                     </view>
-                    <navigationItem key="navigationItem" id="otN-Zj-l7v"/>
+                    <navigationItem key="navigationItem" id="otN-Zj-l7v">
+                        <barButtonItem key="rightBarButtonItem" enabled="NO" title="Item" style="plain" id="q4v-Zj-cAl"/>
+                    </navigationItem>
                     <connections>
                         <outlet property="orderControl" destination="dcw-QI-Cb0" id="jMm-GH-lef"/>
                         <outlet property="scheduleButton" destination="WmK-Dk-ZOx" id="t0A-C5-o2P"/>
                         <outlet property="scheduleLabel" destination="RhN-iR-0aa" id="Jf2-35-x0M"/>
                         <outlet property="sequentialText" destination="Bx5-Si-eEK" id="EvS-5c-MsR"/>
                         <outlet property="topicalText" destination="QFp-yN-aIo" id="1qa-o0-00e"/>
+                        <outlet property="versionLabel" destination="q4v-Zj-cAl" id="sKQ-Os-BwB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Jqs-Bc-RtA" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="511.5" y="259"/>
+            <point key="canvasLocation" x="818.39999999999998" y="232.98350824587709"/>
         </scene>
         <!--Date Picker View Controller-->
         <scene sceneID="VRv-67-wQS">
             <objects>
                 <viewController storyboardIdentifier="BRDatePicker" id="2Zl-Ek-E40" customClass="BRDatePickerViewController" customModule="bible_reading" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="S0p-Yr-pSc">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mDp-4H-EwO">
-                                <rect key="frame" x="0.0" y="362" width="320" height="206"/>
+                                <rect key="frame" x="0.0" y="606" width="375" height="206"/>
                                 <subviews>
                                     <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="NuT-or-GIQ">
-                                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="44" id="QoI-s4-iJz"/>
                                         </constraints>
@@ -342,7 +344,7 @@ The daily divisions have been tuned over the course of several years for both co
                                         <color key="tintColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                     </toolbar>
                                     <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="time" minuteInterval="1" translatesAutoresizingMaskIntoConstraints="NO" id="38B-fv-x6N">
-                                        <rect key="frame" x="0.0" y="44" width="320" height="162"/>
+                                        <rect key="frame" x="0.0" y="44" width="375" height="162"/>
                                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="162" id="gwZ-hq-cns"/>
@@ -380,11 +382,11 @@ The daily divisions have been tuned over the course of several years for both co
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="T5H-aU-LnO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="952" y="259"/>
+            <point key="canvasLocation" x="1523.2" y="232.98350824587709"/>
         </scene>
     </scenes>
     <resources>
-        <image name="bg.png" width="320" height="568"/>
-        <image name="cover.png" width="375" height="666"/>
+        <image name="bg.png" width="360" height="640"/>
+        <image name="cover.png" width="414" height="736"/>
     </resources>
 </document>

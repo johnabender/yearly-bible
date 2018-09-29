@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		37649E44215C021A00CBA6FF /* Bundle+VersionNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */; };
 		C314D5B520B0D9420066EA98 /* Kingthings_Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C314D5B420B0D9400066EA98 /* Kingthings_Foundation.ttf */; };
 		C3200E0D1B0708E400F957DD /* GenBasR.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3200E0C1B0708D400F957DD /* GenBasR.ttf */; };
 		C326EB5E188328160003A1F0 /* BRReading.m in Sources */ = {isa = PBXBuildFile; fileRef = C326EB5D188328160003A1F0 /* BRReading.m */; };
@@ -47,6 +48,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+VersionNumber.swift"; sourceTree = "<group>"; };
 		C314D5B420B0D9400066EA98 /* Kingthings_Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Kingthings_Foundation.ttf; sourceTree = "<group>"; };
 		C3200E0C1B0708D400F957DD /* GenBasR.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GenBasR.ttf; sourceTree = "<group>"; };
 		C326EB5C188328160003A1F0 /* BRReading.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRReading.h; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				C3FBEA6D187A56F90040D082 /* BRReadingManager.m */,
 				C326EB5C188328160003A1F0 /* BRReading.h */,
 				C326EB5D188328160003A1F0 /* BRReading.m */,
+				37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */,
 				C3FBEA4F187A56840040D082 /* Images.xcassets */,
 				C3FBEA3E187A56840040D082 /* Supporting Files */,
 				C36A76FB1A2259FB00E4FD35 /* bible-reading-Bridging-Header.h */,
@@ -313,6 +316,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C326EB5E188328160003A1F0 /* BRReading.m in Sources */,
+				37649E44215C021A00CBA6FF /* Bundle+VersionNumber.swift in Sources */,
 				C3FBEA4E187A56840040D082 /* BRViewController.m in Sources */,
 				C3BB3FDB1B12861200446061 /* BRCoverViewController.m in Sources */,
 				C3FBEA48187A56840040D082 /* BRAppDelegate.m in Sources */,

@@ -18,6 +18,8 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
     @IBOutlet var topicalText: UITextView?
     @IBOutlet var sequentialText: UITextView?
 
+    @IBOutlet var versionLabel: UIBarButtonItem?
+
     var datePickerVC: BRDatePickerViewController?
 
     override func viewDidLoad() {
@@ -25,6 +27,8 @@ class BRSettingsViewController: UIViewController, BRDatePickerDelegate {
 
         let font = UIFont(name: "Gentium Basic", size:15.0)!
         orderControl?.setTitleTextAttributes([NSAttributedString.Key.font: font], for: .normal)
+
+        versionLabel?.title = String(format: "v%@ (%@)", Bundle.main.releaseVersionNumber!, Bundle.main.buildVersionNumber!)
 
         self.updateButtonTitle()
         self.updateExplanatoryText()

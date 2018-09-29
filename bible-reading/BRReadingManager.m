@@ -28,17 +28,6 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 {
     scheduleTimeFormatter = [NSDateFormatter new];
     scheduleTimeFormatter.dateFormat = @"HH:mm";
-
-    UNNotificationAction *action = [UNNotificationAction actionWithIdentifier:BRNotificationActionMarkRead
-                                                                        title:@"Mark as Read"
-                                                                      options:0];
-    UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:BRNotificationCategory
-                                                                              actions:@[action]
-                                                                    intentIdentifiers:@[]
-                                                                              options:0];
-    [[UNUserNotificationCenter currentNotificationCenter] setNotificationCategories:[NSSet setWithObject:category]];
-
-    [[UNUserNotificationCenter currentNotificationCenter] setDelegate:[self sharedReadingManager]];
 }
 
 
@@ -51,6 +40,20 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
     });
 
     return shared;
+}
+
+-(void) registerForNotifications
+{
+    UNNotificationAction *action = [UNNotificationAction actionWithIdentifier:BRNotificationActionMarkRead
+                                                                        title:@"Mark as Read"
+                                                                      options:0];
+    UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:BRNotificationCategory
+                                                                              actions:@[action]
+                                                                    intentIdentifiers:@[]
+                                                                              options:0];
+    [[UNUserNotificationCenter currentNotificationCenter] setNotificationCategories:[NSSet setWithObject:category]];
+
+    [[UNUserNotificationCenter currentNotificationCenter] setDelegate:self];
 }
 
 
@@ -325,13 +328,6 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     }
 
     completionHandler();
-}
-
--(void) userNotificationCenter:(UNUserNotificationCenter *)center
-       willPresentNotification:(UNNotification *)notification
-         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler
-{
-    completionHandler( UNNotificationPresentationOptionNone );
 }
 
 
