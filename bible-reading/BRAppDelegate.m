@@ -30,6 +30,9 @@
     [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}
      forState:UIControlStateHighlighted];
+    [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
+     setTitleTextAttributes:@{NSFontAttributeName: navFont}
+     forState:UIControlStateDisabled];
 
     [[BRReadingManager sharedReadingManager] registerForNotifications];
 
