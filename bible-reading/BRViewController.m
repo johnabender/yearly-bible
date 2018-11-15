@@ -122,6 +122,21 @@
     BRReading *day = readings[indexPath.row];
     [cell populateWithReading:day firstDay:[BRReadingManager firstDay]];
 
+    [cell setSelectionHandler:^(BRReading *reading) {
+        UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+        BRReadingViewController *readingVC = (BRReadingViewController*)[storyboard instantiateViewControllerWithIdentifier:@"BRReadingViewController"];
+        if( readingVC ) {
+            readingVC.reading = reading;
+            [self presentViewController:readingVC animated:YES completion:nil];
+            readingVC.markReadAction = ^(BRReading *reading) {
+                [BRReadingManager readingWasRead:reading];
+                [self.tableView reloadData];
+            };
+        }
+    }];
+
+    if( [day.day isEqualToString:@"Jan. 1"] ) cell.selectionHandler( day ); ///////////////////////////////////////////////
+
     return cell;
 }
 

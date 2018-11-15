@@ -1,17 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Izj-FN-QYw">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Izj-FN-QYw">
     <device id="retina5_9" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <customFonts key="customFonts">
         <array key="GenBasR.ttf">
             <string>GentiumBasic</string>
+        </array>
+        <array key="Kingthings_Foundation.ttf">
+            <string>KingthingsFoundation</string>
         </array>
     </customFonts>
     <scenes>
@@ -75,6 +78,110 @@
             </objects>
             <point key="canvasLocation" x="-772.79999999999995" y="232.98350824587709"/>
         </scene>
+        <!--Reading View Controller-->
+        <scene sceneID="0s4-2R-MKM">
+            <objects>
+                <viewController storyboardIdentifier="BRReadingViewController" modalTransitionStyle="crossDissolve" modalPresentationStyle="overFullScreen" id="Dam-S0-pXj" customClass="BRReadingViewController" customModule="bible_reading" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="2MR-Nb-ssV">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MRk-Ly-XNd">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="xrL-KM-rmb">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JiH-3z-tfU">
+                                            <rect key="frame" x="10" y="79.666666666666686" width="355" height="658.33333333333326"/>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <attributedString key="attributedText">
+                                                <fragment>
+                                                    <string key="content">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.  Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.  Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.  Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                                    <attributes>
+                                                        <color key="NSColor" name="textColor" catalog="System" colorSpace="catalog"/>
+                                                        <font key="NSFont" metaFont="system" size="17"/>
+                                                        <paragraphStyle key="NSParagraphStyle" alignment="left" lineBreakMode="wordWrapping" baseWritingDirection="natural" tighteningFactorForTruncation="0.0"/>
+                                                    </attributes>
+                                                </fragment>
+                                            </attributedString>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        </textView>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3mQ-a7-ssX">
+                                            <rect key="frame" x="328" y="748" width="37" height="30"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="30" id="OZ0-Zb-JcV"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="17"/>
+                                            <state key="normal" title="Close">
+                                                <color key="titleColor" red="0.92156862745098034" green="0.25490196078431371" blue="0.027450980392156862" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="pressedCloseButton" destination="Dam-S0-pXj" eventType="touchUpInside" id="4Jo-e7-NMh"/>
+                                            </connections>
+                                        </button>
+                                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FTi-do-Mlv">
+                                            <rect key="frame" x="10" y="748" width="37" height="30"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="30" id="sAo-Md-cCm"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="17"/>
+                                            <state key="normal" title="Mark">
+                                                <color key="titleColor" red="0.92156862745098034" green="0.25490196078431371" blue="0.027450980392156862" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            </state>
+                                            <connections>
+                                                <action selector="pressedMarkReadButton" destination="Dam-S0-pXj" eventType="touchUpInside" id="nSf-GX-Wsx"/>
+                                            </connections>
+                                        </button>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="251" text="Reading" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Aqn-kg-h94">
+                                            <rect key="frame" x="0.0" y="54" width="375" height="30"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="30" id="Kgf-7y-4zD"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" name="KingthingsFoundation" family="Kingthings Foundation" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="Aqn-kg-h94" firstAttribute="leading" secondItem="xrL-KM-rmb" secondAttribute="leading" id="8Zl-3y-ZQf"/>
+                                        <constraint firstItem="FTi-do-Mlv" firstAttribute="top" secondItem="JiH-3z-tfU" secondAttribute="bottom" constant="10" id="K8x-fB-gzx"/>
+                                        <constraint firstAttribute="trailing" secondItem="Aqn-kg-h94" secondAttribute="trailing" id="Wm4-sn-ptf"/>
+                                        <constraint firstItem="3mQ-a7-ssX" firstAttribute="top" secondItem="FTi-do-Mlv" secondAttribute="top" id="Z3b-Tx-b5F"/>
+                                        <constraint firstItem="JiH-3z-tfU" firstAttribute="top" secondItem="Aqn-kg-h94" secondAttribute="baseline" id="azG-jf-rQy"/>
+                                        <constraint firstItem="3mQ-a7-ssX" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="FTi-do-Mlv" secondAttribute="trailing" constant="8" symbolic="YES" id="rjE-IP-ksE"/>
+                                    </constraints>
+                                </view>
+                                <blurEffect style="light"/>
+                            </visualEffectView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="JiH-3z-tfU" firstAttribute="leading" secondItem="Bpt-g4-pEW" secondAttribute="leading" constant="10" id="BGQ-6v-ruG"/>
+                            <constraint firstItem="FTi-do-Mlv" firstAttribute="bottom" secondItem="Bpt-g4-pEW" secondAttribute="bottom" id="LH0-hk-X4Q"/>
+                            <constraint firstAttribute="top" secondItem="MRk-Ly-XNd" secondAttribute="top" id="MZb-ro-EqS"/>
+                            <constraint firstAttribute="leading" secondItem="MRk-Ly-XNd" secondAttribute="leading" id="R53-OD-Oqz"/>
+                            <constraint firstItem="Aqn-kg-h94" firstAttribute="top" secondItem="Bpt-g4-pEW" secondAttribute="top" constant="10" id="UBJ-mK-Rro"/>
+                            <constraint firstAttribute="bottom" secondItem="MRk-Ly-XNd" secondAttribute="bottom" id="YWq-WS-v8g"/>
+                            <constraint firstItem="3mQ-a7-ssX" firstAttribute="trailing" secondItem="Bpt-g4-pEW" secondAttribute="trailing" constant="-10" id="ZlG-PW-fAj"/>
+                            <constraint firstItem="FTi-do-Mlv" firstAttribute="leading" secondItem="Bpt-g4-pEW" secondAttribute="leading" constant="10" id="akg-2E-Mai"/>
+                            <constraint firstAttribute="trailing" secondItem="MRk-Ly-XNd" secondAttribute="trailing" id="aqf-mI-xSP"/>
+                            <constraint firstItem="JiH-3z-tfU" firstAttribute="trailing" secondItem="Bpt-g4-pEW" secondAttribute="trailing" constant="-10" id="lGY-da-0CQ"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Bpt-g4-pEW"/>
+                    </view>
+                    <modalPageSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+                    <connections>
+                        <outlet property="contentView" destination="xrL-KM-rmb" id="35m-7T-GJ4"/>
+                        <outlet property="dateLabel" destination="Aqn-kg-h94" id="oSq-C9-1FO"/>
+                        <outlet property="markButton" destination="FTi-do-Mlv" id="8nQ-Pk-O2k"/>
+                        <outlet property="textView" destination="JiH-3z-tfU" id="MEW-7f-yIu"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="17u-Fo-tyb" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="56.799999999999997" y="943.5960591133005"/>
+        </scene>
         <!--View Controller-->
         <scene sceneID="mUA-3O-3cQ">
             <objects>
@@ -116,10 +223,10 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="A84-HT-qSJ">
-                                                    <rect key="frame" x="0.0" y="0.0" width="320" height="48"/>
+                                                    <rect key="frame" x="0.0" y="0.0" width="375" height="48"/>
                                                     <subviews>
-                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS">
-                                                            <rect key="frame" x="173" y="3.6666666666666679" width="127" height="41"/>
+                                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="Reading" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mg7-8h-qFS">
+                                                            <rect key="frame" x="173" y="3.6666666666666679" width="182" height="41"/>
                                                             <fontDescription key="fontDescription" name="Kingthings Foundation" family="Kingthings Foundation" pointSize="16"/>
                                                             <color key="textColor" red="0.42352941176470588" green="0.36862745098039218" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                             <nil key="highlightedColor"/>
@@ -128,7 +235,7 @@
                                                             <rect key="frame" x="20" y="3.6666666666666679" width="145" height="41"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="41" id="6bi-GW-IUi"/>
-                                                                <constraint firstAttribute="width" constant="145" id="wW9-An-xkl"/>
+                                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="145" id="wW9-An-xkl"/>
                                                             </constraints>
                                                             <fontDescription key="fontDescription" name="Kingthings Foundation" family="Kingthings Foundation" pointSize="16"/>
                                                             <color key="textColor" red="0.42338570441988954" green="0.36888513975198239" blue="0.26798787865909685" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="sRGB"/>
@@ -192,7 +299,7 @@
                                 <action selector="resetReadings" destination="BNg-m8-Fbl" id="Eph-rF-kSJ"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" title=" Settings" style="plain" id="mWd-9X-P31">
+                        <barButtonItem key="rightBarButtonItem" title=" Settings" id="mWd-9X-P31">
                             <connections>
                                 <segue destination="p54-sg-WgX" kind="push" id="fWL-wE-gaK"/>
                             </connections>
@@ -219,7 +326,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                             </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WmK-Dk-ZOx">
-                                <rect key="frame" x="16" y="98" width="126" height="30"/>
+                                <rect key="frame" x="16" y="98" width="140" height="30"/>
                                 <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
                                 <state key="normal" title="Schedule Reminders">
                                     <color key="titleColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -230,7 +337,7 @@
                                 </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reminder date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RhN-iR-0aa">
-                                <rect key="frame" x="152" y="104.33333333333333" width="90.666666666666686" height="17.333333333333329"/>
+                                <rect key="frame" x="166" y="104.33333333333333" width="98.666666666666686" height="17.333333333333329"/>
                                 <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
                                 <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
@@ -282,8 +389,10 @@ The daily divisions have been tuned over the course of several years for both co
                             <constraint firstAttribute="trailing" secondItem="7Gc-pF-cVf" secondAttribute="trailing" id="M4E-NO-VWO"/>
                             <constraint firstItem="RhN-iR-0aa" firstAttribute="centerY" secondItem="WmK-Dk-ZOx" secondAttribute="centerY" id="MAO-82-VaJ"/>
                             <constraint firstItem="QFp-yN-aIo" firstAttribute="leading" secondItem="Bx5-Si-eEK" secondAttribute="leading" id="NF6-9b-NsL"/>
+                            <constraint firstItem="BOr-1A-RfR" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="dcw-QI-Cb0" secondAttribute="trailing" symbolic="YES" id="NX6-pW-RbV"/>
                             <constraint firstItem="Bx5-Si-eEK" firstAttribute="trailing" secondItem="QFp-yN-aIo" secondAttribute="trailing" id="Pwc-6W-DeJ"/>
                             <constraint firstItem="Bx5-Si-eEK" firstAttribute="leading" secondItem="BOr-1A-RfR" secondAttribute="leading" constant="16" id="QMN-lD-lTE"/>
+                            <constraint firstItem="RhN-iR-0aa" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="BOr-1A-RfR" secondAttribute="trailing" id="SQG-vF-DJo"/>
                             <constraint firstItem="QFp-yN-aIo" firstAttribute="top" secondItem="Bx5-Si-eEK" secondAttribute="top" id="Un1-RZ-9wG"/>
                             <constraint firstItem="7Gc-pF-cVf" firstAttribute="leading" secondItem="lJ3-lV-kh6" secondAttribute="leading" id="XZJ-E2-7LH"/>
                             <constraint firstItem="dcw-QI-Cb0" firstAttribute="top" secondItem="WmK-Dk-ZOx" secondAttribute="bottom" constant="10" id="ZlX-Yx-AnK"/>
@@ -299,7 +408,7 @@ The daily divisions have been tuned over the course of several years for both co
                         <viewLayoutGuide key="safeArea" id="BOr-1A-RfR"/>
                     </view>
                     <navigationItem key="navigationItem" id="otN-Zj-l7v">
-                        <barButtonItem key="rightBarButtonItem" enabled="NO" title="Item" style="plain" id="q4v-Zj-cAl"/>
+                        <barButtonItem key="rightBarButtonItem" enabled="NO" title="Item" id="q4v-Zj-cAl"/>
                     </navigationItem>
                     <connections>
                         <outlet property="orderControl" destination="dcw-QI-Cb0" id="jMm-GH-lef"/>

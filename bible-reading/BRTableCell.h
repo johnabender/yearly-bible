@@ -24,6 +24,8 @@
     __weak IBOutlet NSLayoutConstraint *containerTrailingConstraint;
 }
 
+@property (nonatomic, strong) void (^selectionHandler)(BRReading *);
+
 -(void) populateWithReading:(BRReading*)reading firstDay:(NSString*)firstDay;
 
 @end

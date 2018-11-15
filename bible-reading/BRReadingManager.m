@@ -9,11 +9,13 @@
 #import "BRReadingManager.h"
 
 
-NSString* const BRReadingSchedulePreference = @"BRReadingSchedulePreference"; // deprecated in v2.0.3
-NSString* const BRReadingScheduleTimePreference = @"BRReadingScheduleTimePreference";
-
 NSString* const BRNotificationCategory = @"BRReadingReminderCategory";
 NSString* const BRNotificationActionMarkRead = @"BRMarkReadAction";
+
+NSString* const BRMarkReadString = @"Mark as Read";
+
+static NSString* const BRReadingSchedulePreference = @"BRReadingSchedulePreference"; // deprecated in v2.0.3
+static NSString* const BRReadingScheduleTimePreference = @"BRReadingScheduleTimePreference";
 
 static NSString* const BRReadingTypePreference = @"BRReadingTypePreference";
 
@@ -45,7 +47,7 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 -(void) registerForNotifications
 {
     UNNotificationAction *action = [UNNotificationAction actionWithIdentifier:BRNotificationActionMarkRead
-                                                                        title:@"Mark as Read"
+                                                                        title:BRMarkReadString
                                                                       options:0];
     UNNotificationCategory *category = [UNNotificationCategory categoryWithIdentifier:BRNotificationCategory
                                                                               actions:@[action]
@@ -319,9 +321,9 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     if( [response.actionIdentifier isEqualToString:BRNotificationActionMarkRead] ) {
         BRReading *readingToMark = [[BRReading alloc] initWithDictionary:response.notification.request.content.userInfo];
 
-        for( BRReading *reading in [BRReadingManager readings] ) {
+        for( BRReading *reading in [[self class] readings] ) {
             if( [reading isEqual:readingToMark] ) {
-                [BRReadingManager readingWasRead:reading];
+                [[self class] readingWasRead:reading];
                 break;
             }
         }

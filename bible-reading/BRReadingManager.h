@@ -12,10 +12,10 @@
 #import "BRReading.h"
 
 
-FOUNDATION_EXPORT NSString* const BRReadingSchedulePreference;
-
 FOUNDATION_EXPORT NSString* const BRNotificationCategory;
 FOUNDATION_EXPORT NSString* const BRNotificationActionMarkRead;
+
+FOUNDATION_EXPORT NSString* const BRMarkReadString;
 
 
 typedef NS_ENUM(NSInteger, BRReadingType) {

@@ -8,6 +8,7 @@
 
 #import "BRTableCell.h"
 #import "BRReadingManager.h"
+#import "bible_reading-Swift.h"
 
 @implementation BRTableCell
 
@@ -39,6 +40,17 @@ static const CGFloat dragOvershoot = 60.;
 
     firstFormatter = [NSDateFormatter new];
     firstFormatter.dateFormat = @"HH:mm:ss yyyy MM dd";
+}
+
+
+-(void) awakeFromNib
+{
+    [super awakeFromNib];
+
+    // TODO: switch to 3D touch
+    UILongPressGestureRecognizer *longPressGestureRecognizer = [UILongPressGestureRecognizer new];
+    [longPressGestureRecognizer addTarget:self action:@selector(longPress:)];
+    [self addGestureRecognizer:longPressGestureRecognizer];
 }
 
 
@@ -209,6 +221,14 @@ static const CGFloat dragOvershoot = 60.;
         // so pretend it's the same thing as a purposeful touch end
         [self touchesEnded:touches withEvent:nil];
     }
+}
+
+-(void) longPress:(UILongPressGestureRecognizer*)gr
+{
+    if( gr.state != UIGestureRecognizerStateBegan ) return;
+
+    if( _selectionHandler )
+        _selectionHandler( reading );
 }
 
 -(NSString*) description
