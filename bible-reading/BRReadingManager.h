@@ -50,4 +50,8 @@ typedef NS_ENUM(NSInteger, BRReadingType) {
 
 +(void) updateScheduledNotifications;
 
++(NSArray*) booksForReading:(BRReading*)reading;
++(NSArray*) chaptersForReading:(BRReading*)reading;
++(NSArray*) versesForReading:(BRReading*)reading;
+
 @end

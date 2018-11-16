@@ -17,10 +17,23 @@ class BRReadingFetcher: NSObject {
         return String(hashedApiKey[hashedApiKey.index(hashedApiKey.startIndex, offsetBy: 16)...] + hashedApiKey[..<hashedApiKey.index(hashedApiKey.startIndex, offsetBy: 16)])
     }
 
-    class func fetchReading(_ reading: BRReading, completion: @escaping ([String: Any]) -> Void) {
-        let path = "v1/bibles/" + bibleId + "/chapters/GEN.1?content-type=json&include-notes=false&include-chapter-numbers=false&include-verse-spans=false"
+    class func fetchReading(_ reading: BRReading, completion: @escaping (_ data: [String: Any], _ versesToUse: [Any], _ totalChunks: Int) -> Void) {
+        // count total chunks
+        var totalChunks = 0
+        let books = BRReadingManager.books(for: reading)!
+        let chapters = BRReadingManager.chapters(for: reading)!
+        for b in 0..<books.count {
+            if let bookChapters = chapters[b] as? [Any] {
+                totalChunks += bookChapters.count
+            }
+        }
+
+        let bookId = bookIdForBook(books[0] as! String)
+        let chapterId = (chapters[0] as! [String])[0]
+        let path = "v1/bibles/\(bibleId)/chapters/\(bookId).\(chapterId)?content-type=json&include-notes=false&include-chapter-numbers=false&include-verse-spans=false"
         guard let biblesUrl = URL(string: path, relativeTo: baseUrl) else { return }
         print(biblesUrl.absoluteString)
+
         let config = URLSessionConfiguration.default
         config.httpAdditionalHeaders = ["api-key": self.apiKey()]
         let session = URLSession(configuration: config)
@@ -32,13 +45,36 @@ class BRReadingFetcher: NSObject {
             if let json = try? JSONSerialization.jsonObject(with: data!, options: []),
                 let dict = json as? [String: Any] {
                 if let dataObj = dict["data"] as? [String: Any] {
-                    completion(dataObj)
+                    let verses = BRReadingManager.verses(for: reading)!
+                    completion(dataObj, verses[0] as! [Any], totalChunks)
                 }
-                if let metaObj = dict["meta"] as? [String: Any] {
-                    // TODO: load meta 
+                // fetch img src URL in metadata, which is for API usage/analytics (req'd by license)
+                if let metaObj = dict["meta"] as? [String: Any],
+                    let imgTag = metaObj["fumsNoScript"] as? String,
+                    imgTag.contains("src=\"") {
+                    let start = imgTag.index(imgTag.range(of: "src=\"")!.lowerBound, offsetBy: "src=\"".count)
+                    let end = imgTag[start...].firstIndex(of: "\"")!
+                    let metaUrl = URL(string: String(imgTag[start..<end]))!
+                    print(metaUrl.absoluteString)
+
+                    URLSession(configuration: URLSessionConfiguration.default)
+                        .dataTask(with: metaUrl)
+                        .resume()
                 }
             }
         }
         task.resume()
+    }
+
+    class func fetchChunk(_ chunk: Int, forReading reading: BRReading, completion: @escaping (_ data: [String: Any], _ versesToUse: [Any]) -> Void) {
+        print("fetch chunk", chunk)
+    }
+}
+
+fileprivate func bookIdForBook(_ book: String) -> String {
+    switch book {
+    case "Gen.": return "GEN"
+    case "Ps.": return "PSA"
+    default: return ""
     }
 }

@@ -1075,4 +1075,19 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     };
 }
 
++(NSArray*) booksForReading:(BRReading*)reading
+{
+    return @[@"Gen.", @"Ps."];
+}
+
++(NSArray*) chaptersForReading:(BRReading*)reading
+{
+    return @[@[@"1", @"2"], @[@"150"]];
+}
+
++(NSArray*) versesForReading:(BRReading*)reading
+{
+    return @[@[[NSNull null], [NSNull null]], @[@[@"1", @"5"]]];
+}
+
 @end
