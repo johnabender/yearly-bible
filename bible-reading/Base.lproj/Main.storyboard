@@ -13,9 +13,6 @@
         <array key="GenBasR.ttf">
             <string>GentiumBasic</string>
         </array>
-        <array key="Kingthings_Foundation.ttf">
-            <string>KingthingsFoundation</string>
-        </array>
     </customFonts>
     <scenes>
         <!--Cover View Controller-->
@@ -93,7 +90,7 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JiH-3z-tfU">
-                                            <rect key="frame" x="10" y="80.333333333333314" width="355" height="657.66666666666674"/>
+                                            <rect key="frame" x="10" y="44" width="355" height="694"/>
                                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                             <attributedString key="attributedText"/>
                                             <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -127,28 +124,16 @@
                                                 <action selector="pressedMarkReadButton" destination="Dam-S0-pXj" eventType="touchUpInside" id="nSf-GX-Wsx"/>
                                             </connections>
                                         </button>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="249" verticalHuggingPriority="251" text="Reading" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Aqn-kg-h94">
-                                            <rect key="frame" x="0.0" y="54" width="375" height="30"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="30" id="Kgf-7y-4zD"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" name="KingthingsFoundation" family="Kingthings Foundation" pointSize="17"/>
-                                            <nil key="textColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
                                         <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="iWP-Zi-h4y">
-                                            <rect key="frame" x="169" y="390.66666666666669" width="37" height="37"/>
+                                            <rect key="frame" x="169" y="372.66666666666669" width="37" height="37"/>
                                             <color key="color" red="0.92156862750000001" green="0.25490196079999999" blue="0.027450980390000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                         </activityIndicatorView>
                                     </subviews>
                                     <constraints>
                                         <constraint firstItem="iWP-Zi-h4y" firstAttribute="centerX" secondItem="JiH-3z-tfU" secondAttribute="centerX" id="3LQ-Xg-S8k"/>
-                                        <constraint firstItem="Aqn-kg-h94" firstAttribute="leading" secondItem="xrL-KM-rmb" secondAttribute="leading" id="8Zl-3y-ZQf"/>
                                         <constraint firstItem="iWP-Zi-h4y" firstAttribute="centerY" secondItem="JiH-3z-tfU" secondAttribute="centerY" id="Igs-0z-u8t"/>
                                         <constraint firstItem="FTi-do-Mlv" firstAttribute="top" secondItem="JiH-3z-tfU" secondAttribute="bottom" constant="10" id="K8x-fB-gzx"/>
-                                        <constraint firstAttribute="trailing" secondItem="Aqn-kg-h94" secondAttribute="trailing" id="Wm4-sn-ptf"/>
                                         <constraint firstItem="3mQ-a7-ssX" firstAttribute="top" secondItem="FTi-do-Mlv" secondAttribute="top" id="Z3b-Tx-b5F"/>
-                                        <constraint firstItem="JiH-3z-tfU" firstAttribute="top" secondItem="Aqn-kg-h94" secondAttribute="baseline" id="azG-jf-rQy"/>
                                         <constraint firstItem="3mQ-a7-ssX" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="FTi-do-Mlv" secondAttribute="trailing" constant="8" symbolic="YES" id="rjE-IP-ksE"/>
                                     </constraints>
                                 </view>
@@ -158,10 +143,10 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
                             <constraint firstItem="JiH-3z-tfU" firstAttribute="leading" secondItem="Bpt-g4-pEW" secondAttribute="leading" constant="10" id="BGQ-6v-ruG"/>
+                            <constraint firstItem="JiH-3z-tfU" firstAttribute="top" secondItem="Bpt-g4-pEW" secondAttribute="top" id="EI7-jg-lQT"/>
                             <constraint firstItem="FTi-do-Mlv" firstAttribute="bottom" secondItem="Bpt-g4-pEW" secondAttribute="bottom" id="LH0-hk-X4Q"/>
                             <constraint firstAttribute="top" secondItem="MRk-Ly-XNd" secondAttribute="top" id="MZb-ro-EqS"/>
                             <constraint firstAttribute="leading" secondItem="MRk-Ly-XNd" secondAttribute="leading" id="R53-OD-Oqz"/>
-                            <constraint firstItem="Aqn-kg-h94" firstAttribute="top" secondItem="Bpt-g4-pEW" secondAttribute="top" constant="10" id="UBJ-mK-Rro"/>
                             <constraint firstAttribute="bottom" secondItem="MRk-Ly-XNd" secondAttribute="bottom" id="YWq-WS-v8g"/>
                             <constraint firstItem="3mQ-a7-ssX" firstAttribute="trailing" secondItem="Bpt-g4-pEW" secondAttribute="trailing" constant="-10" id="ZlG-PW-fAj"/>
                             <constraint firstItem="FTi-do-Mlv" firstAttribute="leading" secondItem="Bpt-g4-pEW" secondAttribute="leading" constant="10" id="akg-2E-Mai"/>
@@ -173,7 +158,6 @@
                     <modalPageSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
                         <outlet property="contentView" destination="xrL-KM-rmb" id="35m-7T-GJ4"/>
-                        <outlet property="dateLabel" destination="Aqn-kg-h94" id="oSq-C9-1FO"/>
                         <outlet property="markButton" destination="FTi-do-Mlv" id="8nQ-Pk-O2k"/>
                         <outlet property="spinner" destination="iWP-Zi-h4y" id="TZ5-fJ-dZL"/>
                         <outlet property="spinnerCenterYConstraint" destination="Igs-0z-u8t" id="0gj-Fl-7LJ"/>

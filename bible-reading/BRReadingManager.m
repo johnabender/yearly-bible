@@ -1075,19 +1075,37 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     };
 }
 
+// malachi has 4 ch
+
 +(NSArray*) booksForReading:(BRReading*)reading
 {
-    return @[@"Gen.", @"Ps."];
+    // returns an array of strings [String]!
+    // where each element is a book's abbreviation
+
+    NSPredicate endsNumerically = [NSPredicate predicateWithFormat:@"SELF matches %@", @"\\d+$"];
+    [endsNumerically evaluateWithObject:string]
+    if( [reading.passage hasSuffix:<#(nonnull NSString *)#>])
+
+    return @[@"Ps."];
 }
 
 +(NSArray*) chaptersForReading:(BRReading*)reading
 {
-    return @[@[@"1", @"2"], @[@"150"]];
+    // returns an array of (array of strings) [[String]]!
+    // where each array is for a book,
+    // where each element is a chapter in the book
+    return @[@[@"148", @"149", @"150"]];
 }
 
 +(NSArray*) versesForReading:(BRReading*)reading
 {
-    return @[@[[NSNull null], [NSNull null]], @[@[@"1", @"5"]]];
+    // returns an array of (array of X) [[Any]]!
+    // where each array is for a book,
+    // where each sub-array is for a chapter,
+    // where each element is either
+    // null (for all verses in the chapter),
+    // or an array of 2 strings, meaning the first and last verses
+    return @[@[[NSNull null]], @[[NSNull null], [NSNull null]]];
 }
 
 @end
