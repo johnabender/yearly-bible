@@ -1,0 +1,1316 @@
+["copyright": PUBLIC DOMAIN, "content": [
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 1;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 1;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.1";
+                verseOrgIds =                 (
+                    "LAM.4.1"
+                );
+            };
+            text = "How is the gold become dim! ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "LAM.4.1";
+                        verseOrgIds =                         (
+                            "LAM.4.1"
+                        );
+                    };
+                    text = how;
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.1";
+                verseOrgIds =                 (
+                    "LAM.4.1"
+                );
+            };
+            text = " is the most pure gold changed!";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.1";
+                verseOrgIds =                 (
+                    "LAM.4.1"
+                );
+            };
+            text = "The stones of the sanctuary are poured out at the head of every street.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 2;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 2;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.2";
+                verseOrgIds =                 (
+                    "LAM.4.2"
+                );
+            };
+            text = "The precious sons of Zion, comparable to fine gold,";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.2";
+                verseOrgIds =                 (
+                    "LAM.4.2"
+                );
+            };
+            text = "How are they esteemed as earthen pitchers, the work of the hands of the potter!";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 3;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 3;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.3";
+                verseOrgIds =                 (
+                    "LAM.4.3"
+                );
+            };
+            text = "Even the jackals draw out the breast, they give suck to their young ones:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.3";
+                verseOrgIds =                 (
+                    "LAM.4.3"
+                );
+            };
+            text = "The daughter of my people is become cruel, like the ostriches in the wilderness.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 4;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 4;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.4";
+                verseOrgIds =                 (
+                    "LAM.4.4"
+                );
+            };
+            text = "The tongue of the sucking child cleaveth to the roof of his mouth for thirst:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.4";
+                verseOrgIds =                 (
+                    "LAM.4.4"
+                );
+            };
+            text = "The young children ask bread, and no man breaketh it unto them.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 5;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 5;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.5";
+                verseOrgIds =                 (
+                    "LAM.4.5"
+                );
+            };
+            text = "They that did feed delicately are desolate in the streets:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.5";
+                verseOrgIds =                 (
+                    "LAM.4.5"
+                );
+            };
+            text = "They that were brought up in scarlet embrace dunghills.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 6;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 6;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.6";
+                verseOrgIds =                 (
+                    "LAM.4.6"
+                );
+            };
+            text = "For the iniquity of the daughter of my people is greater than the sin of Sodom,";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.6";
+                verseOrgIds =                 (
+                    "LAM.4.6"
+                );
+            };
+            text = "That was overthrown as in a moment, and no hands were laid upon her.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 7;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 7;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.7";
+                verseOrgIds =                 (
+                    "LAM.4.7"
+                );
+            };
+            text = "Her nobles were purer than snow, they were whiter than milk;";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.7";
+                verseOrgIds =                 (
+                    "LAM.4.7"
+                );
+            };
+            text = "They were more ruddy in body than rubies, their polishing was as of sapphire.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 8;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 8;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.8";
+                verseOrgIds =                 (
+                    "LAM.4.8"
+                );
+            };
+            text = "Their visage is blacker than a coal; they are not known in the streets:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.8";
+                verseOrgIds =                 (
+                    "LAM.4.8"
+                );
+            };
+            text = "Their skin cleaveth to their bones; it is withered, it is become like a stick.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 9;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 9;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.9";
+                verseOrgIds =                 (
+                    "LAM.4.9"
+                );
+            };
+            text = "They that are slain with the sword are better than they that are slain with hunger;";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.9";
+                verseOrgIds =                 (
+                    "LAM.4.9"
+                );
+            };
+            text = "For these pine away, stricken through, for want of the fruits of the field.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 10;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 10;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.10";
+                verseOrgIds =                 (
+                    "LAM.4.10"
+                );
+            };
+            text = "The hands of the pitiful women have boiled their own children;";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.10";
+                verseOrgIds =                 (
+                    "LAM.4.10"
+                );
+            };
+            text = "They were their food in the destruction of the daughter of my people.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = b;
+    };
+    items =     (
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 11;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 11;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.11";
+                verseOrgIds =                 (
+                    "LAM.4.11"
+                );
+            };
+            text = "Jehovah hath accomplished his wrath, he hath poured out his fierce anger;";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.11";
+                verseOrgIds =                 (
+                    "LAM.4.11"
+                );
+            };
+            text = "And he hath kindled a fire in Zion, which hath devoured the foundations thereof.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 12;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 12;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.12";
+                verseOrgIds =                 (
+                    "LAM.4.12"
+                );
+            };
+            text = "The kings of the earth believed not, neither all the inhabitants of the world,";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.12";
+                verseOrgIds =                 (
+                    "LAM.4.12"
+                );
+            };
+            text = "That the adversary and the enemy would enter into the gates of Jerusalem.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 13;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 13;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "LAM.4.13";
+                        verseOrgIds =                         (
+                            "LAM.4.13"
+                        );
+                    };
+                    text = "It is";
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.13";
+                verseOrgIds =                 (
+                    "LAM.4.13"
+                );
+            };
+            text = " because of the sins of her prophets, ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "LAM.4.13";
+                        verseOrgIds =                         (
+                            "LAM.4.13"
+                        );
+                    };
+                    text = "and ";
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.13";
+                verseOrgIds =                 (
+                    "LAM.4.13"
+                );
+            };
+            text = " the iniquities of her priests,";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.13";
+                verseOrgIds =                 (
+                    "LAM.4.13"
+                );
+            };
+            text = "That have shed the blood of the just in the midst of her.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 14;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 14;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.14";
+                verseOrgIds =                 (
+                    "LAM.4.14"
+                );
+            };
+            text = "They wander as blind men in the streets, they are polluted with blood,";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.14";
+                verseOrgIds =                 (
+                    "LAM.4.14"
+                );
+            };
+            text = "So that men cannot touch their garments.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 15;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 15;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.15";
+                verseOrgIds =                 (
+                    "LAM.4.15"
+                );
+            };
+            text = "Depart ye, they cried unto them, Unclean! depart, depart, touch not!";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.15";
+                verseOrgIds =                 (
+                    "LAM.4.15"
+                );
+            };
+            text = "When they fled away and wandered, men said among the nations, They shall no more sojourn ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "LAM.4.15";
+                        verseOrgIds =                         (
+                            "LAM.4.15"
+                        );
+                    };
+                    text = here;
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.15";
+                verseOrgIds =                 (
+                    "LAM.4.15"
+                );
+            };
+            text = ".";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 16;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 16;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.16";
+                verseOrgIds =                 (
+                    "LAM.4.16"
+                );
+            };
+            text = "The anger of Jehovah hath scattered them; he will no more regard them:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.16";
+                verseOrgIds =                 (
+                    "LAM.4.16"
+                );
+            };
+            text = "They respected not the persons of the priests, they favored not the elders.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = b;
+    };
+    items =     (
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 17;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 17;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.17";
+                verseOrgIds =                 (
+                    "LAM.4.17"
+                );
+            };
+            text = "Our eyes do yet fail ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "LAM.4.17";
+                        verseOrgIds =                         (
+                            "LAM.4.17"
+                        );
+                    };
+                    text = "in looking";
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.17";
+                verseOrgIds =                 (
+                    "LAM.4.17"
+                );
+            };
+            text = " for our vain help:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.17";
+                verseOrgIds =                 (
+                    "LAM.4.17"
+                );
+            };
+            text = "In our watching we have watched for a nation that could not save.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 18;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 18;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.18";
+                verseOrgIds =                 (
+                    "LAM.4.18"
+                );
+            };
+            text = "They hunt our steps, so that we cannot go in our streets:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.18";
+                verseOrgIds =                 (
+                    "LAM.4.18"
+                );
+            };
+            text = "Our end is near, our days are fulfilled; for our end is come.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 19;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 19;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.19";
+                verseOrgIds =                 (
+                    "LAM.4.19"
+                );
+            };
+            text = "Our pursuers were swifter than the eagles of the heavens:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.19";
+                verseOrgIds =                 (
+                    "LAM.4.19"
+                );
+            };
+            text = "They chased us upon the mountains, they laid wait for us in the wilderness.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 20;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 20;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.20";
+                verseOrgIds =                 (
+                    "LAM.4.20"
+                );
+            };
+            text = "The breath of our nostrils, the anointed of Jehovah, was taken in their pits;";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.20";
+                verseOrgIds =                 (
+                    "LAM.4.20"
+                );
+            };
+            text = "Of whom we said, Under his shadow we shall live among the nations.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = b;
+    };
+    items =     (
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 21;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 21;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.21";
+                verseOrgIds =                 (
+                    "LAM.4.21"
+                );
+            };
+            text = "Rejoice and be glad, O daughter of Edom, that dwellest in the land of Uz:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.21";
+                verseOrgIds =                 (
+                    "LAM.4.21"
+                );
+            };
+            text = "The cup shall pass through unto thee also; thou shalt be drunken, and shalt make thyself naked.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 22;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 22;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "LAM.4.22";
+                verseOrgIds =                 (
+                    "LAM.4.22"
+                );
+            };
+            text = "The punishment of thine iniquity is accomplished, O daughter of Zion; he will no more carry thee away into captivity:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "LAM.4.22";
+                verseOrgIds =                 (
+                    "LAM.4.22"
+                );
+            };
+            text = "He will visit thine iniquity, O daughter of Edom; he will uncover thy sins.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+}
+], "number": 4, "previous": {
+    bookId = LAM;
+    id = "LAM.3";
+    number = 3;
+}, "id": LAM.4, "bookId": LAM, "reference": Lamentations 4, "bibleId": 06125adad2d5898a-01, "next": {
+    bookId = LAM;
+    id = "LAM.5";
+    number = 5;
+}]

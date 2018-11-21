@@ -206,6 +206,8 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 {
     // update chapters to match what they are in code
 
+    // TODO: remap "Jam." (sequential) to "James"
+
     NSArray *newReadings = [self newReadings:[self readingType]];
     newReadings = [self readingArrayFromDictionaryArray:newReadings];
     assert( [existingReadings count] == [newReadings count] );
@@ -330,6 +332,183 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
     }
 
     completionHandler();
+}
+
+
++(NSArray*) booksForReading:(BRReading*)reading
+{
+    // returns an array of strings [String]!
+    // where each element is a book's abbreviation
+
+    DLog( @"parsing books for %@", reading.passage );
+    // if passage ends with numbers, they're chapter or verse numbers, meaning a single book
+    NSRange numRange = [reading.passage rangeOfString:@"\\d+$" options:NSRegularExpressionSearch];
+    if( numRange.location != NSNotFound ) {
+        DLog( @"ends numerically" );
+        NSRange spaceRange = [reading.passage rangeOfString:@" " options:NSBackwardsSearch];
+        if( spaceRange.location != NSNotFound ) {
+            DLog( @"has a space, returning %@", [reading.passage substringToIndex:spaceRange.location] );
+            return @[[reading.passage substringToIndex:spaceRange.location]];
+        }
+        DLog( @"reading ends with numbers but contains no space" );
+    }
+    // else passage ends with alphabetic characters, so it's whole book(s)
+    else {
+        DLog( @"doesn't end numerically" );
+        // if passage contains no comma, it's one book
+        NSRange commaRange = [reading.passage rangeOfString:@", "];
+        if( commaRange.location == NSNotFound ) {
+            DLog( @"no comma, returning as is" );
+            return @[reading.passage];
+        }
+        // else it's two books
+        else {
+            NSString *firstBook = [reading.passage substringToIndex:commaRange.location];
+            NSString *secondBook = [reading.passage substringFromIndex:commaRange.location + commaRange.length];
+            DLog( @"has comma, returning %@ %@", firstBook, secondBook );
+            return @[firstBook, secondBook];
+        }
+    }
+
+    DLog( @"failed parsing books from reading %@", reading );
+    return @[@"Rev."]; // to avoid crashing
+}
+
++(NSArray*) chaptersForReading:(BRReading*)reading
+{
+    // returns an array of (array of strings) [[String]]!
+    // where each array is for a book,
+    // where each element is a chapter in the book
+
+    DLog( @"parsing chapters for %@", reading.passage );
+    // if passage ends with numbers, they're chapter or verse numbers, meaning a single book
+    NSRange numRange = [reading.passage rangeOfString:@"\\d+$" options:NSRegularExpressionSearch];
+    if( numRange.location != NSNotFound ) {
+        DLog( @"ends numerically" );
+        // parse chapters for "Luke 1", "Rev. 21-22", "Ps. 119:1-200"
+        NSRange chRange = [reading.passage rangeOfString:@" \\d*:?\\d*-?\\d+$" options:NSRegularExpressionSearch];
+        if( chRange.location != NSNotFound ) {
+            NSString *chapterString = [reading.passage substringFromIndex:chRange.location + 1];
+            DLog( @"stripped book to %@", chapterString );
+            NSRange colonRange = [chapterString rangeOfString:@":"];
+            if( colonRange.location != NSNotFound ) {
+                chapterString = [chapterString substringToIndex:colonRange.location];
+                DLog( @"found colon, stripped verses to %@", chapterString );
+            }
+            NSRange dashRange = [chapterString rangeOfString:@"-"];
+            if( dashRange.location == NSNotFound ) {
+                DLog( @"no dash, returning as is" );
+                return @[@[chapterString]];
+            }
+            NSInteger firstChapter = [[chapterString substringToIndex:dashRange.location] integerValue];
+            NSInteger lastChapter = [[chapterString substringFromIndex:dashRange.location + dashRange.length] integerValue];
+            DLog( @"returning range from %ld to %ld", firstChapter, lastChapter );
+            NSMutableArray *chapterArray = [NSMutableArray array];
+            for( NSInteger c = firstChapter; c <= lastChapter; c++ )
+                [chapterArray addObject:[NSString stringWithFormat:@"%ld", c]];
+            return @[chapterArray];
+        }
+    }
+    // else passage ends with alphabetic characters, so it's whole book(s)
+    else {
+        DLog( @"doesn't end numerically" );
+        // if passage contains no comma, it's one book
+        NSRange commaRange = [reading.passage rangeOfString:@", "];
+        if( commaRange.location == NSNotFound ) {
+            DLog( @"no comma, attempting to return hard-coded chapters" );
+            if( [reading.passage isEqualToString:@"Ruth"] )
+                return @[@[@"1", @"2", @"3", @"4"]];
+            else if( [reading.passage isEqualToString:@"Esther"] )
+                return @[@[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10"]];
+            else if( [reading.passage isEqualToString:@"Lamentations"] )
+                return @[@[@"1", @"2", @"3", @"4", @"5"]];
+            else if( [reading.passage isEqualToString:@"Joel"] )
+                return @[@[@"1", @"2", @"3"]];
+            else if( [reading.passage isEqualToString:@"Nahum"] )
+                return @[@[@"1", @"2", @"3"]];
+            else if( [reading.passage isEqualToString:@"Habakkuk"] )
+                return @[@[@"1", @"2", @"3"]];
+            else if( [reading.passage isEqualToString:@"Micah"] )
+                return @[@[@"1", @"2", @"3", @"4", @"5", @"6", @"7"]];
+            else if( [reading.passage isEqualToString:@"Malachi"] )
+                return @[@[@"1", @"2", @"3", @"4"]];
+            else if( [reading.passage isEqualToString:@"2 Thess."] )
+                return @[@[@"1", @"2", @"3"]];
+            else if( [reading.passage isEqualToString:@"2 Timothy"] )
+                return @[@[@"1", @"2", @"3", @"4"]];
+            else if( [reading.passage isEqualToString:@"Titus"] )
+                return @[@[@"1", @"2", @"3"]];
+            else if( [reading.passage isEqualToString:@"Philemon"] )
+                return @[@[@"1"]];
+            else if( [reading.passage isEqualToString:@"2 Peter"] )
+                return @[@[@"1", @"2", @"3"]];
+            else if( [reading.passage isEqualToString:@"Jude"] )
+                return @[@[@"1"]];
+        }
+        // else it's two books
+        else {
+            DLog( @"has comma, attempting to return hard-coded chapters" );
+            if( [reading.passage isEqualToString:@"Obad., Jon."] )
+                return @[@[@"1"], @[@"1", @"2", @"3", @"4"]];
+            else if( [reading.passage isEqualToString:@"Nah., Hab."] )
+                return @[@[@"1", @"2", @"3"], @[@"1", @"2", @"3"]];
+            else if( [reading.passage isEqualToString:@"Zeph., Hagg."] )
+                return @[@[@"1", @"2", @"3"], @[@"1", @"2"]];
+            else if( [reading.passage isEqualToString:@"2 Jn., 3 Jn."] )
+                return @[@[@"1"], @[@"1"]];
+        }
+    }
+
+    DLog( @"failed parsing chapters from reading %@", reading );
+    return @[@[@"1"]]; // to avoid crashing
+}
+
++(NSArray*) versesForReading:(BRReading*)reading
+{
+    // returns an array of (array of X) [[Any]]!
+    // where each array is for a book,
+    // where each sub-array is for a chapter,
+    // where each element is either
+    // null (for all verses in the chapter),
+    // or an array of 2 strings, meaning the first and last verses
+
+    DLog( @"parsing verses for %@", reading.passage );
+    // if passage ends with numbers, they're chapter or verse numbers, meaning a single book
+    NSRange numRange = [reading.passage rangeOfString:@"\\d+$" options:NSRegularExpressionSearch];
+    if( numRange.location != NSNotFound ) {
+        DLog( @"ends numerically" );
+        // parse verses for "Ps. 119:1-200"
+        NSRange colonRange = [reading.passage rangeOfString:@":"];
+        if( colonRange.location != NSNotFound ) {
+            NSString *verseString = [reading.passage substringFromIndex:colonRange.location + colonRange.length];
+            DLog( @"contains colon, stripped to verses %@", verseString );
+            NSRange dashRange = [verseString rangeOfString:@"-"];
+            if( dashRange.location != NSNotFound ) {
+                NSString *firstVerse = [verseString substringToIndex:dashRange.location];
+                NSString *lastVerse = [verseString substringFromIndex:dashRange.location + dashRange.length];
+                DLog( @"contains dash, returning first-last %@ and %@", firstVerse, lastVerse );
+                return @[@[firstVerse, lastVerse]];
+            }
+        }
+        DLog( @"didn't find verses, returning whole chapter" );
+        return @[@[[NSNull null]]];
+    }
+    // else passage ends with alphabetic characters, so it's whole book(s)
+    else {
+        DLog( @"doesn't end numerically, it's whole book(s)") ;
+        // if passage contains no comma, it's one book
+        NSRange commaRange = [reading.passage rangeOfString:@", "];
+        if( commaRange.location == NSNotFound ) {
+            return @[@[[NSNull null]]];
+        }
+        // else it's two books
+        else {
+            return @[@[[NSNull null]], @[[NSNull null]]];
+        }
+    }
+
+    DLog( @"failed parsing verses from reading %@", reading );
+    return @[@[[NSNull null]]]; // to avoid crashing
 }
 
 
@@ -1073,39 +1252,6 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
                      @{@"day": @"Dec. 31", @"passage": @"Rev. 21-22"},
                      ];
     };
-}
-
-// malachi has 4 ch
-
-+(NSArray*) booksForReading:(BRReading*)reading
-{
-    // returns an array of strings [String]!
-    // where each element is a book's abbreviation
-
-    NSPredicate endsNumerically = [NSPredicate predicateWithFormat:@"SELF matches %@", @"\\d+$"];
-    [endsNumerically evaluateWithObject:string]
-    if( [reading.passage hasSuffix:<#(nonnull NSString *)#>])
-
-    return @[@"Ps."];
-}
-
-+(NSArray*) chaptersForReading:(BRReading*)reading
-{
-    // returns an array of (array of strings) [[String]]!
-    // where each array is for a book,
-    // where each element is a chapter in the book
-    return @[@[@"148", @"149", @"150"]];
-}
-
-+(NSArray*) versesForReading:(BRReading*)reading
-{
-    // returns an array of (array of X) [[Any]]!
-    // where each array is for a book,
-    // where each sub-array is for a chapter,
-    // where each element is either
-    // null (for all verses in the chapter),
-    // or an array of 2 strings, meaning the first and last verses
-    return @[@[[NSNull null]], @[[NSNull null], [NSNull null]]];
 }
 
 @end

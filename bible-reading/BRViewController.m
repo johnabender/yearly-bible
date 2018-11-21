@@ -135,8 +135,6 @@
         }
     }];
 
-    if( [day.day isEqualToString:@"Jan. 1"] ) cell.selectionHandler( day ); ///////////////////////////////////////////////
-
     return cell;
 }
 

@@ -1,0 +1,611 @@
+["bookId": PSA, "number": 4, "bibleId": 06125adad2d5898a-01, "content": [
+{
+    attrs =     {
+        style = d;
+    };
+    items =     (
+                {
+            text = "For the Chief Musician; on stringed instruments. A Psalm of David.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = b;
+    };
+    items =     (
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 1;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 1;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.1";
+                verseOrgIds =                 (
+                    "PSA.4.2"
+                );
+            };
+            text = "Answer me when I call, O God of my righteousness;";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "PSA.4.1";
+                verseOrgIds =                 (
+                    "PSA.4.2"
+                );
+            };
+            text = "Thou hast set me at large ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "PSA.4.1";
+                        verseOrgIds =                         (
+                            "PSA.4.2"
+                        );
+                    };
+                    text = "when I was";
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.1";
+                verseOrgIds =                 (
+                    "PSA.4.2"
+                );
+            };
+            text = " in distress:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "PSA.4.1";
+                verseOrgIds =                 (
+                    "PSA.4.2"
+                );
+            };
+            text = "Have mercy upon me, and hear my prayer.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 2;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 2;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.2";
+                verseOrgIds =                 (
+                    "PSA.4.3"
+                );
+            };
+            text = "O ye sons of men, how long shall my glory be turned into dishonor?";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "PSA.4.2";
+                        verseOrgIds =                         (
+                            "PSA.4.3"
+                        );
+                    };
+                    text = "How long";
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.2";
+                verseOrgIds =                 (
+                    "PSA.4.3"
+                );
+            };
+            text = " will ye love vanity, and seek after falsehood? ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = qs;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "PSA.4.2";
+                        verseOrgIds =                         (
+                            "PSA.4.3"
+                        );
+                    };
+                    text = "[Selah";
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 3;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 3;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.3";
+                verseOrgIds =                 (
+                    "PSA.4.4"
+                );
+            };
+            text = "But know that Jehovah hath set apart for himself him that is godly:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "PSA.4.3";
+                verseOrgIds =                 (
+                    "PSA.4.4"
+                );
+            };
+            text = "Jehovah will hear when I call unto him.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 4;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 4;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.4";
+                verseOrgIds =                 (
+                    "PSA.4.5"
+                );
+            };
+            text = "Stand in awe, and sin not:";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "PSA.4.4";
+                verseOrgIds =                 (
+                    "PSA.4.5"
+                );
+            };
+            text = "Commune with your own heart upon your bed, and be still. ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = qs;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "PSA.4.4";
+                        verseOrgIds =                         (
+                            "PSA.4.5"
+                        );
+                    };
+                    text = "[Selah";
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 5;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 5;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.5";
+                verseOrgIds =                 (
+                    "PSA.4.6"
+                );
+            };
+            text = "Offer the sacrifices of righteousness,";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "PSA.4.5";
+                verseOrgIds =                 (
+                    "PSA.4.6"
+                );
+            };
+            text = "And put your trust in Jehovah.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 6;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 6;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.6";
+                verseOrgIds =                 (
+                    "PSA.4.7"
+                );
+            };
+            text = "Many there are that say, Who will show us ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "PSA.4.6";
+                        verseOrgIds =                         (
+                            "PSA.4.7"
+                        );
+                    };
+                    text = any;
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.6";
+                verseOrgIds =                 (
+                    "PSA.4.7"
+                );
+            };
+            text = " good?";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "PSA.4.6";
+                verseOrgIds =                 (
+                    "PSA.4.7"
+                );
+            };
+            text = "Jehovah, lift thou up the light of thy countenance upon us.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 7;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 7;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.7";
+                verseOrgIds =                 (
+                    "PSA.4.8"
+                );
+            };
+            text = "Thou hast put gladness in my heart,";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "PSA.4.7";
+                verseOrgIds =                 (
+                    "PSA.4.8"
+                );
+            };
+            text = "More than ";
+            type = text;
+        },
+                {
+            attrs =             {
+                style = add;
+            };
+            items =             (
+                                {
+                    attrs =                     {
+                        verseId = "PSA.4.7";
+                        verseOrgIds =                         (
+                            "PSA.4.8"
+                        );
+                    };
+                    text = "they have";
+                    type = text;
+                }
+            );
+            name = char;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.7";
+                verseOrgIds =                 (
+                    "PSA.4.8"
+                );
+            };
+            text = " when their grain and their new wine are increased.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                number = 8;
+                style = v;
+            };
+            items =             (
+                                {
+                    text = 8;
+                    type = text;
+                }
+            );
+            name = verse;
+            type = tag;
+        },
+                {
+            attrs =             {
+                verseId = "PSA.4.8";
+                verseOrgIds =                 (
+                    "PSA.4.9"
+                );
+            };
+            text = "In peace will I both lay me down and sleep;";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+},
+{
+    attrs =     {
+        style = q1;
+    };
+    items =     (
+                {
+            attrs =             {
+                verseId = "PSA.4.8";
+                verseOrgIds =                 (
+                    "PSA.4.9"
+                );
+            };
+            text = "For thou, Jehovah, alone makest me dwell in safety.";
+            type = text;
+        }
+    );
+    name = para;
+    type = tag;
+}
+], "next": {
+    bookId = PSA;
+    id = "PSA.5";
+    number = 5;
+}, "id": PSA.4, "reference": Psalms 4, "copyright": PUBLIC DOMAIN, "previous": {
+    bookId = PSA;
+    id = "PSA.3";
+    number = 3;
+}]

@@ -43,6 +43,7 @@ class BRReadingFetcher: NSObject {
             return
         }
         let chapterId = chapters[0][0]
+        print(books, bookId, chapters, chapterId)
 
         // count total chunks
         var totalChunks = 0
@@ -58,25 +59,18 @@ class BRReadingFetcher: NSObject {
                 return
             }
             if verses[0].count > 0,
-                let bookVerses = verses[0] as? [[String]],
-                bookVerses.count > 0,
-                bookVerses[0].count == 2,
-                let firstVerse = Int(bookVerses[0][0]),
-                let lastVerse = Int(bookVerses[0][1]) {
+                let bookVerses = verses[0] as? [String],
+                bookVerses.count == 2,
+                let firstVerse = Int(bookVerses[0]),
+                let lastVerse = Int(bookVerses[1]) {
                 var verseIds: [String] = []
                 for v in firstVerse...lastVerse {
                     verseIds.append("\(bookId).\(chapterId).\(v)")
                 }
+                print("fetcher sending verse IDs", verseIds)
                 completion(data, verseIds, totalChunks)
             }
             else {
-                print(verses, verses[0].count)
-                if let cv = verses[0] as? [String] {
-                    print(cv, cv.count)
-                }
-                else {
-                    print("verses not a string-string array")
-                }
                 completion(data, nil, totalChunks)
             }
         }
@@ -123,7 +117,7 @@ class BRReadingFetcher: NSObject {
     }
 
     class func fetchBookId(_ bookId: String, chapterId: String, completion: @escaping (_ data: [String: Any]) -> Void) {
-        let path = "v1/bibles/\(bibleId)/chapters/\(bookId).\(chapterId)?content-type=json&include-notes=false&include-chapter-numbers=false&include-verse-spans=false"
+        let path = "v1/bibles/\(bibleId)/chapters/\(bookId).\(chapterId)?content-type=text&include-notes=false&include-chapter-numbers=false"
         guard let biblesUrl = URL(string: path, relativeTo: baseUrl) else { return }
         print(biblesUrl.absoluteString)
 
@@ -174,9 +168,76 @@ class BRReadingFetcher: NSObject {
 fileprivate func bookIdForBook(_ book: String) -> String? {
     switch book {
     case "Gen.": return "GEN"
-    case "Malachi": return "MAL"
+    case "Exod.": return "EXO"
+    case "Lev.": return "LEV"
+    case "Num.": return "NUM"
+    case "Deut.": return "DEU"
+    case "Josh.": return "JOS"
+    case "Judg.": return "JDG"
+    case "Ruth": return "RUT"
+    case "1 Sam.": return "1SA"
+    case "2 Sam.": return "2SA"
+    case "1 Kin.": return "1KI"
+    case "2 Kin.": return "2KI"
+    case "1 Chr.": return "1CH"
+    case "2 Chr.": return "2CH"
+    case "Ezra": return "EZR"
+    case "Neh.": return "NEH"
+    case "Esth.": return "EST"
+    case "Esther": return "EST"
+    case "Job": return "JOB"
     case "Ps.": return "PSA"
+    case "Prov.": return "PRO"
+    case "Ecc.": return "ECC"
+    case "Song": return "SNG"
+    case "Isa.": return "ISA"
+    case "Jer.": return "JER"
+    case "Lamentations": return "LAM"
+    case "Eze.": return "EZE"
+    case "Dan.": return "DAN"
+    case "Hos.": return "HOS"
+    case "Joel": return "JOL"
+    case "Amos": return "AMO"
+    case "Obad.": return "OBA"
+    case "Jon.": return "JON"
+    case "Mic.": return "MIC"
+    case "Nah.": return "NAH"
+    case "Nahum": return "NAM"
+    case "Hab.": return "HAB"
+    case "Habakkuk": return "HAB"
+    case "Zeph.": return "ZEP"
+    case "Hag.": return "HAG"
+    case "Zech.": return "ZEC"
+    case "Malachi": return "MAL"
+    case "Mat.": return "MAT"
+    case "Mark": return "MRK"
+    case "Luke": return "LUK"
+    case "John": return "JHN"
+    case "Acts": return "ACT"
+    case "Rom.": return "ROM"
+    case "1 Cor.": return "1CO"
+    case "2 Cor.": return "2CO"
+    case "Gal.": return "GAL"
+    case "Eph.": return "EPH"
+    case "Phil.": return "PHP"
+    case "Col.": return "COL"
+    case "1 Th.": return "1TH"
+    case "2 Thess.": return "2TH"
+    case "1 Tim.": return "1TI"
+    case "2 Tim.": return "2TI"
+    case "2 Timothy": return "2TI"
+    case "Titus": return "TIT"
+    case "Philemon": return "PHM"
+    case "Heb.": return "HEB"
+    case "Jam.": return "JAS"
+    case "James": return "JAS"
+    case "1 Pet.": return "1PE"
+    case "2 Peter": return "2PE"
+    case "1 Jn.": return "1JN"
+    case "2 Jn.": return "1JN"
+    case "3 Jn.": return "3JN"
     case "Jude": return "JUD"
+    case "Rev.": return "REV"
     default: return nil
     }
 }

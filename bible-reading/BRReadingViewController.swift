@@ -44,7 +44,6 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
                 self.loadedChunks = 1
                 self.isLoadingChunk = false
 
-                // TODO: use only specified verses
                 let readingText = attributedStringFromData(data, verseIds: verseIds)
                 OperationQueue.main.addOperation {
                     self.spinner?.stopAnimating()
@@ -88,7 +87,6 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
     }
 
     func loadNextChunk() {
-        self.spinner?.startAnimating() // TODO: only after scrolled all the way down
         self.isLoadingChunk = true
 
         BRReadingFetcher.fetchChunk(self.loadedChunks + 1, forReading: self.reading!) { (data: [String: Any]) in
@@ -106,24 +104,44 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
     }
 
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if self.isLoadingChunk { return }
         if self.loadedChunks == self.totalChunks { return }
-        if scrollView.contentSize.height < (self.textView?.frame.size.height ?? 10000) { return }
-        if scrollView.contentOffset.y < scrollView.contentSize.height/2 { return }
-        self.loadNextChunk()
+        if scrollView.contentSize.height < scrollView.frame.size.height { return }
+        if (scrollView.contentSize.height - scrollView.contentOffset.y - scrollView.frame.size.height) > scrollView.frame.size.height/2 { return }
+        if self.isLoadingChunk {
+            if self.spinner != nil, self.spinner!.isAnimating { return }
+            if (scrollView.contentSize.height - scrollView.contentOffset.y - scrollView.frame.size.height) < 100 {
+                self.spinner?.startAnimating()
+            }
+        }
+        else {
+            self.loadNextChunk()
+        }
     }
 }
 
 fileprivate func attributedStringFromData(_ data: [String: Any], verseIds: [String]? = nil) -> NSAttributedString {
     let readingText: NSMutableAttributedString = NSMutableAttributedString(string: "")
-    if verseIds != nil {
-        print(verseIds!, "\n", data)
-    }
 
     if let chapterTitle = data["reference"] as? String {
         readingText.append(NSAttributedString(string: chapterTitle + "\n\n", attributes: chapterAttributes))
     }
-    if let content = data["content"] as? Array<Any> {
+    if var content = data["content"] as? NSString {
+        var nextVerseHeader = content.range(of: "\\[\\d+\\]", options: .regularExpression)
+        while nextVerseHeader.location != NSNotFound {
+            readingText.append(NSAttributedString(string: content.substring(to: nextVerseHeader.location), attributes: textAttributes))
+
+            let verseNumber = content.substring(with: NSRange(location: nextVerseHeader.location + 1, length: nextVerseHeader.length - 2))
+            readingText.append(NSAttributedString(string: verseNumber, attributes: verseAttributes))
+
+            content = content.substring(from: nextVerseHeader.location + nextVerseHeader.length + 1) as NSString
+            nextVerseHeader = content.range(of: "\\[\\d+\\]", options: .regularExpression)
+        }
+        readingText.append(NSAttributedString(string: content as String, attributes: textAttributes))
+    }
+    /* change ReadingFetcher from text to json
+     misses added words, chapter titles (Psalms), "Selah" tags, double-labels some verses
+     see GEN.1, PS.1, LAM.4 (json in repo) */
+    else if let content = data["content"] as? [Any] {
         for c in content {
             var wroteAnything = false
             if let para = c as? [String: Any],
@@ -146,7 +164,7 @@ fileprivate func attributedStringFromData(_ data: [String: Any], verseIds: [Stri
                             let text = item["text"] as? String {
                             if shouldUseVerse(verseId, goodVerseIds: verseIds) {
                                 if verseNumber != nil {
-                                    readingText.append(NSAttributedString(string: verseNumber! + " ", attributes: verseAttributes))
+                                    readingText.append(NSAttributedString(string: verseNumber!, attributes: verseAttributes))
                                 }
                                 readingText.append(NSAttributedString(string: text + " ", attributes: textAttributes))
                                 wroteAnything = true
@@ -161,6 +179,7 @@ fileprivate func attributedStringFromData(_ data: [String: Any], verseIds: [Stri
         }
     }
     readingText.append(NSAttributedString(string: "\n", attributes: textAttributes))
+
 
     return readingText
 }

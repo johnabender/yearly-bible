@@ -228,6 +228,7 @@ static const CGFloat dragOvershoot = 60.;
     if( gr.state != UIGestureRecognizerStateBegan ) return;
 
     if( _selectionHandler )
+        // TODO: add haptic feedback
         _selectionHandler( reading );
 }
 
