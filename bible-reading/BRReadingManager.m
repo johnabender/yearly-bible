@@ -19,6 +19,9 @@ static NSString* const BRReadingScheduleTimePreference = @"BRReadingScheduleTime
 
 static NSString* const BRReadingTypePreference = @"BRReadingTypePreference";
 
+static NSString* const BRReadingViewTypePreference = @"BRReadingViewTypePreference";
+static NSString* const BRTranslationPreference = @"BRTranslationPreference";
+
 
 @implementation BRReadingManager
 
@@ -161,6 +164,33 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 }
 
 
+#pragma mark - Reading view preferences
+
++(BRReadingViewType) readingViewType
+{
+    return [[NSUserDefaults standardUserDefaults] integerForKey:BRReadingViewTypePreference];
+}
+
++(void) setReadingViewType:(BRReadingViewType)newType
+{
+    [[NSUserDefaults standardUserDefaults] setInteger:newType forKey:BRReadingViewTypePreference];
+}
+
+
++(BRTranslation*) preferredTranslation
+{
+    NSDictionary *storedPreference = [[NSUserDefaults standardUserDefaults] dictionaryForKey:BRTranslationPreference];
+    if( storedPreference == nil ) return nil;
+    return [[BRTranslation alloc] initWithDictionary:storedPreference];
+}
+
++(void) setPreferredTranslation:(BRTranslation*)newPreferredTranslation
+{
+    [[NSUserDefaults standardUserDefaults] setObject:[newPreferredTranslation dictionaryRepresentation]
+                                              forKey:BRTranslationPreference];
+}
+
+
 +(NSArray*) resetReadings
 {
     NSArray *r = [self newReadings:[self readingType]];
@@ -205,8 +235,6 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 +(void) fixReadings:(NSArray*)existingReadings
 {
     // update chapters to match what they are in code
-
-    // TODO: remap "Jam." (sequential) to "James"
 
     NSArray *newReadings = [self newReadings:[self readingType]];
     newReadings = [self readingArrayFromDictionaryArray:newReadings];
@@ -453,6 +481,8 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
             else if( [reading.passage isEqualToString:@"Nah., Hab."] )
                 return @[@[@"1", @"2", @"3"], @[@"1", @"2", @"3"]];
             else if( [reading.passage isEqualToString:@"Zeph., Hagg."] )
+                return @[@[@"1", @"2", @"3"], @[@"1", @"2"]];
+            else if( [reading.passage isEqualToString:@"Zeph., Hag."] )
                 return @[@[@"1", @"2", @"3"], @[@"1", @"2"]];
             else if( [reading.passage isEqualToString:@"2 Jn., 3 Jn."] )
                 return @[@[@"1"], @[@"1"]];
@@ -1123,7 +1153,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
                      @{@"day": @"Aug. 24", @"passage": @"Mic. 4-7"},
                      @{@"day": @"Aug. 25", @"passage": @"Nahum"},
                      @{@"day": @"Aug. 26", @"passage": @"Habakkuk"},
-                     @{@"day": @"Aug. 27", @"passage": @"Zeph., Hag."},
+                     @{@"day": @"Aug. 27", @"passage": @"Zeph., Hagg."},
                      @{@"day": @"Aug. 28", @"passage": @"Zech. 1-6"},
                      @{@"day": @"Aug. 29", @"passage": @"Zech. 7-10"},
                      @{@"day": @"Aug. 30", @"passage": @"Zech. 11-14"},
@@ -1232,8 +1262,8 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
                      @{@"day": @"Dec. 11", @"passage": @"Heb. 8-9"},
                      @{@"day": @"Dec. 12", @"passage": @"Heb. 10-11"},
                      @{@"day": @"Dec. 13", @"passage": @"Heb. 12-13"},
-                     @{@"day": @"Dec. 14", @"passage": @"Jam. 1-2"},
-                     @{@"day": @"Dec. 15", @"passage": @"Jam. 3-5"},
+                     @{@"day": @"Dec. 14", @"passage": @"James 1-2"},
+                     @{@"day": @"Dec. 15", @"passage": @"James 3-5"},
                      @{@"day": @"Dec. 16", @"passage": @"1 Pet. 1-3"},
                      @{@"day": @"Dec. 17", @"passage": @"1 Pet. 4-5"},
                      @{@"day": @"Dec. 18", @"passage": @"2 Peter"},

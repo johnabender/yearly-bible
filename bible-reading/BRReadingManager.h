@@ -10,6 +10,7 @@
 #import <UserNotifications/UserNotifications.h>
 
 #import "BRReading.h"
+#import "BRTranslation.h"
 
 
 FOUNDATION_EXPORT NSString* const BRNotificationCategory;
@@ -21,6 +22,11 @@ FOUNDATION_EXPORT NSString* const BRMarkReadString;
 typedef NS_ENUM(NSInteger, BRReadingType) {
     BRReadingTypeSequential,
     BRReadingTypeTopical
+};
+
+typedef NS_ENUM(NSInteger, BRReadingViewType) {
+    BRReadingViewTypeDarkText,
+    BRReadingViewTypeLightText
 };
 
 
@@ -42,6 +48,12 @@ typedef NS_ENUM(NSInteger, BRReadingType) {
 +(NSArray*) resetReadings;
 
 +(NSArray*) shiftReadings:(NSInteger)offset;
+
++(BRReadingViewType) readingViewType;
++(void) setReadingViewType:(BRReadingViewType)newType;
+
++(BRTranslation*) preferredTranslation;
++(void) setPreferredTranslation:(BRTranslation*)newPreferredTranslation;
 
 +(void) readingWasRead:(BRReading*)reading;
 +(void) readingWasUnread:(BRReading*)reading;

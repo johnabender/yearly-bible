@@ -9,15 +9,17 @@
 import UIKit
 
 fileprivate let chapterFont = UIFont(name: "KingThingsFoundation", size: 17)!
-fileprivate let chapterAttributes = [NSAttributedString.Key.font: chapterFont]
+fileprivate var chapterAttributes: [NSAttributedString.Key: Any] = [.font: chapterFont]
 fileprivate let textFont = UIFont(name: "Gentium Basic", size: 15)!
-fileprivate let textAttributes = [NSAttributedString.Key.font: textFont]
+fileprivate var textAttributes: [NSAttributedString.Key: Any] = [.font: textFont]
 fileprivate let verseFont = UIFont(name: "KingThingsFoundation", size: 10)!
-fileprivate let verseAttributes = [NSAttributedString.Key.font: verseFont,
-                                   NSAttributedString.Key.baselineOffset: NSNumber(value: 5),
-                                   NSAttributedString.Key.obliqueness: NSNumber(value: 0.1)]
+fileprivate var verseAttributes: [NSAttributedString.Key: Any] = [.font: verseFont,
+                                                                  .baselineOffset: NSNumber(value: 5),
+                                                                  .obliqueness: NSNumber(value: 0.1)]
 
 class BRReadingViewController: UIViewController, UIScrollViewDelegate {
+
+    @IBOutlet weak var blurView: UIVisualEffectView?
 
     @IBOutlet weak var contentView: UIView?
     @IBOutlet weak var markButton: UIButton?
@@ -35,6 +37,20 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+
+        var fontColor = UIColor.black
+        switch BRReadingManager.readingViewType() {
+        case .darkText:
+            print("dark text")
+            self.blurView?.effect = UIBlurEffect(style: .light)
+        case .lightText:
+            print("light text")
+            self.blurView?.effect = UIBlurEffect(style: .dark)
+            fontColor = .white
+        }
+        chapterAttributes[.foregroundColor] = fontColor
+        textAttributes[.foregroundColor] = fontColor
+        verseAttributes[.foregroundColor] = fontColor
 
         self.markButton?.setTitle(BRMarkReadString, for: .normal)
 

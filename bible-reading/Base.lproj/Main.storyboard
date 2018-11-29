@@ -99,7 +99,7 @@
                                             </connections>
                                         </textView>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3mQ-a7-ssX">
-                                            <rect key="frame" x="321" y="748" width="44" height="30"/>
+                                            <rect key="frame" x="328" y="748" width="37" height="30"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="OZ0-Zb-JcV"/>
                                             </constraints>
@@ -112,7 +112,7 @@
                                             </connections>
                                         </button>
                                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FTi-do-Mlv">
-                                            <rect key="frame" x="10" y="748" width="39" height="30"/>
+                                            <rect key="frame" x="10" y="748" width="37" height="30"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="30" id="sAo-Md-cCm"/>
                                             </constraints>
@@ -157,6 +157,7 @@
                     </view>
                     <modalPageSheetSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <connections>
+                        <outlet property="blurView" destination="MRk-Ly-XNd" id="CFF-fS-bhW"/>
                         <outlet property="contentView" destination="xrL-KM-rmb" id="35m-7T-GJ4"/>
                         <outlet property="markButton" destination="FTi-do-Mlv" id="8nQ-Pk-O2k"/>
                         <outlet property="spinner" destination="iWP-Zi-h4y" id="TZ5-fJ-dZL"/>
@@ -183,26 +184,8 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                                 <prototypes>
-                                    <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="spacng dummy" textLabel="Qsr-5p-L70" style="IBUITableViewCellStyleDefault" id="3pB-BF-Sge" customClass="BRTableCell">
-                                        <rect key="frame" x="0.0" y="22" width="375" height="50"/>
-                                        <autoresizingMask key="autoresizingMask"/>
-                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="3pB-BF-Sge" id="FJL-Sp-Vce">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="49.666666666666664"/>
-                                            <autoresizingMask key="autoresizingMask"/>
-                                            <subviews>
-                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Qsr-5p-L70">
-                                                    <rect key="frame" x="15" y="0.0" width="345" height="49.666666666666664"/>
-                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                                                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                    <nil key="highlightedColor"/>
-                                                </label>
-                                            </subviews>
-                                        </tableViewCellContentView>
-                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                    </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" id="yAT-n8-lV7" customClass="BRTableCell">
-                                        <rect key="frame" x="0.0" y="72" width="375" height="50"/>
+                                        <rect key="frame" x="0.0" y="22" width="375" height="50"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="yAT-n8-lV7" id="zoI-f0-Gh8">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="49.666666666666664"/>
@@ -287,7 +270,7 @@
                         </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" title=" Settings" id="mWd-9X-P31">
                             <connections>
-                                <segue destination="p54-sg-WgX" kind="push" id="fWL-wE-gaK"/>
+                                <segue destination="tMY-8n-NX9" kind="push" id="sZn-cD-CIk"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -300,114 +283,224 @@
             </objects>
             <point key="canvasLocation" x="57.600000000000001" y="232.98350824587709"/>
         </scene>
-        <!--Settings View Controller-->
-        <scene sceneID="ifw-NJ-s3d">
+        <!--Settings-->
+        <scene sceneID="Zhr-kQ-OzM">
             <objects>
-                <viewController storyboardIdentifier="BRSettingsViewController" id="p54-sg-WgX" customClass="BRSettingsViewController" customModule="bible_reading" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="lJ3-lV-kh6">
+                <tableViewController id="tMY-8n-NX9" customClass="BRSettingsViewController" customModule="bible_reading" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="static" style="grouped" separatorStyle="none" rowHeight="44" estimatedRowHeight="-1" sectionHeaderHeight="18" estimatedSectionHeaderHeight="-1" sectionFooterHeight="18" estimatedSectionFooterHeight="-1" id="bGK-d0-15N">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg.png" translatesAutoresizingMaskIntoConstraints="NO" id="7Gc-pF-cVf">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
-                            </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WmK-Dk-ZOx">
-                                <rect key="frame" x="16" y="98" width="140" height="30"/>
-                                <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
-                                <state key="normal" title="Schedule Reminders">
-                                    <color key="titleColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
-                                <connections>
-                                    <action selector="pressedReminderButton" destination="p54-sg-WgX" eventType="touchUpInside" id="s7F-iz-czH"/>
-                                </connections>
-                            </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reminder date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RhN-iR-0aa">
-                                <rect key="frame" x="166" y="104.33333333333333" width="98.666666666666686" height="17.333333333333329"/>
-                                <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
-                                <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QFp-yN-aIo">
-                                <rect key="frame" x="16" y="176" width="343" height="543"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                <string key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.
-
-This list of readings divides the Bible into seven sections, one for each day of the week. If January 1 were a Monday, the days would be as follows:
-
-Monday: Law (Gen. - Deut.)
-Tuesday: History (Joshua - Esther)
-Wednesday: Psalms
-Thursday: Poetry (Job, Prov. - Song)
-Friday: Prophecy (Isaiah - Malachi)
-Saturday: Gospels (Matt. - Acts)
-Sunday: Letters (Romans - Rev.)
-
-Thus, if one were to read all the Mondays, then all the Tuesdays, then all the Wednesdays, etc., it would be roughly the equivalent of reading the Bible straight through. However, dividing it into sections provides variety from day to day in both the type of content and its length. This helps avoid boredom and also allows one to catch up more easily if a day is missed, by combining two shorter readings together to make up for the lost day.
-
-The daily divisions have been tuned over the course of several years for both consistency and contiguity. Within a section, each day’s reading is approximately the same length throughout the year, subject to a few caveats. None of the chapters are broken across days (other than Psalm 119), and related neighboring chapters are kept together if practical. In general, drier sections of text, such as descriptions of the tabernacle or genealogies, are conglomerated into longer daily readings, while more poetic or narrative text, such as the psalms or the travels of the patriarchs, are separated for more individual attention.</string>
-                                <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dcw-QI-Cb0">
-                                <rect key="frame" x="16" y="138" width="157" height="29"/>
-                                <segments>
-                                    <segment title="Sequential"/>
-                                    <segment title="Topical"/>
-                                </segments>
-                                <color key="tintColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <connections>
-                                    <action selector="changedOrderSelection" destination="p54-sg-WgX" eventType="valueChanged" id="HvP-X7-c4A"/>
-                                </connections>
-                            </segmentedControl>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Bx5-Si-eEK">
-                                <rect key="frame" x="16" y="176" width="343" height="543"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
-                                <string key="text">This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.</string>
-                                <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="15"/>
-                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                            </textView>
-                        </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="dcw-QI-Cb0" firstAttribute="leading" secondItem="WmK-Dk-ZOx" secondAttribute="leading" id="2vu-hf-Ehx"/>
-                            <constraint firstItem="Bx5-Si-eEK" firstAttribute="bottom" secondItem="QFp-yN-aIo" secondAttribute="bottom" id="8B5-yT-bWW"/>
-                            <constraint firstAttribute="trailing" secondItem="7Gc-pF-cVf" secondAttribute="trailing" id="M4E-NO-VWO"/>
-                            <constraint firstItem="RhN-iR-0aa" firstAttribute="centerY" secondItem="WmK-Dk-ZOx" secondAttribute="centerY" id="MAO-82-VaJ"/>
-                            <constraint firstItem="QFp-yN-aIo" firstAttribute="leading" secondItem="Bx5-Si-eEK" secondAttribute="leading" id="NF6-9b-NsL"/>
-                            <constraint firstItem="BOr-1A-RfR" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="dcw-QI-Cb0" secondAttribute="trailing" symbolic="YES" id="NX6-pW-RbV"/>
-                            <constraint firstItem="Bx5-Si-eEK" firstAttribute="trailing" secondItem="QFp-yN-aIo" secondAttribute="trailing" id="Pwc-6W-DeJ"/>
-                            <constraint firstItem="Bx5-Si-eEK" firstAttribute="leading" secondItem="BOr-1A-RfR" secondAttribute="leading" constant="16" id="QMN-lD-lTE"/>
-                            <constraint firstItem="RhN-iR-0aa" firstAttribute="trailing" relation="lessThanOrEqual" secondItem="BOr-1A-RfR" secondAttribute="trailing" id="SQG-vF-DJo"/>
-                            <constraint firstItem="QFp-yN-aIo" firstAttribute="top" secondItem="Bx5-Si-eEK" secondAttribute="top" id="Un1-RZ-9wG"/>
-                            <constraint firstItem="7Gc-pF-cVf" firstAttribute="leading" secondItem="lJ3-lV-kh6" secondAttribute="leading" id="XZJ-E2-7LH"/>
-                            <constraint firstItem="dcw-QI-Cb0" firstAttribute="top" secondItem="WmK-Dk-ZOx" secondAttribute="bottom" constant="10" id="ZlX-Yx-AnK"/>
-                            <constraint firstAttribute="bottom" secondItem="7Gc-pF-cVf" secondAttribute="bottom" id="bLL-BG-Qpi"/>
-                            <constraint firstItem="7Gc-pF-cVf" firstAttribute="top" secondItem="lJ3-lV-kh6" secondAttribute="top" id="c3V-J9-bQI"/>
-                            <constraint firstItem="WmK-Dk-ZOx" firstAttribute="top" secondItem="BOr-1A-RfR" secondAttribute="top" constant="10" id="eDe-uN-QT0"/>
-                            <constraint firstItem="BOr-1A-RfR" firstAttribute="bottom" secondItem="Bx5-Si-eEK" secondAttribute="bottom" constant="10" id="la5-ND-MxM"/>
-                            <constraint firstItem="WmK-Dk-ZOx" firstAttribute="leading" secondItem="Bx5-Si-eEK" secondAttribute="leading" id="nx5-sD-xmc"/>
-                            <constraint firstItem="Bx5-Si-eEK" firstAttribute="top" secondItem="dcw-QI-Cb0" secondAttribute="bottom" constant="10" id="rPP-Zj-AUh"/>
-                            <constraint firstItem="BOr-1A-RfR" firstAttribute="trailing" secondItem="Bx5-Si-eEK" secondAttribute="trailing" constant="16" id="rsV-K9-D28"/>
-                            <constraint firstItem="RhN-iR-0aa" firstAttribute="leading" secondItem="WmK-Dk-ZOx" secondAttribute="trailing" constant="10" id="yDs-fy-XYN"/>
-                        </constraints>
-                        <viewLayoutGuide key="safeArea" id="BOr-1A-RfR"/>
-                    </view>
-                    <navigationItem key="navigationItem" id="otN-Zj-l7v">
+                        <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                        <imageView key="tableFooterView" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg.png" id="7Gc-pF-cVf">
+                            <rect key="frame" x="0.0" y="361.33333333333337" width="375" height="200"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
+                        <sections>
+                            <tableViewSection headerTitle="Reminders" id="IpE-AI-vig">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="Q22-im-8Ls">
+                                        <rect key="frame" x="0.0" y="55.333333333333343" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Q22-im-8Ls" id="pCC-v4-6KT">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WmK-Dk-ZOx">
+                                                    <rect key="frame" x="16" y="7" width="142" height="30"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="30" id="xvW-1e-Ha5"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="17"/>
+                                                    <state key="normal" title="Schedule Reminders">
+                                                        <color key="titleColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                        <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="pressedReminderButton" destination="tMY-8n-NX9" eventType="touchUpInside" id="fu2-Mc-DHK"/>
+                                                    </connections>
+                                                </button>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Reminder date" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RhN-iR-0aa">
+                                                    <rect key="frame" x="162" y="12" width="102.66666666666669" height="20"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="20" id="EjD-zO-cBU"/>
+                                                    </constraints>
+                                                    <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="17"/>
+                                                    <color key="textColor" red="0.42352941176470588" green="0.36862745098039218" blue="0.26666666666666666" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstItem="RhN-iR-0aa" firstAttribute="centerY" secondItem="WmK-Dk-ZOx" secondAttribute="centerY" id="Kfc-i9-wj3"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="RhN-iR-0aa" secondAttribute="trailing" constant="20" symbolic="YES" id="ScL-Mj-gES"/>
+                                                <constraint firstItem="WmK-Dk-ZOx" firstAttribute="centerY" secondItem="pCC-v4-6KT" secondAttribute="centerY" id="mdy-ex-s06"/>
+                                                <constraint firstItem="RhN-iR-0aa" firstAttribute="leading" secondItem="WmK-Dk-ZOx" secondAttribute="trailing" constant="4" id="p8U-Bn-O5s"/>
+                                                <constraint firstItem="WmK-Dk-ZOx" firstAttribute="leading" secondItem="pCC-v4-6KT" secondAttribute="leading" constant="16" id="taZ-AS-IKZ"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Reading View" id="fIF-uj-RqW">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="Lpb-jL-LVK">
+                                        <rect key="frame" x="0.0" y="155.33333333333334" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Lpb-jL-LVK" id="fnQ-Xb-x9b">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="0Z5-dE-I9c">
+                                                    <rect key="frame" x="16" y="7.3333333333333321" width="145" height="29.999999999999996"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="29" id="Ecp-EO-Ada"/>
+                                                    </constraints>
+                                                    <segments>
+                                                        <segment title="Dark text"/>
+                                                        <segment title="Light text"/>
+                                                    </segments>
+                                                    <color key="tintColor" red="0.91972148419999999" green="0.25468263029999999" blue="0.026138082149999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <connections>
+                                                        <action selector="changedOrderSelection" destination="tMY-8n-NX9" eventType="valueChanged" id="nmV-uj-vZZ"/>
+                                                        <action selector="changedReadingDisplaySelection" destination="tMY-8n-NX9" eventType="valueChanged" id="JQW-5x-qMM"/>
+                                                    </connections>
+                                                </segmentedControl>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="0Z5-dE-I9c" secondAttribute="trailing" constant="20" symbolic="YES" id="4GT-ju-PoL"/>
+                                                <constraint firstItem="0Z5-dE-I9c" firstAttribute="centerY" secondItem="fnQ-Xb-x9b" secondAttribute="centerY" id="KHa-8p-mXD"/>
+                                                <constraint firstItem="0Z5-dE-I9c" firstAttribute="leading" secondItem="fnQ-Xb-x9b" secondAttribute="leading" constant="16" id="bHg-94-vJw"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="d5r-WO-7NF" style="IBUITableViewCellStyleDefault" id="RjF-RL-RgJ">
+                                        <rect key="frame" x="0.0" y="199.33333333333334" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="RjF-RL-RgJ" id="T8a-K7-oTN">
+                                            <rect key="frame" x="0.0" y="0.0" width="341" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Translation" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="d5r-WO-7NF">
+                                                    <rect key="frame" x="16" y="0.0" width="324" height="44"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="17"/>
+                                                    <color key="textColor" red="0.42352941179999998" green="0.36862745099999999" blue="0.2666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <connections>
+                                            <segue destination="UQw-dH-Nbo" kind="push" id="3PZ-2l-3R3"/>
+                                        </connections>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                            <tableViewSection headerTitle="Sequence" id="msH-TS-ahY">
+                                <cells>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" id="uOw-Da-YjT">
+                                        <rect key="frame" x="0.0" y="299.33333333333337" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="uOw-Da-YjT" id="Hxt-Pl-qfc">
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dcw-QI-Cb0">
+                                                    <rect key="frame" x="16" y="7.3333333333333321" width="157" height="29.999999999999996"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="29" id="mUr-o8-5U3"/>
+                                                    </constraints>
+                                                    <segments>
+                                                        <segment title="Sequential"/>
+                                                        <segment title="Topical"/>
+                                                    </segments>
+                                                    <color key="tintColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                    <connections>
+                                                        <action selector="changedOrderSelection" destination="tMY-8n-NX9" eventType="valueChanged" id="zYo-Ik-eO2"/>
+                                                    </connections>
+                                                </segmentedControl>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstItem="dcw-QI-Cb0" firstAttribute="centerY" secondItem="Hxt-Pl-qfc" secondAttribute="centerY" id="DTa-gS-DZF"/>
+                                                <constraint firstItem="dcw-QI-Cb0" firstAttribute="leading" secondItem="Hxt-Pl-qfc" secondAttribute="leading" constant="16" id="I9R-FK-tna"/>
+                                                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="dcw-QI-Cb0" secondAttribute="trailing" constant="20" symbolic="YES" id="hnm-1g-sTh"/>
+                                            </constraints>
+                                        </tableViewCellContentView>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </tableViewCell>
+                                </cells>
+                            </tableViewSection>
+                        </sections>
+                        <connections>
+                            <outlet property="dataSource" destination="tMY-8n-NX9" id="BXp-yW-4ed"/>
+                            <outlet property="delegate" destination="tMY-8n-NX9" id="AyJ-s2-s41"/>
+                        </connections>
+                    </tableView>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" title="Settings" id="QPe-CS-Eer">
                         <barButtonItem key="rightBarButtonItem" enabled="NO" title="Item" id="q4v-Zj-cAl"/>
                     </navigationItem>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
-                        <outlet property="orderControl" destination="dcw-QI-Cb0" id="jMm-GH-lef"/>
-                        <outlet property="scheduleButton" destination="WmK-Dk-ZOx" id="t0A-C5-o2P"/>
-                        <outlet property="scheduleLabel" destination="RhN-iR-0aa" id="Jf2-35-x0M"/>
-                        <outlet property="sequentialText" destination="Bx5-Si-eEK" id="EvS-5c-MsR"/>
-                        <outlet property="topicalText" destination="QFp-yN-aIo" id="1qa-o0-00e"/>
-                        <outlet property="versionLabel" destination="q4v-Zj-cAl" id="sKQ-Os-BwB"/>
+                        <outlet property="backgroundView" destination="7Gc-pF-cVf" id="PIh-mF-g9y"/>
+                        <outlet property="orderControl" destination="dcw-QI-Cb0" id="7Tb-JJ-7BH"/>
+                        <outlet property="readingDisplayControl" destination="0Z5-dE-I9c" id="xIv-Q4-BX9"/>
+                        <outlet property="scheduleButton" destination="WmK-Dk-ZOx" id="hi9-FU-tr9"/>
+                        <outlet property="scheduleLabel" destination="RhN-iR-0aa" id="tpX-Zp-VzR"/>
+                        <outlet property="translationLabel" destination="d5r-WO-7NF" id="vC2-4y-r5s"/>
+                        <outlet property="versionLabel" destination="q4v-Zj-cAl" id="irP-LS-zQC"/>
                     </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Jqs-Bc-RtA" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="15r-Om-ZHN" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="818.39999999999998" y="232.98350824587709"/>
+            <point key="canvasLocation" x="852" y="233"/>
+        </scene>
+        <!--Choose Translation-->
+        <scene sceneID="So1-mQ-As2">
+            <objects>
+                <tableViewController id="UQw-dH-Nbo" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="rRP-MP-QXq">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <imageView key="tableFooterView" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="bg.png" id="6b6-7t-jld">
+                            <rect key="frame" x="0.0" y="72" width="375" height="200"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        </imageView>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="translationCell" textLabel="Red-yQ-aXi" style="IBUITableViewCellStyleDefault" id="2Qo-Bs-cms">
+                                <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="2Qo-Bs-cms" id="gAh-wl-2Ho">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="43.666666666666664"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="Red-yQ-aXi">
+                                            <rect key="frame" x="16" y="0.0" width="343" height="43.666666666666664"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" name="GentiumBasic" family="Gentium Basic" pointSize="17"/>
+                                            <color key="textColor" red="0.42352941179999998" green="0.36862745099999999" blue="0.2666666667" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="UQw-dH-Nbo" id="XJB-te-hQg"/>
+                            <outlet property="delegate" destination="UQw-dH-Nbo" id="KCz-uX-1lg"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Choose Translation" id="kOv-eK-k0S"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cJM-zn-lkU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1660" y="233"/>
         </scene>
         <!--Date Picker View Controller-->
         <scene sceneID="VRv-67-wQS">
@@ -477,7 +570,7 @@ The daily divisions have been tuned over the course of several years for both co
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="T5H-aU-LnO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1523.2" y="232.98350824587709"/>
+            <point key="canvasLocation" x="854" y="944"/>
         </scene>
     </scenes>
     <resources>

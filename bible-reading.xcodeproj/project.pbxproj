@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		37649E44215C021A00CBA6FF /* Bundle+VersionNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */; };
 		376FAC20219CDD7300D6DEB8 /* BRReadingFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376FAC1F219CDD7300D6DEB8 /* BRReadingFetcher.swift */; };
+		37BBBF4121B04A5600BC06E7 /* BRTranslation.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BBBF4021B04A5600BC06E7 /* BRTranslation.m */; };
 		37E293C5219B81BA0086012D /* BRReadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E293C4219B81BA0086012D /* BRReadingViewController.swift */; };
 		C314D5B520B0D9420066EA98 /* Kingthings_Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C314D5B420B0D9400066EA98 /* Kingthings_Foundation.ttf */; };
 		C3200E0D1B0708E400F957DD /* GenBasR.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3200E0C1B0708D400F957DD /* GenBasR.ttf */; };
@@ -52,6 +53,8 @@
 /* Begin PBXFileReference section */
 		37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+VersionNumber.swift"; sourceTree = "<group>"; };
 		376FAC1F219CDD7300D6DEB8 /* BRReadingFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BRReadingFetcher.swift; sourceTree = "<group>"; };
+		37BBBF3F21B04A5600BC06E7 /* BRTranslation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BRTranslation.h; sourceTree = "<group>"; };
+		37BBBF4021B04A5600BC06E7 /* BRTranslation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BRTranslation.m; sourceTree = "<group>"; };
 		37E293C4219B81BA0086012D /* BRReadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BRReadingViewController.swift; sourceTree = "<group>"; };
 		C314D5B420B0D9400066EA98 /* Kingthings_Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Kingthings_Foundation.ttf; sourceTree = "<group>"; };
 		C3200E0C1B0708D400F957DD /* GenBasR.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GenBasR.ttf; sourceTree = "<group>"; };
@@ -164,6 +167,8 @@
 				376FAC1F219CDD7300D6DEB8 /* BRReadingFetcher.swift */,
 				C3FBEA6C187A56F90040D082 /* BRReadingManager.h */,
 				C3FBEA6D187A56F90040D082 /* BRReadingManager.m */,
+				37BBBF3F21B04A5600BC06E7 /* BRTranslation.h */,
+				37BBBF4021B04A5600BC06E7 /* BRTranslation.m */,
 				C326EB5C188328160003A1F0 /* BRReading.h */,
 				C326EB5D188328160003A1F0 /* BRReading.m */,
 				37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */,
@@ -332,6 +337,7 @@
 				376FAC20219CDD7300D6DEB8 /* BRReadingFetcher.swift in Sources */,
 				C3FBEA6E187A56F90040D082 /* BRReadingManager.m in Sources */,
 				C3FBEA44187A56840040D082 /* main.m in Sources */,
+				37BBBF4121B04A5600BC06E7 /* BRTranslation.m in Sources */,
 				C36A76FD1A2259FB00E4FD35 /* BRSettingsViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

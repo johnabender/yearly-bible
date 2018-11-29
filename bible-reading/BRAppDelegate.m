@@ -20,7 +20,9 @@
 
 //    for( NSString *name in [UIFont familyNames] ) DLog( @"%@", name );
     UIFont *navFont = [UIFont fontWithName:@"Gentium Basic" size:17.];
-    [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont}];
+    UIColor *textColor = [UIColor colorWithRed:108./255. green:94./255. blue:68./255. alpha:1.];
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont,
+                                                           NSForegroundColorAttributeName: textColor}];
     [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}
      forState:UIControlStateNormal];
@@ -29,7 +31,7 @@
      forState:UIControlStateHighlighted];
     [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}
-     forState:UIControlStateHighlighted];
+     forState:UIControlStateSelected];
     [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}
      forState:UIControlStateDisabled];
