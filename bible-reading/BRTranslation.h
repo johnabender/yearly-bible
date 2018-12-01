@@ -13,6 +13,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface BRTranslation : NSObject
 
 @property (nonatomic, copy) NSString *name;
+@property (nonatomic, copy) NSString *version;
+@property (nonatomic, copy) NSString *language;
 @property (nonatomic, copy) NSString *key;
 
 -(id) initWithDictionary:(NSDictionary*)dict;

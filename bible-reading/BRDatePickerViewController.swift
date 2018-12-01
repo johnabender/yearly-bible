@@ -34,7 +34,7 @@ class BRDatePickerViewController: UIViewController {
 
         UIView.animate(withDuration: 0.3, animations: { () -> Void in
             self.view.alpha = 1
-            self.bottomOffsetConstraint?.constant = 0
+            self.bottomOffsetConstraint?.constant = view.safeAreaInsets.bottom
             self.view.layoutIfNeeded()
         })
     }

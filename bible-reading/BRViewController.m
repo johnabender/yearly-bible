@@ -165,14 +165,14 @@
     [self presentViewController:alert animated:YES completion:nil];
 }
 
-
+/*
 -(void) pushSettingsVC
 {
     UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     BRSettingsViewController *settingsVC = [storyboard instantiateViewControllerWithIdentifier:@"BRSettingsViewController"];
     [self.navigationController pushViewController:settingsVC animated:YES];
 }
-
+*/
 
 -(void) shiftReadings
 {

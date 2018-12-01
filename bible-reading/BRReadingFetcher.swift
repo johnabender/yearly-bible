@@ -9,12 +9,15 @@
 import UIKit
 
 fileprivate let hashedApiKey = "2ae1" + "5c639c3d6217c0524ad5b7697286"
-fileprivate let baseUrl = URL(string: "https://api.scripture.api.bible")
-fileprivate let bibleId = "06125adad2d5898a-01" // ASV
+fileprivate let defaultBibleId = "06125adad2d5898a-01" // ASV
 
 class BRReadingFetcher: NSObject {
     class func apiKey() -> String {
         return String(hashedApiKey[hashedApiKey.index(hashedApiKey.startIndex, offsetBy: 16)...] + hashedApiKey[..<hashedApiKey.index(hashedApiKey.startIndex, offsetBy: 16)])
+    }
+
+    class func baseUrl() -> URL? {
+        return URL(string: "https://api.scripture.api.bible")
     }
 
     class func fetchReading(_ reading: BRReading, completion: @escaping (_ data: [String: Any], _ verseIds: [String]?, _ totalChunks: Int) -> Void) {
@@ -117,8 +120,13 @@ class BRReadingFetcher: NSObject {
     }
 
     class func fetchBookId(_ bookId: String, chapterId: String, completion: @escaping (_ data: [String: Any]) -> Void) {
+        var bibleId = defaultBibleId
+        if let preferredTranslation = BRReadingManager.preferredTranslation() {
+            bibleId = preferredTranslation.key
+        }
+
         let path = "v1/bibles/\(bibleId)/chapters/\(bookId).\(chapterId)?content-type=text&include-notes=false&include-chapter-numbers=false"
-        guard let biblesUrl = URL(string: path, relativeTo: baseUrl) else { return }
+        guard let biblesUrl = URL(string: path, relativeTo: self.baseUrl()) else { return }
         print(biblesUrl.absoluteString)
 
         let config = URLSessionConfiguration.default
@@ -127,7 +135,7 @@ class BRReadingFetcher: NSObject {
         let task = session.dataTask(with: biblesUrl) { (data: Data?, resp: URLResponse?, err: Error?) in
             if err != nil {
                 print("connection error:", err!)
-                return
+                return 
             }
             else if let r = resp as? HTTPURLResponse,
                 r.statusCode > 299 {

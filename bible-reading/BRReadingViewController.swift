@@ -60,7 +60,8 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
                 self.loadedChunks = 1
                 self.isLoadingChunk = false
 
-                let readingText = attributedStringFromData(data, verseIds: verseIds)
+                let readingText = NSMutableAttributedString(string: "\n\n", attributes: textAttributes)
+                readingText.append(attributedStringFromData(data, verseIds: verseIds))
                 OperationQueue.main.addOperation {
                     self.spinner?.stopAnimating()
                     self.spinnerCenterYConstraint?.constant = (self.textView?.frame.size.height ?? 0)/2 - (self.spinner?.frame.size.height ?? 0)
@@ -81,7 +82,7 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if false && self.contentView != nil && self.textView != nil {
+        if self.contentView != nil && self.textView != nil {
             let gradientLayer = CAGradientLayer()
             gradientLayer.frame = self.contentView!.bounds
             gradientLayer.colors = [UIColor.white.cgColor, UIColor.clear.cgColor, UIColor.white.cgColor]
@@ -108,13 +109,17 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
         BRReadingFetcher.fetchChunk(self.loadedChunks + 1, forReading: self.reading!) { (data: [String: Any]) in
             let newText = attributedStringFromData(data)
             OperationQueue.main.addOperation {
-                let readingText = NSMutableAttributedString(attributedString: self.textView!.attributedText)
-                readingText.append(newText)
-                self.spinner?.stopAnimating()
-                self.textView?.attributedText = readingText
-
                 self.loadedChunks += 1
                 self.isLoadingChunk = false
+
+                let readingText = NSMutableAttributedString(attributedString: self.textView!.attributedText)
+                readingText.append(newText)
+                if self.loadedChunks == self.totalChunks {
+                    readingText.append(NSAttributedString(string: "\n\n", attributes: textAttributes))
+                }
+
+                self.spinner?.stopAnimating()
+                self.textView?.attributedText = readingText
             }
         }
     }
@@ -144,7 +149,14 @@ fileprivate func attributedStringFromData(_ data: [String: Any], verseIds: [Stri
     if var content = data["content"] as? NSString {
         var nextVerseHeader = content.range(of: "\\[\\d+\\]", options: .regularExpression)
         while nextVerseHeader.location != NSNotFound {
-            readingText.append(NSAttributedString(string: content.substring(to: nextVerseHeader.location), attributes: textAttributes))
+            var text = content.substring(to: nextVerseHeader.location)
+
+            // replace random garbage in text strings
+            text = text.replacingOccurrences(of: " ¶ ", with: "")
+            text = text.replacingOccurrences(of: "  ", with: " ")
+            text = text.replacingOccurrences(of: "[Selah", with: "Selah")
+
+            readingText.append(NSAttributedString(string: text, attributes: textAttributes))
 
             let verseNumber = content.substring(with: NSRange(location: nextVerseHeader.location + 1, length: nextVerseHeader.length - 2))
             readingText.append(NSAttributedString(string: verseNumber, attributes: verseAttributes))
@@ -157,7 +169,7 @@ fileprivate func attributedStringFromData(_ data: [String: Any], verseIds: [Stri
     /* change ReadingFetcher from text to json
      misses added words, chapter titles (Psalms), "Selah" tags, double-labels some verses
      see GEN.1, PS.1, LAM.4 (json in repo) */
-    else if let content = data["content"] as? [Any] {
+    /*else if let content = data["content"] as? [Any] {
         for c in content {
             var wroteAnything = false
             if let para = c as? [String: Any],
@@ -193,7 +205,7 @@ fileprivate func attributedStringFromData(_ data: [String: Any], verseIds: [Stri
                 readingText.append(NSAttributedString(string: "\n\n", attributes: textAttributes))
             }
         }
-    }
+    }*/
     readingText.append(NSAttributedString(string: "\n", attributes: textAttributes))
 
 

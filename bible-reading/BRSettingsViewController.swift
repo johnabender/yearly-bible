@@ -9,15 +9,9 @@
 import UIKit
 import UserNotifications
 
-fileprivate let smallFont = UIFont(name: "Gentium Basic", size:15.0)!
-fileprivate let largeFont = UIFont(name: "Gentium Basic", size:17.0)!
-fileprivate let textColor = UIColor(red: 108.0/255.0, green: 94.0/255.0, blue: 68.0/255.0, alpha: 1)
-
 class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
 
     @IBOutlet var versionLabel: UIBarButtonItem?
-
-    @IBOutlet var backgroundView: UIImageView?
 
     @IBOutlet var scheduleButton: UIButton?
     @IBOutlet var scheduleLabel: UILabel?
@@ -29,19 +23,22 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
 
     var datePickerVC: BRDatePickerViewController?
 
+    class func smallFont() -> UIFont { return UIFont(name: "Gentium Basic", size:15.0)! }
+    class func largeFont() -> UIFont { return UIFont(name: "Gentium Basic", size:17.0)! }
+    class func textColor() -> UIColor { return UIColor(red: 108.0/255.0, green: 94.0/255.0, blue: 68.0/255.0, alpha: 1) }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
         versionLabel?.title = String(format: "v%@ (%@)", Bundle.main.releaseVersionNumber!, Bundle.main.buildVersionNumber!)
-        let versionColor = textColor.withAlphaComponent(0.5)
+        let versionColor = BRSettingsViewController.textColor().withAlphaComponent(0.5)
         versionLabel?.setTitleTextAttributes([.foregroundColor: versionColor], for: .disabled)
 
-        self.backgroundView?.removeFromSuperview()
-        self.tableView.backgroundView = self.backgroundView
+        self.tableView.backgroundView = UIImageView(image: UIImage(named: "bg"))
 
         self.updateButtonTitle()
 
-        orderControl?.setTitleTextAttributes([.font: largeFont], for: .normal)
+        orderControl?.setTitleTextAttributes([.font: BRSettingsViewController.largeFont()], for: .normal)
         switch BRReadingManager.readingType() {
         case .sequential:
             orderControl?.selectedSegmentIndex = 0 // should cast the readingType, but Swift
@@ -49,7 +46,7 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
             orderControl?.selectedSegmentIndex = 1
         }
 
-        readingDisplayControl?.setTitleTextAttributes([.font: largeFont], for: .normal)
+        readingDisplayControl?.setTitleTextAttributes([.font: BRSettingsViewController.largeFont()], for: .normal)
         switch BRReadingManager.readingViewType() {
         case .darkText:
             readingDisplayControl?.selectedSegmentIndex = 0
@@ -60,8 +57,8 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
 
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         guard let header = view as? UITableViewHeaderFooterView else { return }
-        header.textLabel?.font = largeFont
-        header.textLabel?.textColor = textColor
+        header.textLabel?.font = BRSettingsViewController.largeFont().withSize(20)
+        header.textLabel?.textColor = .black
     }
 
     override func tableView(_ tableView: UITableView, willDisplayFooterView view: UIView, forSection section: Int) {
@@ -70,32 +67,42 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
                 self.changedOrderSelection()
             }
         }
+        else {
+            guard let footer = view as? UITableViewHeaderFooterView else { return }
+            footer.textLabel?.font = BRSettingsViewController.smallFont()
+            footer.textLabel?.textColor = BRSettingsViewController.textColor()
+        }
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
-        if section != tableView.numberOfSections - 1 { return nil }
+        switch section {
+        case 1:
+            return "Press and hold on a reading to display the verses in the app."
+        case tableView.numberOfSections - 1:
+            switch BRReadingManager.readingType() {
+            case .sequential:
+                return "Swipe each day's reading left to mark it as read, or right to mark it unread."
+            case .topical:
+                return """
+                Swipe each day's reading left to mark it as read, or right to mark it unread.
 
-        switch BRReadingManager.readingType() {
-        case .sequential:
-            return "This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread."
-        case .topical:
-            return """
-            This app provides a list of daily readings for completing the entire Bible each year. The readings are presented as a checklist to aid in tracking progress - simply swipe each day left to mark it as read, or right to mark it unread.
+                The topical reading order divides the Bible into seven sections, one for each day of the week. If January 1 were a Monday, the days would be as follows:
 
-            This list of readings divides the Bible into seven sections, one for each day of the week. If January 1 were a Monday, the days would be as follows:
+                Monday: Law (Gen. - Deut.)
+                Tuesday: History (Joshua - Esther)
+                Wednesday: Psalms
+                Thursday: Poetry (Job, Prov. - Song)
+                Friday: Prophecy (Isaiah - Malachi)
+                Saturday: Gospels (Matt. - Acts)
+                Sunday: Letters (Romans - Rev.)
 
-            Monday: Law (Gen. - Deut.)
-            Tuesday: History (Joshua - Esther)
-            Wednesday: Psalms
-            Thursday: Poetry (Job, Prov. - Song)
-            Friday: Prophecy (Isaiah - Malachi)
-            Saturday: Gospels (Matt. - Acts)
-            Sunday: Letters (Romans - Rev.)
+                Dividing the Bible into topical sections provides variety from day to day in both the type of each day's content and its length. This helps avoid boredom and also allows one to catch up more easily if a day is missed, by combining two shorter readings together to make up for the lost day.
 
-            Thus, if one were to read all the Mondays, then all the Tuesdays, then all the Wednesdays, etc., it would be roughly the equivalent of reading the Bible straight through. However, dividing it into sections provides variety from day to day in both the type of content and its length. This helps avoid boredom and also allows one to catch up more easily if a day is missed, by combining two shorter readings together to make up for the lost day.
-
-            The daily divisions have been tuned over the course of several years for both consistency and contiguity. Within a section, each day’s reading is approximately the same length throughout the year, subject to a few caveats. None of the chapters are broken across days (other than Psalm 119), and related neighboring chapters are kept together if practical. In general, drier sections of text, such as descriptions of the tabernacle or genealogies, are conglomerated into longer daily readings, while more poetic or narrative text, such as the psalms or the travels of the patriarchs, are separated for more individual attention.
-            """
+                The daily divisions have been tuned over the course of several years for both consistency and contiguity. Within a section, each day’s reading is approximately the same length throughout the year, subject to a few caveats. None of the chapters are broken across days (other than Psalm 119), and related neighboring chapters are kept together if practical. In general, drier sections of text, such as descriptions of the tabernacle or genealogies, are conglomerated into longer daily readings, while more poetic or narrative text, such as the psalms or the travels of the patriarchs, are separated for more individual attention.
+                """
+            }
+        default:
+            return nil
         }
     }
 
@@ -182,8 +189,8 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
              label.layer.add(animation, forKey: "kCATransitionFade")
  */
             label.text = self.tableView(self.tableView, titleForFooterInSection: lastSection)
-            label.font = smallFont
-            label.textColor = textColor
+            label.font = BRSettingsViewController.smallFont()
+            label.textColor = BRSettingsViewController.textColor()
             label.sizeToFit()
 
             var height = CGFloat(10*self.tableView.numberOfSections)
@@ -192,9 +199,21 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
                 for _ in 0..<self.tableView.numberOfRows(inSection: s) {
                     height += self.tableView.rowHeight
                 }
+                if s < self.tableView.numberOfSections - 1 {
+                    height += self.tableView.footerView(forSection: s)?.frame.size.height ?? self.tableView.sectionFooterHeight
+                }
+                else {
+                    height += label.frame.size.height
+                }
             }
-            height += label.frame.size.height
+
             self.tableView.contentSize = CGSize(width: self.tableView.contentSize.width, height: height)
+            if self.tableView.contentSize.height < self.tableView.frame.size.height - self.tableView.safeAreaInsets.top - self.tableView.safeAreaInsets.bottom {
+                self.tableView.isScrollEnabled = false
+            }
+            else {
+                self.tableView.isScrollEnabled = true
+            }
         }
     }
 

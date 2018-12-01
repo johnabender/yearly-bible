@@ -10,6 +10,8 @@
 		37649E44215C021A00CBA6FF /* Bundle+VersionNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */; };
 		376FAC20219CDD7300D6DEB8 /* BRReadingFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376FAC1F219CDD7300D6DEB8 /* BRReadingFetcher.swift */; };
 		37BBBF4121B04A5600BC06E7 /* BRTranslation.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BBBF4021B04A5600BC06E7 /* BRTranslation.m */; };
+		37BBBF4321B0571300BC06E7 /* BRTranslationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBBF4221B0571300BC06E7 /* BRTranslationListViewController.swift */; };
+		37BBBF4521B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBBF4421B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift */; };
 		37E293C5219B81BA0086012D /* BRReadingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37E293C4219B81BA0086012D /* BRReadingViewController.swift */; };
 		C314D5B520B0D9420066EA98 /* Kingthings_Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C314D5B420B0D9400066EA98 /* Kingthings_Foundation.ttf */; };
 		C3200E0D1B0708E400F957DD /* GenBasR.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C3200E0C1B0708D400F957DD /* GenBasR.ttf */; };
@@ -55,6 +57,8 @@
 		376FAC1F219CDD7300D6DEB8 /* BRReadingFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BRReadingFetcher.swift; sourceTree = "<group>"; };
 		37BBBF3F21B04A5600BC06E7 /* BRTranslation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BRTranslation.h; sourceTree = "<group>"; };
 		37BBBF4021B04A5600BC06E7 /* BRTranslation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BRTranslation.m; sourceTree = "<group>"; };
+		37BBBF4221B0571300BC06E7 /* BRTranslationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BRTranslationListViewController.swift; sourceTree = "<group>"; };
+		37BBBF4421B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UITableViewCell+SelectionColor.swift"; sourceTree = "<group>"; };
 		37E293C4219B81BA0086012D /* BRReadingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BRReadingViewController.swift; sourceTree = "<group>"; };
 		C314D5B420B0D9400066EA98 /* Kingthings_Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Kingthings_Foundation.ttf; sourceTree = "<group>"; };
 		C3200E0C1B0708D400F957DD /* GenBasR.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GenBasR.ttf; sourceTree = "<group>"; };
@@ -160,6 +164,7 @@
 				C3FBEA4C187A56840040D082 /* BRViewController.h */,
 				C3FBEA4D187A56840040D082 /* BRViewController.m */,
 				C36A76FC1A2259FB00E4FD35 /* BRSettingsViewController.swift */,
+				37BBBF4221B0571300BC06E7 /* BRTranslationListViewController.swift */,
 				C32E921A1A58DE9800A486B6 /* BRDatePickerViewController.swift */,
 				C33F6E3C1880CF6700D9AA77 /* BRTableCell.h */,
 				C33F6E3D1880CF6700D9AA77 /* BRTableCell.m */,
@@ -172,6 +177,7 @@
 				C326EB5C188328160003A1F0 /* BRReading.h */,
 				C326EB5D188328160003A1F0 /* BRReading.m */,
 				37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */,
+				37BBBF4421B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift */,
 				C3FBEA4F187A56840040D082 /* Images.xcassets */,
 				C3FBEA3E187A56840040D082 /* Supporting Files */,
 				C36A76FB1A2259FB00E4FD35 /* bible-reading-Bridging-Header.h */,
@@ -328,8 +334,10 @@
 			files = (
 				C326EB5E188328160003A1F0 /* BRReading.m in Sources */,
 				37649E44215C021A00CBA6FF /* Bundle+VersionNumber.swift in Sources */,
+				37BBBF4321B0571300BC06E7 /* BRTranslationListViewController.swift in Sources */,
 				C3FBEA4E187A56840040D082 /* BRViewController.m in Sources */,
 				C3BB3FDB1B12861200446061 /* BRCoverViewController.m in Sources */,
+				37BBBF4521B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift in Sources */,
 				C3FBEA48187A56840040D082 /* BRAppDelegate.m in Sources */,
 				C33F6E3E1880CF6700D9AA77 /* BRTableCell.m in Sources */,
 				37E293C5219B81BA0086012D /* BRReadingViewController.swift in Sources */,

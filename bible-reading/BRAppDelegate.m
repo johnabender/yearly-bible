@@ -21,6 +21,7 @@
 //    for( NSString *name in [UIFont familyNames] ) DLog( @"%@", name );
     UIFont *navFont = [UIFont fontWithName:@"Gentium Basic" size:17.];
     UIColor *textColor = [UIColor colorWithRed:108./255. green:94./255. blue:68./255. alpha:1.];
+    UIColor *buttonColor = [UIColor colorWithRed:235./255. green:65./255. blue:7./255. alpha:1.];
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont,
                                                            NSForegroundColorAttributeName: textColor}];
     [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
@@ -35,6 +36,7 @@
     [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
      setTitleTextAttributes:@{NSFontAttributeName: navFont}
      forState:UIControlStateDisabled];
+    [[UIView appearanceWhenContainedInInstancesOfClasses:@[[UIAlertController class]]] setTintColor:buttonColor];
 
     [[BRReadingManager sharedReadingManager] registerForNotifications];
 
