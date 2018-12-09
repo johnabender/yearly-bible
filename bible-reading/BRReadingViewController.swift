@@ -53,12 +53,32 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
         verseAttributes[.foregroundColor] = fontColor
 
         self.markButton?.setTitle(BRMarkReadString, for: .normal)
+        if self.reading != nil && self.reading!.read {
+            self.markButton?.isHidden = true
+        }
 
         if self.reading != nil {
-            BRReadingFetcher.fetchReading(self.reading!) { (data: [String: Any], verseIds: [String]?, totalChunks: Int) in
+            BRReadingFetcher.fetchReading(self.reading!) { (connectionError: Bool, apiError: Bool, data: [String: Any], verseIds: [String]?, totalChunks: Int) in
                 self.totalChunks = totalChunks
                 self.loadedChunks = 1
                 self.isLoadingChunk = false
+
+                var errorText: String? = nil
+                if connectionError {
+                    errorText = "Couldn't connect to the reading service. Check your Internet connection."
+                }
+                else if apiError {
+                    errorText = "Couldn't download this reading. It may not be included in the translation you've selected."
+                }
+                if errorText != nil {
+                    OperationQueue.main.addOperation {
+                        let alert = UIAlertController(title: "Error", message: errorText, preferredStyle: .alert)
+                        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action: UIAlertAction) in
+                            self.dismiss(animated: true, completion: nil)
+                        }))
+                        self.present(alert, animated: true, completion: nil)
+                    }
+                }
 
                 let readingText = NSMutableAttributedString(string: "\n\n", attributes: textAttributes)
                 readingText.append(attributedStringFromData(data, verseIds: verseIds))
@@ -82,16 +102,23 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
-        if self.contentView != nil && self.textView != nil {
-            let gradientLayer = CAGradientLayer()
-            gradientLayer.frame = self.contentView!.bounds
-            gradientLayer.colors = [UIColor.white.cgColor, UIColor.clear.cgColor, UIColor.white.cgColor]
-            let bottomOffset = (self.textView!.frame.size.height + self.textView!.frame.origin.y + 1)/self.contentView!.bounds.size.height
-            let topOffset = bottomOffset - 0.1
-            let bottomCoordinate = NSNumber(value: Double(bottomOffset))
-            let topCoordinate = NSNumber(value: Double(topOffset))
-            gradientLayer.locations = [topCoordinate, bottomCoordinate, bottomCoordinate]
-            self.contentView!.layer.mask = gradientLayer
+        OperationQueue.main.addOperation {
+            if let contentView = self.contentView, let textView = self.textView {
+                let gradientSize = CGFloat(0.1) // fraction of contentView's height
+                let gradientLayer = CAGradientLayer()
+                gradientLayer.frame = contentView.bounds
+                let topTopOffset = (textView.frame.origin.y - 2)/contentView.bounds.size.height
+                let topBottomOffset = topTopOffset + gradientSize
+                let topTopCoordinate = NSNumber(value: Double(topTopOffset))
+                let topBottomCoordinate = NSNumber(value: Double(topBottomOffset))
+                let bottomBottomOffset = (textView.frame.size.height + textView.frame.origin.y + 1)/contentView.bounds.size.height
+                let bottomTopOffset = bottomBottomOffset - gradientSize
+                let bottomBottomCoordinate = NSNumber(value: Double(bottomBottomOffset))
+                let bottomTopCoordinate = NSNumber(value: Double(bottomTopOffset))
+                gradientLayer.locations = [topTopCoordinate, topTopCoordinate, topBottomCoordinate, bottomTopCoordinate, bottomBottomCoordinate, bottomBottomCoordinate]
+                gradientLayer.colors = [UIColor.white.cgColor, UIColor.clear.cgColor, UIColor.white.cgColor, UIColor.white.cgColor, UIColor.clear.cgColor, UIColor.white.cgColor]
+                contentView.layer.mask = gradientLayer
+            }
         }
     }
 

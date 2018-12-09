@@ -47,7 +47,6 @@ static const CGFloat dragOvershoot = 60.;
 {
     [super awakeFromNib];
 
-    // TODO: switch to 3D touch
     UILongPressGestureRecognizer *longPressGestureRecognizer = [UILongPressGestureRecognizer new];
     [longPressGestureRecognizer addTarget:self action:@selector(longPress:)];
     [self addGestureRecognizer:longPressGestureRecognizer];
@@ -227,9 +226,11 @@ static const CGFloat dragOvershoot = 60.;
 {
     if( gr.state != UIGestureRecognizerStateBegan ) return;
 
-    if( _selectionHandler )
-        // TODO: add haptic feedback
-        _selectionHandler( reading );
+    if( _selectionHandler ) {
+        UIImpactFeedbackGenerator *feedbackGenerator = [UIImpactFeedbackGenerator new];
+        [feedbackGenerator prepare]; // not really enough time to prepare, designed for 3D touch
+        _selectionHandler( reading, feedbackGenerator );
+    }
 }
 
 -(NSString*) description

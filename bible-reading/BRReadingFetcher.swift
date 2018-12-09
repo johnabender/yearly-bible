@@ -20,7 +20,7 @@ class BRReadingFetcher: NSObject {
         return URL(string: "https://api.scripture.api.bible")
     }
 
-    class func fetchReading(_ reading: BRReading, completion: @escaping (_ data: [String: Any], _ verseIds: [String]?, _ totalChunks: Int) -> Void) {
+    class func fetchReading(_ reading: BRReading, completion: @escaping (_ connectionError: Bool, _ apiError: Bool, _ data: [String: Any], _ verseIds: [String]?, _ totalChunks: Int) -> Void) {
         guard let books = BRReadingManager.books(for: reading) as? [String] else {
             print("didn't understand books value for", reading)
             return
@@ -55,10 +55,14 @@ class BRReadingFetcher: NSObject {
         }
         print("total chunks:", totalChunks)
 
-        self.fetchBookId(bookId, chapterId: chapterId) { (data: [String: Any]) in
+        self.fetchBookId(bookId, chapterId: chapterId) { (connectionError: Bool, apiError: Bool, data: [String: Any]?) in
+            if connectionError || apiError {
+                completion(connectionError, apiError, [:], nil, 0)
+                return
+            }
             guard let verses = BRReadingManager.verses(for: reading) as? [[Any]] else {
                 print("didn't understand verses value for", reading)
-                completion(data, nil, totalChunks)
+                completion(false, false, data!, nil, totalChunks)
                 return
             }
             if verses[0].count > 0,
@@ -71,17 +75,17 @@ class BRReadingFetcher: NSObject {
                     verseIds.append("\(bookId).\(chapterId).\(v)")
                 }
                 print("fetcher sending verse IDs", verseIds)
-                completion(data, verseIds, totalChunks)
+                completion(false, false, data!, verseIds, totalChunks)
             }
             else {
-                completion(data, nil, totalChunks)
+                completion(false, false, data!, nil, totalChunks)
             }
         }
     }
 
     class func fetchChunk(_ chunk: Int, forReading reading: BRReading, completion: @escaping (_ data: [String: Any]) -> Void) {
         // assumption: fetchReading() has already been called with this reading,
-        // so lots of upfront validation can be skipped
+        // so lots of validation can be skipped
 
         // don't bother with verses, assuming that if a reading has more
         // than one chunk, then all the chunks are complete chapters
@@ -110,8 +114,10 @@ class BRReadingFetcher: NSObject {
         }
 
         if let bookId = bookIdForBook(bookToGet!) {
-            self.fetchBookId(bookId, chapterId: chapterToGet!) { (_ data: [String : Any]) in
-                completion(data)
+            self.fetchBookId(bookId, chapterId: chapterToGet!) { (connectionError: Bool, apiError: Bool, data: [String : Any]?) in
+                if data != nil {
+                    completion(data!)
+                }
             }
         }
         else {
@@ -119,7 +125,7 @@ class BRReadingFetcher: NSObject {
         }
     }
 
-    class func fetchBookId(_ bookId: String, chapterId: String, completion: @escaping (_ data: [String: Any]) -> Void) {
+    class func fetchBookId(_ bookId: String, chapterId: String, completion: @escaping (_ connectionError: Bool, _ apiError: Bool, _ data: [String: Any]?) -> Void) {
         var bibleId = defaultBibleId
         if let preferredTranslation = BRReadingManager.preferredTranslation() {
             bibleId = preferredTranslation.key
@@ -135,18 +141,23 @@ class BRReadingFetcher: NSObject {
         let task = session.dataTask(with: biblesUrl) { (data: Data?, resp: URLResponse?, err: Error?) in
             if err != nil {
                 print("connection error:", err!)
-                return 
+                completion(true, false, nil)
+                return
             }
             else if let r = resp as? HTTPURLResponse,
                 r.statusCode > 299 {
                 print("API error:", r)
+                completion(false, true, nil)
                 return
             }
 
             if let json = try? JSONSerialization.jsonObject(with: data!, options: []),
                 let dict = json as? [String: Any] {
                 if let dataObj = dict["data"] as? [String: Any] {
-                    completion(dataObj)
+                    completion(false, false, dataObj)
+                }
+                else {
+                    completion(false, true, nil)
                 }
 
                 // fetch img src URL in metadata, which is for API usage/analytics (req'd by license)

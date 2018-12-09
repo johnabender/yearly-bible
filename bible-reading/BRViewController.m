@@ -122,7 +122,8 @@
     BRReading *day = readings[indexPath.row];
     [cell populateWithReading:day firstDay:[BRReadingManager firstDay]];
 
-    [cell setSelectionHandler:^(BRReading *reading) {
+    [cell setSelectionHandler:^(BRReading *reading, UIImpactFeedbackGenerator *feedbackGenerator) {
+        [feedbackGenerator impactOccurred];
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
         BRReadingViewController *readingVC = (BRReadingViewController*)[storyboard instantiateViewControllerWithIdentifier:@"BRReadingViewController"];
         if( readingVC ) {
