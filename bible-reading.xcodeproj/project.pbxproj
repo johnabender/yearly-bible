@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		37649E44215C021A00CBA6FF /* Bundle+VersionNumber.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */; };
 		376FAC20219CDD7300D6DEB8 /* BRReadingFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376FAC1F219CDD7300D6DEB8 /* BRReadingFetcher.swift */; };
+		37A2ADC721DEBCFE00992CF8 /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A2ADC621DEBCFD00992CF8 /* Util.swift */; };
+		37A2ADC921DEBF9600992CF8 /* UIFont+Traits.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37A2ADC821DEBF9600992CF8 /* UIFont+Traits.swift */; };
+		37A2ADD121DEC23E00992CF8 /* GenBasI.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 37A2ADCD21DEC20000992CF8 /* GenBasI.ttf */; };
 		37BBBF4121B04A5600BC06E7 /* BRTranslation.m in Sources */ = {isa = PBXBuildFile; fileRef = 37BBBF4021B04A5600BC06E7 /* BRTranslation.m */; };
 		37BBBF4321B0571300BC06E7 /* BRTranslationListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBBF4221B0571300BC06E7 /* BRTranslationListViewController.swift */; };
 		37BBBF4521B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37BBBF4421B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift */; };
@@ -55,6 +58,11 @@
 /* Begin PBXFileReference section */
 		37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Bundle+VersionNumber.swift"; sourceTree = "<group>"; };
 		376FAC1F219CDD7300D6DEB8 /* BRReadingFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BRReadingFetcher.swift; sourceTree = "<group>"; };
+		37A2ADC621DEBCFD00992CF8 /* Util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
+		37A2ADC821DEBF9600992CF8 /* UIFont+Traits.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIFont+Traits.swift"; sourceTree = "<group>"; };
+		37A2ADCD21DEC20000992CF8 /* GenBasI.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GenBasI.ttf; sourceTree = "<group>"; };
+		37A2ADCE21DEC20000992CF8 /* GenBasB.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GenBasB.ttf; sourceTree = "<group>"; };
+		37A2ADCF21DEC20000992CF8 /* GenBasBI.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = GenBasBI.ttf; sourceTree = "<group>"; };
 		37BBBF3F21B04A5600BC06E7 /* BRTranslation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BRTranslation.h; sourceTree = "<group>"; };
 		37BBBF4021B04A5600BC06E7 /* BRTranslation.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BRTranslation.m; sourceTree = "<group>"; };
 		37BBBF4221B0571300BC06E7 /* BRTranslationListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BRTranslationListViewController.swift; sourceTree = "<group>"; };
@@ -177,7 +185,9 @@
 				C326EB5C188328160003A1F0 /* BRReading.h */,
 				C326EB5D188328160003A1F0 /* BRReading.m */,
 				37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */,
+				37A2ADC821DEBF9600992CF8 /* UIFont+Traits.swift */,
 				37BBBF4421B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift */,
+				37A2ADC621DEBCFD00992CF8 /* Util.swift */,
 				C3FBEA4F187A56840040D082 /* Images.xcassets */,
 				C3FBEA3E187A56840040D082 /* Supporting Files */,
 				C36A76FB1A2259FB00E4FD35 /* bible-reading-Bridging-Header.h */,
@@ -190,6 +200,9 @@
 			children = (
 				C314D5B420B0D9400066EA98 /* Kingthings_Foundation.ttf */,
 				C3200E0C1B0708D400F957DD /* GenBasR.ttf */,
+				37A2ADCD21DEC20000992CF8 /* GenBasI.ttf */,
+				37A2ADCE21DEC20000992CF8 /* GenBasB.ttf */,
+				37A2ADCF21DEC20000992CF8 /* GenBasBI.ttf */,
 				C341C20A1A9908DC005E951C /* Launch Screen.xib */,
 				C38E66541AF6695000EC5EDB /* bg@2x.png */,
 				C38E66551AF6695000EC5EDB /* bg@3x.png */,
@@ -305,6 +318,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3200E0D1B0708E400F957DD /* GenBasR.ttf in Resources */,
+				37A2ADD121DEC23E00992CF8 /* GenBasI.ttf in Resources */,
 				C38E66571AF6695000EC5EDB /* bg@3x.png in Resources */,
 				C3FBEA50187A56840040D082 /* Images.xcassets in Resources */,
 				C314D5B520B0D9420066EA98 /* Kingthings_Foundation.ttf in Resources */,
@@ -332,9 +346,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				37A2ADC921DEBF9600992CF8 /* UIFont+Traits.swift in Sources */,
 				C326EB5E188328160003A1F0 /* BRReading.m in Sources */,
 				37649E44215C021A00CBA6FF /* Bundle+VersionNumber.swift in Sources */,
 				37BBBF4321B0571300BC06E7 /* BRTranslationListViewController.swift in Sources */,
+				37A2ADC721DEBCFE00992CF8 /* Util.swift in Sources */,
 				C3FBEA4E187A56840040D082 /* BRViewController.m in Sources */,
 				C3BB3FDB1B12861200446061 /* BRCoverViewController.m in Sources */,
 				37BBBF4521B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift in Sources */,
@@ -513,6 +529,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "org.bendersystems.bible-reading";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OBJC_BRIDGING_HEADER = "bible-reading/bible-reading-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 4.2;

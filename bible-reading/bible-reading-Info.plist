@@ -39,6 +39,7 @@
 	<array>
 		<string>Kingthings_Foundation.ttf</string>
 		<string>GenBasR.ttf</string>
+		<string>GenBasI.ttf</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>Launch Screen</string>

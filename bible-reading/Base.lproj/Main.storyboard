@@ -102,7 +102,7 @@
                                                     </connections>
                                                 </textView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3mQ-a7-ssX">
-                                                    <rect key="frame" x="328" y="738" width="37" height="30"/>
+                                                    <rect key="frame" x="321" y="738" width="44" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="OZ0-Zb-JcV"/>
                                                     </constraints>
@@ -115,7 +115,7 @@
                                                     </connections>
                                                 </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FTi-do-Mlv">
-                                                    <rect key="frame" x="10" y="738" width="37" height="30"/>
+                                                    <rect key="frame" x="10" y="738" width="39" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="sAo-Md-cCm"/>
                                                     </constraints>
