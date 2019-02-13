@@ -162,7 +162,7 @@ class BRTranslationListViewController: UITableViewController {
         }
 
         var cell = tableView.dequeueReusableCell(withIdentifier: "translationDetailCell", for: indexPath)
-        if translation.version == "common" || translation.version == translation.name {
+        if translation.version == "common" || translation.version == "Common" || translation.version == "commo" || translation.version == "Bible" || translation.version == translation.name {
             cell = tableView.dequeueReusableCell(withIdentifier: "translationCell", for: indexPath)
         }
         else {

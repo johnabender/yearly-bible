@@ -86,18 +86,20 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
 
             let readingText = NSMutableAttributedString(string: "\n\n", attributes: textAttributes)
             readingText.append(self.attributedStringFromData(data, verseIds: verseIds))
+            if self.totalChunks == 1 {
+                readingText.append(NSAttributedString(string: "\n\n", attributes: textAttributes))
+                if self.copyright != nil {
+                    readingText.append(NSAttributedString(string: "Copyright: \(self.copyright!)\n\n\n", attributes: copyrightAttributes))
+                }
+            }
+
             OperationQueue.main.addOperation {
                 self.spinner?.stopAnimating()
                 self.spinnerCenterYConstraint?.constant = (self.textView?.frame.size.height ?? 0)/2 - (self.spinner?.frame.size.height ?? 0)
                 self.textView?.attributedText = readingText
                 self.textView?.isScrollEnabled = true
-
-                if let cs = self.textView?.contentSize.height,
-                    let fs = self.textView?.frame.size.height,
-                    cs <= fs,
-                    self.totalChunks > 1 {
-                    self.loadNextChunk()
-                }
+                
+                self.checkToLoadNextChunk()
             }
         }
     }
@@ -131,6 +133,17 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
 
     @IBAction func pressedMarkReadButton() {
         markReadAction?(self.reading)
+        self.markButton?.isHidden = true
+    }
+
+    func checkToLoadNextChunk() {
+        // start loading next chunk without scroll, if content isn't long enough to scroll
+        if let cs = self.textView?.contentSize.height,
+            let fs = self.textView?.frame.size.height,
+            cs <= fs,
+            self.totalChunks > self.loadedChunks {
+            self.loadNextChunk()
+        }
     }
 
     func loadNextChunk() {
@@ -153,6 +166,8 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
 
                 self.spinner?.stopAnimating()
                 self.textView?.attributedText = readingText
+
+                self.checkToLoadNextChunk()
             }
         }
     }
@@ -175,8 +190,9 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
     private func attributedStringFromData(_ data: [String: Any], verseIds: [String]? = nil) -> NSAttributedString {
         let readingText: NSMutableAttributedString = NSMutableAttributedString(string: "")
 
+//        Util.log("\(data)")
         if let copyrightText = data["copyright"] as? String {
-            self.copyright = copyrightText
+            self.copyright = copyrightText // storing globally assumes it's effectively constant
         }
         if let chapterTitle = data["reference"] as? String {
             readingText.append(NSAttributedString(string: chapterTitle + "\n\n", attributes: chapterAttributes))
@@ -189,19 +205,28 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
             content = content.replacingOccurrences(of: "[Selah", with: "Selah") as NSString
 
             var nextVerseHeader = content.range(of: "\\[\\d+\\]", options: .regularExpression)
+            var currentVerse = "1"
+            var shouldUseCurrentVerse = shouldUseVerse(currentVerse, goodVerseIds: verseIds)
             while nextVerseHeader.location != NSNotFound {
-                let text = content.substring(to: nextVerseHeader.location)
-                readingText.append(NSAttributedString(string: text, attributes: textAttributes))
+                if shouldUseCurrentVerse {
+                    let text = content.substring(to: nextVerseHeader.location)
+                    readingText.append(NSAttributedString(string: text, attributes: textAttributes))
+                }
 
-                let verseNumber = content.substring(with: NSRange(location: nextVerseHeader.location + 1, length: nextVerseHeader.length - 2))
-                readingText.append(NSAttributedString(string: verseNumber, attributes: verseAttributes))
+                currentVerse = content.substring(with: NSRange(location: nextVerseHeader.location + 1, length: nextVerseHeader.length - 2))
+                shouldUseCurrentVerse = shouldUseVerse(currentVerse, goodVerseIds: verseIds)
+                if shouldUseCurrentVerse {
+                    readingText.append(NSAttributedString(string: currentVerse, attributes: verseAttributes))
+                }
 
                 content = content.substring(from: nextVerseHeader.location + nextVerseHeader.length + 1) as NSString
                 nextVerseHeader = content.range(of: "\\[\\d+\\]", options: .regularExpression)
             }
-            readingText.append(NSAttributedString(string: content as String, attributes: textAttributes))
+            if shouldUseCurrentVerse {
+                readingText.append(NSAttributedString(string: content as String, attributes: textAttributes))
+            }
         }
-        /* change ReadingFetcher from text to json
+        /* change ReadingFetcher API call from text to json content-type
          misses added words, chapter titles (Psalms), "Selah" tags, double-labels some verses
          see GEN.1, PS.1, LAM.4 (json in repo) */
         /*else if let content = data["content"] as? [Any] {

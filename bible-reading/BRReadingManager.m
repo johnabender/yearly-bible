@@ -1150,7 +1150,7 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
                      @{@"day": @"Aug. 21", @"passage": @"Amos 6-9"},
                      @{@"day": @"Aug. 22", @"passage": @"Obad., Jon."},
                      @{@"day": @"Aug. 23", @"passage": @"Mic. 1-4"},
-                     @{@"day": @"Aug. 24", @"passage": @"Mic. 4-7"},
+                     @{@"day": @"Aug. 24", @"passage": @"Mic. 5-7"},
                      @{@"day": @"Aug. 25", @"passage": @"Nahum"},
                      @{@"day": @"Aug. 26", @"passage": @"Habakkuk"},
                      @{@"day": @"Aug. 27", @"passage": @"Zeph., Hagg."},

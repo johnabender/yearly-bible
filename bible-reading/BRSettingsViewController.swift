@@ -77,7 +77,7 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
         switch section {
         case 1:
-            return "Press and hold on a reading to display the verses in the app."
+            return "For each reading, press and hold to display the verses."
         case tableView.numberOfSections - 1:
             switch BRReadingManager.readingType() {
             case .sequential:

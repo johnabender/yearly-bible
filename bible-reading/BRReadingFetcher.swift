@@ -72,7 +72,10 @@ class BRReadingFetcher: NSObject {
                 let lastVerse = Int(bookVerses[1]) {
                 var verseIds: [String] = []
                 for v in firstVerse...lastVerse {
-                    verseIds.append("\(bookId).\(chapterId).\(v)")
+                    // if using JSON API:
+                    //verseIds.append("\(bookId).\(chapterId).\(v)")
+                    // else if using text API:
+                    verseIds.append("\(v)")
                 }
                 print("fetcher sending verse IDs", verseIds)
                 completion(false, false, data!, verseIds, totalChunks)
@@ -212,7 +215,7 @@ fileprivate func bookIdForBook(_ book: String) -> String? {
     case "Isa.": return "ISA"
     case "Jer.": return "JER"
     case "Lamentations": return "LAM"
-    case "Eze.": return "EZE"
+    case "Eze.": return "EZK"
     case "Dan.": return "DAN"
     case "Hos.": return "HOS"
     case "Joel": return "JOL"
@@ -253,7 +256,7 @@ fileprivate func bookIdForBook(_ book: String) -> String? {
     case "1 Pet.": return "1PE"
     case "2 Peter": return "2PE"
     case "1 Jn.": return "1JN"
-    case "2 Jn.": return "1JN"
+    case "2 Jn.": return "2JN"
     case "3 Jn.": return "3JN"
     case "Jude": return "JUD"
     case "Rev.": return "REV"
