@@ -55,6 +55,12 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
         }
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        self.updateTranslationLabel()
+    }
+
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         guard let header = view as? UITableViewHeaderFooterView else { return }
         header.textLabel?.font = BRSettingsViewController.largeFont().withSize(20)
@@ -107,24 +113,20 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
     }
 
     func updateButtonTitle() {
-        var wasSet = false
-        if scheduleButton != nil {
-            if BRReadingManager.isReadingScheduleSet() {
-                let dateFormatter = DateFormatter()
-                dateFormatter.dateFormat = "HH:mm"
-                if let savedDate = dateFormatter.date(from: BRReadingManager.readingSchedule()) {
-                    wasSet = true
-                    let timeFormatter = DateFormatter()
-                    timeFormatter.timeStyle = DateFormatter.Style.short
-                    let scheduleString = timeFormatter.string(from: savedDate)
-                    scheduleLabel!.text = String(format: "daily at %@", scheduleString)
-                    scheduleButton!.setTitle("Stop reminders", for: UIControl.State.normal)
-                }
-            }
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "HH:mm"
+        if BRReadingManager.isReadingScheduleSet(),
+            let savedDate = dateFormatter.date(from: BRReadingManager.readingSchedule()) {
+
+            let timeFormatter = DateFormatter()
+            timeFormatter.timeStyle = DateFormatter.Style.short
+            let scheduleString = timeFormatter.string(from: savedDate)
+            scheduleLabel?.text = String(format: "daily at %@", scheduleString)
+            scheduleButton?.setTitle("Stop reminders", for: UIControl.State.normal)
         }
-        if !wasSet {
-            scheduleButton!.setTitle("Schedule reminders", for: UIControl.State.normal)
-            scheduleLabel!.text = ""
+        else {
+            scheduleButton?.setTitle("Schedule reminders", for: UIControl.State.normal)
+            scheduleLabel?.text = ""
         }
     }
 
@@ -146,6 +148,12 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
                     break
                 }
             }
+        }
+    }
+
+    func updateTranslationLabel() {
+        if let translation = BRReadingManager.preferredTranslation() {
+            translationLabel?.text = translation.name
         }
     }
 

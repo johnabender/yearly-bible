@@ -281,7 +281,7 @@
 				CLASSPREFIX = BR;
 				LastSwiftMigration = 0720;
 				LastSwiftUpdateCheck = 0720;
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "Bender Systems";
 				TargetAttributes = {
 					C3FBEA33187A56840040D082 = {
@@ -295,7 +295,7 @@
 			};
 			buildConfigurationList = C3FBEA2F187A56840040D082 /* Build configuration list for PBXProject "bible-reading" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,

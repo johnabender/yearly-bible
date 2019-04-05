@@ -52,7 +52,8 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
         }
         chapterAttributes[.foregroundColor] = fontColor
         textAttributes[.foregroundColor] = fontColor
-        verseAttributes[.foregroundColor] = fontColor
+        verseAttributes[.foregroundColor] = fontColor.withAlphaComponent(0.5)
+        copyrightAttributes[.foregroundColor] = fontColor
 
         self.markButton?.setTitle(BRMarkReadString, for: .normal)
 

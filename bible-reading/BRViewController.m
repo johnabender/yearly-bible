@@ -18,6 +18,7 @@
     NSArray *readings;
 }
 
+@property (nonatomic, weak) IBOutlet UIView *contentView;
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
 
 -(IBAction) resetReadings;
@@ -60,6 +61,19 @@
     [super viewWillAppear:animated];
 
     [self initializeViewForAppearance];
+
+    [NSOperationQueue.mainQueue addOperationWithBlock:^{
+        CGFloat gradientSize = 0.15; // fraction of contentView's height
+        CAGradientLayer *gradientLayer = [CAGradientLayer new];
+        gradientLayer.frame = self.contentView.bounds;
+        CGFloat bottomBottomOffset = 1.;
+        CGFloat bottomTopOffset = bottomBottomOffset - gradientSize;
+        NSNumber *bottomBottomCoordinate = [NSNumber numberWithDouble:bottomBottomOffset];
+        NSNumber *bottomTopCoordinate = [NSNumber numberWithDouble:bottomTopOffset];
+        gradientLayer.locations = @[bottomTopCoordinate, bottomBottomCoordinate, bottomBottomCoordinate];
+        gradientLayer.colors = @[(id)UIColor.whiteColor.CGColor, (id)UIColor.clearColor.CGColor, (id)UIColor.whiteColor.CGColor];
+        self.contentView.layer.mask = gradientLayer;
+    }];
 }
 
 -(void) appWillEnterForeground:(NSNotification*)note
