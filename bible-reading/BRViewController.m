@@ -62,6 +62,7 @@
 
     [self initializeViewForAppearance];
 
+    /*
     [NSOperationQueue.mainQueue addOperationWithBlock:^{
         CGFloat gradientSize = 0.15; // fraction of contentView's height
         CAGradientLayer *gradientLayer = [CAGradientLayer new];
@@ -74,6 +75,7 @@
         gradientLayer.colors = @[(id)UIColor.whiteColor.CGColor, (id)UIColor.clearColor.CGColor, (id)UIColor.whiteColor.CGColor];
         self.contentView.layer.mask = gradientLayer;
     }];
+     */
 }
 
 -(void) appWillEnterForeground:(NSNotification*)note

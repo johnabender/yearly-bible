@@ -44,6 +44,8 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
             orderControl?.selectedSegmentIndex = 0 // should cast the readingType, but Swift
         case .topical:
             orderControl?.selectedSegmentIndex = 1
+        @unknown default:
+            break
         }
 
         readingDisplayControl?.setTitleTextAttributes([.font: BRSettingsViewController.largeFont()], for: .normal)
@@ -52,6 +54,8 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
             readingDisplayControl?.selectedSegmentIndex = 0
         case .lightText:
             readingDisplayControl?.selectedSegmentIndex = 1
+        @unknown default:
+            break
         }
     }
 
@@ -106,6 +110,8 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
 
                 The daily divisions have been tuned over the course of several years for both consistency and contiguity. Within a section, each day’s reading is approximately the same length throughout the year, subject to a few caveats. None of the chapters are broken across days (other than Psalm 119), and related neighboring chapters are kept together if practical. In general, drier sections of text, such as descriptions of the tabernacle or genealogies, are conglomerated into longer daily readings, while more poetic or narrative text, such as the psalms or the travels of the patriarchs, are separated for more individual attention.
                 """
+            @unknown default:
+                return nil
             }
         default:
             return nil

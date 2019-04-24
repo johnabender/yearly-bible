@@ -24,6 +24,7 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
 
     @IBOutlet weak var contentView: UIView?
     @IBOutlet weak var markButton: UIButton?
+    @IBOutlet weak var closeButton: UIButton?
     @IBOutlet weak var textView: UITextView?
 
     @IBOutlet weak var spinner: UIActivityIndicatorView?
@@ -43,12 +44,20 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
         var fontColor = UIColor.black
         switch BRReadingManager.readingViewType() {
         case .darkText:
-            print("dark text")
             self.blurView?.effect = UIBlurEffect(style: .light)
         case .lightText:
-            print("light text")
             self.blurView?.effect = UIBlurEffect(style: .dark)
             fontColor = .white
+
+            let brightenFactor = CGFloat(0.1)
+            var h = CGFloat(0), s = CGFloat(0), v = CGFloat(0), a = CGFloat(0)
+            self.spinner?.color.getHue(&h, saturation: &s, brightness: &v, alpha: &a)
+            let brighterColor = UIColor(hue: h, saturation: max(s - brightenFactor, 0), brightness: min(v + brightenFactor, 1), alpha: a)
+            self.spinner?.color = brighterColor
+            self.markButton?.setTitleColor(brighterColor, for: .normal)
+            self.closeButton?.setTitleColor(brighterColor, for: .normal)
+        @unknown default:
+            break
         }
         chapterAttributes[.foregroundColor] = fontColor
         textAttributes[.foregroundColor] = fontColor
@@ -85,7 +94,7 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
                 }
             }
 
-            let readingText = NSMutableAttributedString(string: "\n\n", attributes: textAttributes)
+            let readingText = NSMutableAttributedString(string: "\n\n\n", attributes: textAttributes)
             readingText.append(self.attributedStringFromData(data, verseIds: verseIds))
             if self.totalChunks == 1 {
                 readingText.append(NSAttributedString(string: "\n\n", attributes: textAttributes))
@@ -96,7 +105,7 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
 
             OperationQueue.main.addOperation {
                 self.spinner?.stopAnimating()
-                self.spinnerCenterYConstraint?.constant = (self.textView?.frame.size.height ?? 0)/2 - (self.spinner?.frame.size.height ?? 0)
+                self.spinnerCenterYConstraint?.constant = (self.textView?.frame.size.height ?? 0)/2 - 2*(self.spinner?.frame.size.height ?? 0)
                 self.textView?.attributedText = readingText
                 self.textView?.isScrollEnabled = true
                 
