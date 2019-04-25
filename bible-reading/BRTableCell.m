@@ -50,6 +50,9 @@ static const CGFloat dragOvershoot = 60.;
     UILongPressGestureRecognizer *longPressGestureRecognizer = [UILongPressGestureRecognizer new];
     [longPressGestureRecognizer addTarget:self action:@selector(longPress:)];
     [self addGestureRecognizer:longPressGestureRecognizer];
+
+    dateLabel.font = [[UIFontMetrics defaultMetrics] scaledFontForFont:dateLabel.font];
+    readingLabel.font = [[UIFontMetrics defaultMetrics] scaledFontForFont:readingLabel.font];
 }
 
 

@@ -23,8 +23,9 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
 
     var datePickerVC: BRDatePickerViewController?
 
-    class func smallFont() -> UIFont { return UIFont(name: "Gentium Basic", size:15.0)! }
-    class func largeFont() -> UIFont { return UIFont(name: "Gentium Basic", size:17.0)! }
+    class func smallFont() -> UIFont { return UIFontMetrics.default.scaledFont(for: UIFont(name: "Gentium Basic", size:15.0)!) }
+    class func largeFont() -> UIFont { return UIFontMetrics.default.scaledFont(for: UIFont(name: "Gentium Basic", size:17.0)!) }
+    class func headerFont() -> UIFont { return UIFontMetrics.default.scaledFont(for: UIFont(name: "Gentium Basic", size:20.0)!) }
     class func textColor() -> UIColor { return UIColor(red: 108.0/255.0, green: 94.0/255.0, blue: 68.0/255.0, alpha: 1) }
 
     override func viewDidLoad() {
@@ -57,6 +58,10 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
         @unknown default:
             break
         }
+
+        translationLabel!.font = UIFontMetrics.default.scaledFont(for: translationLabel!.font)
+        scheduleLabel!.font = UIFontMetrics.default.scaledFont(for: scheduleLabel!.font)
+        scheduleButton!.titleLabel!.font = UIFontMetrics.default.scaledFont(for: scheduleButton!.titleLabel!.font)
     }
 
     override func viewWillAppear(_ animated: Bool) {
@@ -67,7 +72,7 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
 
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         guard let header = view as? UITableViewHeaderFooterView else { return }
-        header.textLabel?.font = BRSettingsViewController.largeFont().withSize(20)
+        header.textLabel?.font = BRSettingsViewController.headerFont()
         header.textLabel?.textColor = .black
     }
 

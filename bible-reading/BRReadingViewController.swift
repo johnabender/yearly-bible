@@ -41,6 +41,12 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        chapterAttributes[.font] = UIFontMetrics.default.scaledFont(for: chapterAttributes[.font] as! UIFont)
+        textAttributes[.font] = UIFontMetrics.default.scaledFont(for: textAttributes[.font] as! UIFont)
+        verseAttributes[.font] = UIFontMetrics.default.scaledFont(for: verseAttributes[.font] as! UIFont)
+        self.markButton!.titleLabel!.font = UIFontMetrics.default.scaledFont(for: self.markButton!.titleLabel!.font)
+        self.closeButton!.titleLabel!.font = UIFontMetrics.default.scaledFont(for: self.closeButton!.titleLabel!.font)
+
         var fontColor = UIColor.black
         switch BRReadingManager.readingViewType() {
         case .darkText:
