@@ -8,11 +8,11 @@
 
 import UIKit
 
-fileprivate let chapterFont = UIFont(name: "KingThingsFoundation", size: 17)!
+fileprivate let chapterFont = UIFont(name: "KingThingsFoundation", size: 17) ?? UIFont.systemFont(ofSize: 17)
 fileprivate var chapterAttributes: [NSAttributedString.Key: Any] = [.font: chapterFont]
-fileprivate let textFont = UIFont(name: "Gentium Basic", size: 15)!
+fileprivate let textFont = UIFont(name: "Gentium Basic", size: 15) ?? UIFont.systemFont(ofSize: 15)
 fileprivate var textAttributes: [NSAttributedString.Key: Any] = [.font: textFont]
-fileprivate let verseFont = UIFont(name: "KingThingsFoundation", size: 10)!
+fileprivate let verseFont = UIFont(name: "KingThingsFoundation", size: 10) ?? UIFont.systemFont(ofSize: 10)
 fileprivate var verseAttributes: [NSAttributedString.Key: Any] = [.font: verseFont,
                                                                   .baselineOffset: NSNumber(value: 5),
                                                                   .obliqueness: NSNumber(value: 0.1)]
@@ -41,11 +41,15 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        chapterAttributes[.font] = UIFontMetrics.default.scaledFont(for: chapterAttributes[.font] as! UIFont)
-        textAttributes[.font] = UIFontMetrics.default.scaledFont(for: textAttributes[.font] as! UIFont)
-        verseAttributes[.font] = UIFontMetrics.default.scaledFont(for: verseAttributes[.font] as! UIFont)
-        self.markButton!.titleLabel!.font = UIFontMetrics.default.scaledFont(for: self.markButton!.titleLabel!.font)
-        self.closeButton!.titleLabel!.font = UIFontMetrics.default.scaledFont(for: self.closeButton!.titleLabel!.font)
+        chapterAttributes[.font] = UIFontMetrics.default.scaledFont(for: chapterFont)
+        textAttributes[.font] = UIFontMetrics.default.scaledFont(for: textFont)
+        verseAttributes[.font] = UIFontMetrics.default.scaledFont(for: verseFont)
+        if self.markButton?.titleLabel?.font != nil {
+            self.markButton!.titleLabel!.font = UIFontMetrics.default.scaledFont(for: self.markButton!.titleLabel!.font)
+        }
+        if self.closeButton?.titleLabel?.font != nil {
+            self.closeButton!.titleLabel!.font = UIFontMetrics.default.scaledFont(for: self.closeButton!.titleLabel!.font)
+        }
 
         var fontColor = UIColor.black
         switch BRReadingManager.readingViewType() {
