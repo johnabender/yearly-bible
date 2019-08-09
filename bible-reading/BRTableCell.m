@@ -152,6 +152,15 @@ static const CGFloat dragOvershoot = 60.;
     if( !movingTouch ) return;
     if( ![touches containsObject:movingTouch] ) return;
 
+    if( movingTouch.force >= 6 ) {
+        [self touchesCancelled:touches withEvent:nil];
+        for( UIGestureRecognizer *gr in movingTouch.gestureRecognizers )
+            [gr ignoreTouch:movingTouch forEvent:event];
+        movingTouch = nil;
+        [self longPress:nil];
+        return;
+    }
+
     CGPoint location = [movingTouch locationInView:labelContainer.superview];
     CGFloat distanceMoved = location.x - touchStart.x;
     CGFloat newOffset;
@@ -212,22 +221,12 @@ static const CGFloat dragOvershoot = 60.;
     if( !movingTouch ) return;
     if( ![touches containsObject:movingTouch] ) return;
 
-    /*
-    if( -[touchStartTime timeIntervalSinceNow] < 0.1 ) {
-        // if touch was cancelled very quickly, don't change state
-        movingTouch = nil;
-        [self markReadOrUnread];
-    }
-    else */{
-        // probably touch cancelled because of scrolling or edge of screen,
-        // so pretend it's the same thing as a purposeful touch end
-        [self touchesEnded:touches withEvent:nil];
-    }
+    [self touchesEnded:touches withEvent:nil];
 }
 
 -(void) longPress:(UILongPressGestureRecognizer*)gr
 {
-    if( gr.state != UIGestureRecognizerStateBegan ) return;
+    if( gr && gr.state != UIGestureRecognizerStateBegan ) return;
 
     if( _selectionHandler ) {
         UIImpactFeedbackGenerator *feedbackGenerator = [UIImpactFeedbackGenerator new];

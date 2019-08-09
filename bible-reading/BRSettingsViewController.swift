@@ -90,16 +90,16 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
     }
 
     override func tableView(_ tableView: UITableView, titleForFooterInSection section: Int) -> String? {
+        let swipeInstructions = "Swipe each day's reading left to mark it as read, or right to mark it unread."
         switch section {
         case 1:
-            return "For each reading, press and hold to display the verses."
+            return "To display the verses, press and hold on a date in the list."
         case tableView.numberOfSections - 1:
             switch BRReadingManager.readingType() {
             case .sequential:
-                return "Swipe each day's reading left to mark it as read, or right to mark it unread."
+                return swipeInstructions
             case .topical:
-                return """
-                Swipe each day's reading left to mark it as read, or right to mark it unread.
+                return swipeInstructions + """
 
                 The topical reading order divides the Bible into seven sections, one for each day of the week. If January 1 were a Monday, the days would be as follows:
 
