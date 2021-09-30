@@ -20,22 +20,21 @@
 
 //    for( NSString *name in [UIFont familyNames] ) DLog( @"%@", name );
     UIFont *navFont = [UIFont fontWithName:@"Gentium Basic" size:17.];
-    UIColor *textColor = [UIColor colorWithRed:108./255. green:94./255. blue:68./255. alpha:1.];
     UIColor *buttonColor = [UIColor colorWithRed:235./255. green:65./255. blue:7./255. alpha:1.];
-    [[UINavigationBar appearance] setTitleTextAttributes:@{NSFontAttributeName: navFont,
-                                                           NSForegroundColorAttributeName: textColor}];
-    [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
-     setTitleTextAttributes:@{NSFontAttributeName: navFont}
-     forState:UIControlStateNormal];
-    [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
-     setTitleTextAttributes:@{NSFontAttributeName: navFont}
-     forState:UIControlStateHighlighted];
-    [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
-     setTitleTextAttributes:@{NSFontAttributeName: navFont}
-     forState:UIControlStateSelected];
-    [[UIBarButtonItem appearanceWhenContainedInInstancesOfClasses:@[[UINavigationBar class]]]
-     setTitleTextAttributes:@{NSFontAttributeName: navFont}
-     forState:UIControlStateDisabled];
+
+    UINavigationBarAppearance *navBarAppearance = [UINavigationBarAppearance new];
+    [navBarAppearance setTitleTextAttributes:@{NSFontAttributeName: navFont}];
+
+    UIBarButtonItemAppearance *buttonAppearance = [UIBarButtonItemAppearance new];
+    [buttonAppearance.normal setTitleTextAttributes:@{NSFontAttributeName: navFont}];
+    [buttonAppearance.highlighted setTitleTextAttributes:@{NSFontAttributeName: navFont}];
+    [buttonAppearance.focused setTitleTextAttributes:@{NSFontAttributeName: navFont}];
+    [buttonAppearance.disabled setTitleTextAttributes:@{NSFontAttributeName: navFont}];
+    navBarAppearance.buttonAppearance = buttonAppearance;
+
+    [UINavigationBar appearance].standardAppearance = navBarAppearance;
+    [UINavigationBar appearance].scrollEdgeAppearance = navBarAppearance;
+
     [[UIView appearanceWhenContainedInInstancesOfClasses:@[[UIAlertController class]]] setTintColor:buttonColor];
 
     [[BRReadingManager sharedReadingManager] registerForNotifications];

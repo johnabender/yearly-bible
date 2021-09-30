@@ -26,38 +26,36 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
     class func smallFont() -> UIFont { return UIFontMetrics.default.scaledFont(for: UIFont(name: "Gentium Basic", size:15.0)!) }
     class func largeFont() -> UIFont { return UIFontMetrics.default.scaledFont(for: UIFont(name: "Gentium Basic", size:17.0)!) }
     class func headerFont() -> UIFont { return UIFontMetrics.default.scaledFont(for: UIFont(name: "Gentium Basic", size:20.0)!) }
-    class func textColor() -> UIColor { return UIColor(red: 108.0/255.0, green: 94.0/255.0, blue: 68.0/255.0, alpha: 1) }
+    class func textColor() -> UIColor {
+        switch UITraitCollection.current.userInterfaceStyle {
+        case .dark:
+            return UIColor(red: 1.0 - 108.0/255.0,
+                           green: 1.0 - 94.0/255.0,
+                           blue: 1.0 - 68.0/255.0,
+                           alpha: 1)
+        default:
+            return UIColor(red: 108.0/255.0, green: 94.0/255.0, blue: 68.0/255.0, alpha: 1)
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         versionLabel?.title = String(format: "v%@ (%@)", Bundle.main.releaseVersionNumber!, Bundle.main.buildVersionNumber!)
         let versionColor = BRSettingsViewController.textColor().withAlphaComponent(0.5)
-        versionLabel?.setTitleTextAttributes([.foregroundColor: versionColor], for: .disabled)
+        versionLabel?.setTitleTextAttributes([.foregroundColor: versionColor,
+                                              .font: BRSettingsViewController.largeFont()],
+                                             for: .disabled)
 
         self.tableView.backgroundView = UIImageView(image: UIImage(named: "bg"))
 
         self.updateButtonTitle()
 
         orderControl?.setTitleTextAttributes([.font: BRSettingsViewController.largeFont()], for: .normal)
-        switch BRReadingManager.readingType() {
-        case .sequential:
-            orderControl?.selectedSegmentIndex = 0 // should cast the readingType, but Swift
-        case .topical:
-            orderControl?.selectedSegmentIndex = 1
-        @unknown default:
-            break
-        }
+        orderControl?.selectedSegmentIndex = BRReadingManager.readingType().rawValue
 
         readingDisplayControl?.setTitleTextAttributes([.font: BRSettingsViewController.largeFont()], for: .normal)
-        switch BRReadingManager.readingViewType() {
-        case .darkText:
-            readingDisplayControl?.selectedSegmentIndex = 0
-        case .lightText:
-            readingDisplayControl?.selectedSegmentIndex = 1
-        @unknown default:
-            break
-        }
+        readingDisplayControl?.selectedSegmentIndex = BRReadingManager.readingViewType().rawValue
 
         translationLabel!.font = UIFontMetrics.default.scaledFont(for: translationLabel!.font)
         scheduleLabel!.font = UIFontMetrics.default.scaledFont(for: scheduleLabel!.font)
@@ -156,6 +154,7 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
                         self.scheduleReminder()
                     }
                 default:
+                    // TODO: prompt to allow notifications?
                     break
                 }
             }

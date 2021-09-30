@@ -20,12 +20,12 @@ FOUNDATION_EXPORT NSString* const BRMarkReadString;
 
 
 typedef NS_ENUM(NSInteger, BRReadingType) {
-    BRReadingTypeSequential,
+    BRReadingTypeSequential = 0,
     BRReadingTypeTopical
 };
 
 typedef NS_ENUM(NSInteger, BRReadingViewType) {
-    BRReadingViewTypeDarkText,
+    BRReadingViewTypeDarkText = 0,
     BRReadingViewTypeLightText
 };
 
