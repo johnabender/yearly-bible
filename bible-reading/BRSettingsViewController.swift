@@ -99,6 +99,7 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
             case .topical:
                 return swipeInstructions + """
 
+                
                 The topical reading order divides the Bible into seven sections, one for each day of the week. If January 1 were a Monday, the days would be as follows:
 
                 Monday: Law (Gen. - Deut.)
@@ -112,6 +113,12 @@ class BRSettingsViewController: UITableViewController, BRDatePickerDelegate {
                 Dividing the Bible into topical sections provides variety from day to day in both the type of each day's content and its length. This helps avoid boredom and also allows one to catch up more easily if a day is missed, by combining two shorter readings together to make up for the lost day.
 
                 The daily divisions have been tuned over the course of several years for both consistency and contiguity. Within a section, each day’s reading is approximately the same length throughout the year, subject to a few caveats. None of the chapters are broken across days (other than Psalm 119), and related neighboring chapters are kept together if practical. In general, drier sections of text, such as descriptions of the tabernacle or genealogies, are conglomerated into longer daily readings, while more poetic or narrative text, such as the psalms or the travels of the patriarchs, are separated for more individual attention.
+                """
+            case .chronological:
+                return swipeInstructions + """
+
+                
+                Chronological order attempts to place biblical events in the order they happened. Biblical chronology is debatable in places. This app uses the reading plan from The Bible Recap, without modification.
                 """
             @unknown default:
                 return nil

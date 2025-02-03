@@ -9,8 +9,11 @@
 #import <Foundation/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
 
-#import "BRReading.h"
 #import "BRTranslation.h"
+
+@class Book;
+@class Passage;
+@class Reading;
 
 
 FOUNDATION_EXPORT NSString* const BRNotificationCategory;
@@ -21,7 +24,8 @@ FOUNDATION_EXPORT NSString* const BRMarkReadString;
 
 typedef NS_ENUM(NSInteger, BRReadingType) {
     BRReadingTypeSequential = 0,
-    BRReadingTypeTopical
+    BRReadingTypeTopical,
+    BRReadingTypeChronological
 };
 
 typedef NS_ENUM(NSInteger, BRReadingViewType) {
@@ -55,15 +59,11 @@ typedef NS_ENUM(NSInteger, BRReadingViewType) {
 +(BRTranslation*) preferredTranslation;
 +(void) setPreferredTranslation:(BRTranslation*)newPreferredTranslation;
 
-+(void) readingWasRead:(BRReading*)reading;
-+(void) readingWasUnread:(BRReading*)reading;
++(void) readingWasRead:(Reading*)reading;
++(void) readingWasUnread:(Reading*)reading;
 
 +(NSString*) firstDay;
 
 +(void) updateScheduledNotifications;
-
-+(NSArray*) booksForReading:(BRReading*)reading;
-+(NSArray*) chaptersForReading:(BRReading*)reading;
-+(NSArray*) versesForReading:(BRReading*)reading;
 
 @end

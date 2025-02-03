@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -27,6 +27,8 @@
 		C36A76FD1A2259FB00E4FD35 /* BRSettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C36A76FC1A2259FB00E4FD35 /* BRSettingsViewController.swift */; };
 		C38E66561AF6695000EC5EDB /* bg@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C38E66541AF6695000EC5EDB /* bg@2x.png */; };
 		C38E66571AF6695000EC5EDB /* bg@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C38E66551AF6695000EC5EDB /* bg@3x.png */; };
+		C3A309E72D4359EA0008DBC8 /* Passage.swift in Sources */ = {isa = PBXBuildFile; fileRef = C3A309E62D4359EA0008DBC8 /* Passage.swift */; };
+		C3A309EA2D5049220008DBC8 /* Algorithms in Frameworks */ = {isa = PBXBuildFile; productRef = C3A309E92D5049220008DBC8 /* Algorithms */; };
 		C3BB3FDB1B12861200446061 /* BRCoverViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = C3BB3FDA1B12861200446061 /* BRCoverViewController.m */; };
 		C3FBEA38187A56840040D082 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3FBEA37187A56840040D082 /* Foundation.framework */; };
 		C3FBEA3A187A56840040D082 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C3FBEA39187A56840040D082 /* CoreGraphics.framework */; };
@@ -82,6 +84,7 @@
 		C36A76FC1A2259FB00E4FD35 /* BRSettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BRSettingsViewController.swift; sourceTree = "<group>"; };
 		C38E66541AF6695000EC5EDB /* bg@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bg@2x.png"; path = "assets/bg@2x.png"; sourceTree = SOURCE_ROOT; };
 		C38E66551AF6695000EC5EDB /* bg@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "bg@3x.png"; path = "assets/bg@3x.png"; sourceTree = SOURCE_ROOT; };
+		C3A309E62D4359EA0008DBC8 /* Passage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Passage.swift; sourceTree = "<group>"; };
 		C3BB3FD91B12861200446061 /* BRCoverViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BRCoverViewController.h; sourceTree = "<group>"; };
 		C3BB3FDA1B12861200446061 /* BRCoverViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BRCoverViewController.m; sourceTree = "<group>"; };
 		C3FBEA34187A56840040D082 /* bible-reading.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "bible-reading.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -112,6 +115,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3A309EA2D5049220008DBC8 /* Algorithms in Frameworks */,
 				C3FBEA3A187A56840040D082 /* CoreGraphics.framework in Frameworks */,
 				C3FBEA3C187A56840040D082 /* UIKit.framework in Frameworks */,
 				C3FBEA38187A56840040D082 /* Foundation.framework in Frameworks */,
@@ -184,6 +188,7 @@
 				37BBBF4021B04A5600BC06E7 /* BRTranslation.m */,
 				C326EB5C188328160003A1F0 /* BRReading.h */,
 				C326EB5D188328160003A1F0 /* BRReading.m */,
+				C3A309E62D4359EA0008DBC8 /* Passage.swift */,
 				37649E43215C021A00CBA6FF /* Bundle+VersionNumber.swift */,
 				37A2ADC821DEBF9600992CF8 /* UIFont+Traits.swift */,
 				37BBBF4421B1CEDE00BC06E7 /* UITableViewCell+SelectionColor.swift */,
@@ -278,10 +283,11 @@
 		C3FBEA2C187A56840040D082 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				CLASSPREFIX = BR;
 				LastSwiftMigration = 0720;
 				LastSwiftUpdateCheck = 0720;
-				LastUpgradeCheck = 1400;
+				LastUpgradeCheck = 1620;
 				ORGANIZATIONNAME = "Bender Systems";
 				TargetAttributes = {
 					C3FBEA33187A56840040D082 = {
@@ -302,6 +308,9 @@
 				Base,
 			);
 			mainGroup = C3FBEA2B187A56840040D082;
+			packageReferences = (
+				C3A309E82D5049220008DBC8 /* XCRemoteSwiftPackageReference "swift-algorithms" */,
+			);
 			productRefGroup = C3FBEA35187A56840040D082 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -350,6 +359,7 @@
 				C326EB5E188328160003A1F0 /* BRReading.m in Sources */,
 				37649E44215C021A00CBA6FF /* Bundle+VersionNumber.swift in Sources */,
 				37BBBF4321B0571300BC06E7 /* BRTranslationListViewController.swift in Sources */,
+				C3A309E72D4359EA0008DBC8 /* Passage.swift in Sources */,
 				37A2ADC721DEBCFE00992CF8 /* Util.swift in Sources */,
 				C3FBEA4E187A56840040D082 /* BRViewController.m in Sources */,
 				C3BB3FDB1B12861200446061 /* BRCoverViewController.m in Sources */,
@@ -443,8 +453,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEFINES_MODULE = YES;
+				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -461,6 +473,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu99 gnu++11";
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_VERSION = 4.0;
@@ -498,8 +511,10 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				DEFINES_MODULE = YES;
+				ENABLE_MODULE_VERIFIER = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -509,6 +524,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				MODULE_VERIFIER_SUPPORTED_LANGUAGE_STANDARDS = "gnu99 gnu++11";
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_VERSION = 4.0;
@@ -523,13 +539,17 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 20220927.1;
+				CURRENT_PROJECT_VERSION = 20250204.1;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "bible-reading/bible-reading-Prefix.pch";
 				INFOPLIST_FILE = "bible-reading/bible-reading-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.2.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 4.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.bendersystems.bible-reading";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -548,13 +568,17 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 20220927.1;
+				CURRENT_PROJECT_VERSION = 20250204.1;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "bible-reading/bible-reading-Prefix.pch";
 				INFOPLIST_FILE = "bible-reading/bible-reading-Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
-				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 3.2.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 4.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "org.bendersystems.bible-reading";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
@@ -637,6 +661,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		C3A309E82D5049220008DBC8 /* XCRemoteSwiftPackageReference "swift-algorithms" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/apple/swift-algorithms.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C3A309E92D5049220008DBC8 /* Algorithms */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3A309E82D5049220008DBC8 /* XCRemoteSwiftPackageReference "swift-algorithms" */;
+			productName = Algorithms;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C3FBEA2C187A56840040D082 /* Project object */;
 }

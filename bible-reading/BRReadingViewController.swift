@@ -30,8 +30,8 @@ class BRReadingViewController: UIViewController, UIScrollViewDelegate {
     @IBOutlet weak var spinner: UIActivityIndicatorView?
     @IBOutlet weak var spinnerCenterYConstraint: NSLayoutConstraint?
 
-    @objc var reading: BRReading?
-    @objc var markReadAction: ((BRReading?) -> Void)?
+    @objc var reading: Reading?
+    @objc var markReadAction: ((Reading?) -> Void)?
 
     private var loadedChunks = 0
     private var totalChunks = 0

@@ -7,6 +7,7 @@
 //
 
 #import "BRReadingManager.h"
+#import "bible_reading-Swift.h"
 
 
 NSString* const BRNotificationCategory = @"BRReadingReminderCategory";
@@ -66,9 +67,13 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 {
     if( !readings ) {
         NSArray *r = [NSArray arrayWithContentsOfURL:[self fileURL:[self readingType]]];
-        if( r ) {
-            NSArray *diskReadings = [self readingArrayFromDictionaryArray:r];
-            [self fixReadings:diskReadings];
+        if( [r count] ) {
+            NSMutableArray *_readings = [NSMutableArray arrayWithCapacity:[r count]];
+            for( NSDictionary *dict in r ) {
+                Reading *reading = [[Reading alloc] initWithDictionary:dict];
+                [_readings addObject:reading];
+            }
+            [self fixReadings:_readings];
         }
         else
             [self resetReadings];
@@ -79,21 +84,10 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
     return readings;
 }
 
-+(NSArray*) readingArrayFromDictionaryArray:(NSArray*)dicts
-{
-    NSMutableArray *_readings = [NSMutableArray arrayWithCapacity:[dicts count]];
-    for( NSDictionary *dict in dicts ) {
-        BRReading *reading = [[BRReading alloc] initWithDictionary:dict];
-        [_readings addObject:reading];
-    }
-    return [NSArray arrayWithArray:_readings];
-}
-
-
 +(NSArray*) dictionaryArrayFromReadingArray:(NSArray*)_readings
 {
     NSMutableArray *dicts = [NSMutableArray arrayWithCapacity:[_readings count]];
-    for( BRReading *reading in _readings )
+    for( Reading *reading in _readings )
         [dicts addObject:[reading dictionaryRepresentation]];
     return [NSArray arrayWithArray:dicts];
 }
@@ -151,13 +145,13 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 }
 
 
-+(void) readingWasRead:(BRReading*)reading
++(void) readingWasRead:(Reading*)reading
 {
     reading.read = TRUE;
     [self save];
 }
 
-+(void) readingWasUnread:(BRReading*)reading
++(void) readingWasUnread:(Reading*)reading
 {
     reading.read = FALSE;
     [self save];
@@ -193,8 +187,7 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 
 +(NSArray*) resetReadings
 {
-    NSArray *r = [self newReadings:[self readingType]];
-    readings = [self readingArrayFromDictionaryArray:r];
+    readings = [self newReadings:[self readingType]];
     [self save];
     return readings;
 }
@@ -205,21 +198,21 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
     assert( offset < [readings count] );
     
     NSMutableArray *newReadings = [NSMutableArray arrayWithCapacity:[readings count]];
-    NSArray *unshiftedReadings = [self readingArrayFromDictionaryArray:[self newReadings:[self readingType]]];
+    NSArray *unshiftedReadings = [self newReadings:[self readingType]];
 
     NSInteger i = offset, j = 0;
     for( ; i < [readings count]; i++, j++ ) {
-        BRReading *ur = unshiftedReadings[j];
-        BRReading *sr = readings[i];
-        BRReading *pr = readings[j];
+        Reading *ur = unshiftedReadings[j];
+        Reading *sr = readings[i];
+        Reading *pr = readings[j];
         ur.day = sr.day;
         ur.read = pr.read;
         [newReadings addObject:ur];
     }
     for( ; [newReadings count] < [readings count]; i++, j++ ) {
-        BRReading *ur = unshiftedReadings[j];
-        BRReading *sr = readings[i - [readings count]];
-        BRReading *pr = readings[j];
+        Reading *ur = unshiftedReadings[j];
+        Reading *sr = readings[i - [readings count]];
+        Reading *pr = readings[j];
         ur.day = sr.day;
         ur.read = pr.read;
         [newReadings addObject:ur];
@@ -235,31 +228,13 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 +(void) fixReadings:(NSArray*)existingReadings
 {
     // update chapters to match what they are in code
-
     NSArray *newReadings = [self newReadings:[self readingType]];
-    newReadings = [self readingArrayFromDictionaryArray:newReadings];
     assert( [existingReadings count] == [newReadings count] );
 
     NSMutableArray *fixedReadings = [NSMutableArray arrayWithCapacity:[existingReadings count]];
-    /*
-    NSInteger offset = 0;
-    BRReading *nr = newReadings[offset];
-    BRReading *er = existingReadings[0];
-    while( ![nr.day isEqualToString:er.day] ) {
-        offset++;
-        nr = newReadings[offset];
-    }
-     */
-
     for( NSInteger i = 0; i < [existingReadings count]; i++ ) {
-        /*
-        if( offset + i < [newReadings count] )
-            nr = newReadings[offset + i];
-        else
-            nr = newReadings[offset + i - [newReadings count]];
-         */
-        BRReading *nr = newReadings[i];
-        BRReading *er = existingReadings[i];
+        Reading *nr = newReadings[i];
+        Reading *er = existingReadings[i];
         if( ![nr.day isEqualToString:er.day] ) {
             readings = existingReadings;
             return; // can't fix chapter if offset, because what reading matches?
@@ -277,7 +252,7 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 +(NSURL*) fileURL:(BRReadingType)readingType
 {
     NSURL *documentsPath = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
-    NSString *fileName = [NSString stringWithFormat:@"My Readings %d.plist", ((int)[self readingType])];
+    NSString *fileName = [NSString stringWithFormat:@"My Readings (%d).plist", ((int)[self readingType])];
     return [documentsPath URLByAppendingPathComponent:fileName];
 }
 
@@ -294,7 +269,7 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 
 +(void) updateFirstDay
 {
-    BRReading *first = readings[0];
+    Reading *first = readings[0];
     firstDay = first.day;
 }
 
@@ -312,7 +287,7 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
     [[UNUserNotificationCenter currentNotificationCenter] removeAllPendingNotificationRequests];
 
     // choose reading
-    BRReading *reading = nil;
+    Reading *reading = nil;
     for( reading in [self readings] )
         if( !reading.read )
             break;
@@ -321,7 +296,7 @@ static NSDateFormatter *scheduleTimeFormatter = nil;
 
     // notify repeatedly
 
-    NSString *readingText = [NSString stringWithFormat:@"%@: %@", reading.day, reading.passage];
+    NSString *readingText = [NSString stringWithFormat:@"%@: %@", reading.day, reading.displayText];
 
     UNMutableNotificationContent *content = [UNMutableNotificationContent new];
     content.categoryIdentifier = BRNotificationCategory;
@@ -349,9 +324,9 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
          withCompletionHandler:(void (^)(void))completionHandler
 {
     if( [response.actionIdentifier isEqualToString:BRNotificationActionMarkRead] ) {
-        BRReading *readingToMark = [[BRReading alloc] initWithDictionary:response.notification.request.content.userInfo];
+        Reading *readingToMark = [[Reading alloc] initWithDictionary:response.notification.request.content.userInfo];
 
-        for( BRReading *reading in [[self class] readings] ) {
+        for( Reading *reading in [[self class] readings] ) {
             if( [reading isEqual:readingToMark] ) {
                 [[self class] readingWasRead:reading];
                 break;
@@ -363,924 +338,5427 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 }
 
 
-+(NSArray*) booksForReading:(BRReading*)reading
-{
-    // returns an array of strings [String]!
-    // where each element is a book's abbreviation
-
-    DLog( @"parsing books for %@", reading.passage );
-    // if passage ends with numbers, they're chapter or verse numbers, meaning a single book
-    NSRange numRange = [reading.passage rangeOfString:@"\\d+$" options:NSRegularExpressionSearch];
-    if( numRange.location != NSNotFound ) {
-        DLog( @"ends numerically" );
-        NSRange spaceRange = [reading.passage rangeOfString:@" " options:NSBackwardsSearch];
-        if( spaceRange.location != NSNotFound ) {
-            DLog( @"has a space, returning %@", [reading.passage substringToIndex:spaceRange.location] );
-            return @[[reading.passage substringToIndex:spaceRange.location]];
-        }
-        DLog( @"reading ends with numbers but contains no space" );
-    }
-    // else passage ends with alphabetic characters, so it's whole book(s)
-    else {
-        DLog( @"doesn't end numerically" );
-        // if passage contains no comma, it's one book
-        NSRange commaRange = [reading.passage rangeOfString:@", "];
-        if( commaRange.location == NSNotFound ) {
-            DLog( @"no comma, returning as is" );
-            return @[reading.passage];
-        }
-        // else it's two books
-        else {
-            NSString *firstBook = [reading.passage substringToIndex:commaRange.location];
-            NSString *secondBook = [reading.passage substringFromIndex:commaRange.location + commaRange.length];
-            DLog( @"has comma, returning %@ %@", firstBook, secondBook );
-            return @[firstBook, secondBook];
-        }
-    }
-
-    DLog( @"failed parsing books from reading %@", reading );
-    return @[@"Rev."]; // to avoid crashing
-}
-
-+(NSArray*) chaptersForReading:(BRReading*)reading
-{
-    // returns an array of (array of strings) [[String]]!
-    // where each array is for a book,
-    // where each element is a chapter in the book
-
-    DLog( @"parsing chapters for %@", reading.passage );
-    // if passage ends with numbers, they're chapter or verse numbers, meaning a single book
-    NSRange numRange = [reading.passage rangeOfString:@"\\d+$" options:NSRegularExpressionSearch];
-    if( numRange.location != NSNotFound ) {
-        DLog( @"ends numerically" );
-        // parse chapters for "Luke 1", "Rev. 21-22", "Ps. 119:1-200"
-        NSRange chRange = [reading.passage rangeOfString:@" \\d*:?\\d*-?\\d+$" options:NSRegularExpressionSearch];
-        if( chRange.location != NSNotFound ) {
-            NSString *chapterString = [reading.passage substringFromIndex:chRange.location + 1];
-            DLog( @"stripped book to %@", chapterString );
-            NSRange colonRange = [chapterString rangeOfString:@":"];
-            if( colonRange.location != NSNotFound ) {
-                chapterString = [chapterString substringToIndex:colonRange.location];
-                DLog( @"found colon, stripped verses to %@", chapterString );
-            }
-            NSRange dashRange = [chapterString rangeOfString:@"-"];
-            if( dashRange.location == NSNotFound ) {
-                DLog( @"no dash, returning as is" );
-                return @[@[chapterString]];
-            }
-            NSInteger firstChapter = [[chapterString substringToIndex:dashRange.location] integerValue];
-            NSInteger lastChapter = [[chapterString substringFromIndex:dashRange.location + dashRange.length] integerValue];
-            DLog( @"returning range from %ld to %ld", firstChapter, lastChapter );
-            NSMutableArray *chapterArray = [NSMutableArray array];
-            for( NSInteger c = firstChapter; c <= lastChapter; c++ )
-                [chapterArray addObject:[NSString stringWithFormat:@"%ld", c]];
-            return @[chapterArray];
-        }
-    }
-    // else passage ends with alphabetic characters, so it's whole book(s)
-    else {
-        DLog( @"doesn't end numerically" );
-        // if passage contains no comma, it's one book
-        NSRange commaRange = [reading.passage rangeOfString:@", "];
-        if( commaRange.location == NSNotFound ) {
-            DLog( @"no comma, attempting to return hard-coded chapters" );
-            if( [reading.passage isEqualToString:@"Ruth"] )
-                return @[@[@"1", @"2", @"3", @"4"]];
-            else if( [reading.passage isEqualToString:@"Esther"] )
-                return @[@[@"1", @"2", @"3", @"4", @"5", @"6", @"7", @"8", @"9", @"10"]];
-            else if( [reading.passage isEqualToString:@"Lamentations"] )
-                return @[@[@"1", @"2", @"3", @"4", @"5"]];
-            else if( [reading.passage isEqualToString:@"Joel"] )
-                return @[@[@"1", @"2", @"3"]];
-            else if( [reading.passage isEqualToString:@"Nahum"] )
-                return @[@[@"1", @"2", @"3"]];
-            else if( [reading.passage isEqualToString:@"Habakkuk"] )
-                return @[@[@"1", @"2", @"3"]];
-            else if( [reading.passage isEqualToString:@"Micah"] )
-                return @[@[@"1", @"2", @"3", @"4", @"5", @"6", @"7"]];
-            else if( [reading.passage isEqualToString:@"Malachi"] )
-                return @[@[@"1", @"2", @"3", @"4"]];
-            else if( [reading.passage isEqualToString:@"2 Thess."] )
-                return @[@[@"1", @"2", @"3"]];
-            else if( [reading.passage isEqualToString:@"2 Timothy"] )
-                return @[@[@"1", @"2", @"3", @"4"]];
-            else if( [reading.passage isEqualToString:@"Titus"] )
-                return @[@[@"1", @"2", @"3"]];
-            else if( [reading.passage isEqualToString:@"Philemon"] )
-                return @[@[@"1"]];
-            else if( [reading.passage isEqualToString:@"2 Peter"] )
-                return @[@[@"1", @"2", @"3"]];
-            else if( [reading.passage isEqualToString:@"Jude"] )
-                return @[@[@"1"]];
-        }
-        // else it's two books
-        else {
-            DLog( @"has comma, attempting to return hard-coded chapters" );
-            if( [reading.passage isEqualToString:@"Obad., Jon."] )
-                return @[@[@"1"], @[@"1", @"2", @"3", @"4"]];
-            else if( [reading.passage isEqualToString:@"Nah., Hab."] )
-                return @[@[@"1", @"2", @"3"], @[@"1", @"2", @"3"]];
-            else if( [reading.passage isEqualToString:@"Zeph., Hagg."] )
-                return @[@[@"1", @"2", @"3"], @[@"1", @"2"]];
-            else if( [reading.passage isEqualToString:@"Zeph., Hag."] )
-                return @[@[@"1", @"2", @"3"], @[@"1", @"2"]];
-            else if( [reading.passage isEqualToString:@"2 Jn., 3 Jn."] )
-                return @[@[@"1"], @[@"1"]];
-        }
-    }
-
-    DLog( @"failed parsing chapters from reading %@", reading );
-    return @[@[@"1"]]; // to avoid crashing
-}
-
-+(NSArray*) versesForReading:(BRReading*)reading
-{
-    // returns an array of (array of X) [[Any]]!
-    // where each array is for a book,
-    // where each sub-array is for a chapter,
-    // where each element is either
-    // null (for all verses in the chapter),
-    // or an array of 2 strings, meaning the first and last verses
-
-    DLog( @"parsing verses for %@", reading.passage );
-    // if passage ends with numbers, they're chapter or verse numbers, meaning a single book
-    NSRange numRange = [reading.passage rangeOfString:@"\\d+$" options:NSRegularExpressionSearch];
-    if( numRange.location != NSNotFound ) {
-        DLog( @"ends numerically" );
-        // parse verses for "Ps. 119:1-200"
-        NSRange colonRange = [reading.passage rangeOfString:@":"];
-        if( colonRange.location != NSNotFound ) {
-            NSString *verseString = [reading.passage substringFromIndex:colonRange.location + colonRange.length];
-            DLog( @"contains colon, stripped to verses %@", verseString );
-            NSRange dashRange = [verseString rangeOfString:@"-"];
-            if( dashRange.location != NSNotFound ) {
-                NSString *firstVerse = [verseString substringToIndex:dashRange.location];
-                NSString *lastVerse = [verseString substringFromIndex:dashRange.location + dashRange.length];
-                DLog( @"contains dash, returning first-last %@ and %@", firstVerse, lastVerse );
-                return @[@[firstVerse, lastVerse]];
-            }
-        }
-        DLog( @"didn't find verses, returning whole chapter" );
-        return @[@[[NSNull null]]];
-    }
-    // else passage ends with alphabetic characters, so it's whole book(s)
-    else {
-        DLog( @"doesn't end numerically, it's whole book(s)") ;
-        // if passage contains no comma, it's one book
-        NSRange commaRange = [reading.passage rangeOfString:@", "];
-        if( commaRange.location == NSNotFound ) {
-            return @[@[[NSNull null]]];
-        }
-        // else it's two books
-        else {
-            return @[@[[NSNull null]], @[[NSNull null]]];
-        }
-    }
-
-    DLog( @"failed parsing verses from reading %@", reading );
-    return @[@[[NSNull null]]]; // to avoid crashing
-}
-
-
 +(NSArray*) newReadings:(BRReadingType)readingType
 {
     switch( readingType ) {
+#pragma mark Topical
         case BRReadingTypeTopical:
             return @[
-                     @{@"day": @"Jan. 1", @"passage": @"Gen. 1-2"},
-                     @{@"day": @"Jan. 2", @"passage": @"Josh. 1-6"},
-                     @{@"day": @"Jan. 3", @"passage": @"Ps. 1-4"},
-                     @{@"day": @"Jan. 4", @"passage": @"Job 1-2"},
-                     @{@"day": @"Jan. 5", @"passage": @"Isa. 1-5"},
-                     @{@"day": @"Jan. 6", @"passage": @"Mat. 1-3"},
-                     @{@"day": @"Jan. 7", @"passage": @"Rom. 1-2"},
-                     @{@"day": @"Jan. 8", @"passage": @"Gen. 3-4"},
-                     @{@"day": @"Jan. 9", @"passage": @"Josh. 7-11"},
-                     @{@"day": @"Jan. 10", @"passage": @"Ps. 5-7"},
-                     @{@"day": @"Jan. 11", @"passage": @"Job 3-5"},
-                     @{@"day": @"Jan. 12", @"passage": @"Isa. 6-10"},
-                     @{@"day": @"Jan. 13", @"passage": @"Mat. 4-5"},
-                     @{@"day": @"Jan. 14", @"passage": @"Rom. 3-4"},
-                     @{@"day": @"Jan. 15", @"passage": @"Gen. 5-8"},
-                     @{@"day": @"Jan. 16", @"passage": @"Josh. 12-17"},
-                     @{@"day": @"Jan. 17", @"passage": @"Ps. 8-11"},
-                     @{@"day": @"Jan. 18", @"passage": @"Job 6-7"},
-                     @{@"day": @"Jan. 19", @"passage": @"Isa. 11-15"},
-                     @{@"day": @"Jan. 20", @"passage": @"Mat. 6-7"},
-                     @{@"day": @"Jan. 21", @"passage": @"Rom. 5-7"},
-                     @{@"day": @"Jan. 22", @"passage": @"Gen. 9-11"},
-                     @{@"day": @"Jan. 23", @"passage": @"Josh. 18-21"},
-                     @{@"day": @"Jan. 24", @"passage": @"Ps. 12-17"},
-                     @{@"day": @"Jan. 25", @"passage": @"Job 8-10"},
-                     @{@"day": @"Jan. 26", @"passage": @"Isa. 16-22"},
-                     @{@"day": @"Jan. 27", @"passage": @"Mat. 8-10"},
-                     @{@"day": @"Jan. 28", @"passage": @"Rom. 8-9"},
-                     @{@"day": @"Jan. 29", @"passage": @"Gen. 12-14"},
-                     @{@"day": @"Jan. 30", @"passage": @"Josh. 22-24"},
-                     @{@"day": @"Jan. 31", @"passage": @"Ps. 18"},
-                     @{@"day": @"Feb. 1", @"passage": @"Job 11-14"},
-                     @{@"day": @"Feb. 2", @"passage": @"Isa. 23-26"},
-                     @{@"day": @"Feb. 3", @"passage": @"Mat. 11-13"},
-                     @{@"day": @"Feb. 4", @"passage": @"Rom. 10-11"},
-                     @{@"day": @"Feb. 5", @"passage": @"Gen. 15-17"},
-                     @{@"day": @"Feb. 6", @"passage": @"Judg. 1-5"},
-                     @{@"day": @"Feb. 7", @"passage": @"Ps. 19-21"},
-                     @{@"day": @"Feb. 8", @"passage": @"Job 15-17"},
-                     @{@"day": @"Feb. 9", @"passage": @"Isa. 27-30"},
-                     @{@"day": @"Feb. 10", @"passage": @"Mat. 14-16"},
-                     @{@"day": @"Feb. 11", @"passage": @"Rom. 12-13"},
-                     @{@"day": @"Feb. 12", @"passage": @"Gen. 18-20"},
-                     @{@"day": @"Feb. 13", @"passage": @"Judg. 6-9"},
-                     @{@"day": @"Feb. 14", @"passage": @"Ps. 22-23"},
-                     @{@"day": @"Feb. 15", @"passage": @"Job 18-19"},
-                     @{@"day": @"Feb. 16", @"passage": @"Isa. 31-35"},
-                     @{@"day": @"Feb. 17", @"passage": @"Mat. 17-18"},
-                     @{@"day": @"Feb. 18", @"passage": @"Rom. 14-16"},
-                     @{@"day": @"Feb. 19", @"passage": @"Gen. 21-23"},
-                     @{@"day": @"Feb. 20", @"passage": @"Judg. 10-16"},
-                     @{@"day": @"Feb. 21", @"passage": @"Ps. 24-26"},
-                     @{@"day": @"Feb. 22", @"passage": @"Job 20-22"},
-                     @{@"day": @"Feb. 23", @"passage": @"Isa. 36-40"},
-                     @{@"day": @"Feb. 24", @"passage": @"Mat. 19-20"},
-                     @{@"day": @"Feb. 25", @"passage": @"1 Cor. 1-3"},
-                     @{@"day": @"Feb. 26", @"passage": @"Gen. 24-25"},
-                     @{@"day": @"Feb. 27", @"passage": @"Judg. 17-21"},
-                     @{@"day": @"Feb. 28", @"passage": @"Ps. 27-29"},
-                     @{@"day": @"Mar. 1", @"passage": @"Job 23-24"},
-                     @{@"day": @"Mar. 2", @"passage": @"Isa. 41-44"},
-                     @{@"day": @"Mar. 3", @"passage": @"Mat. 21-23"},
-                     @{@"day": @"Mar. 4", @"passage": @"1 Cor. 4-6"},
-                     @{@"day": @"Mar. 5", @"passage": @"Gen. 26-28"},
-                     @{@"day": @"Mar. 6", @"passage": @"Ruth"},
-                     @{@"day": @"Mar. 7", @"passage": @"Ps. 30-31"},
-                     @{@"day": @"Mar. 8", @"passage": @"Job 25-28"},
-                     @{@"day": @"Mar. 9", @"passage": @"Isa. 45-48"},
-                     @{@"day": @"Mar. 10", @"passage": @"Mat. 24-25"},
-                     @{@"day": @"Mar. 11", @"passage": @"1 Cor. 7-9"},
-                     @{@"day": @"Mar. 12", @"passage": @"Gen. 29-30"},
-                     @{@"day": @"Mar. 13", @"passage": @"1 Sam. 1-4"},
-                     @{@"day": @"Mar. 14", @"passage": @"Ps. 32-33"},
-                     @{@"day": @"Mar. 15", @"passage": @"Job 29-31"},
-                     @{@"day": @"Mar. 16", @"passage": @"Isa. 49-52"},
-                     @{@"day": @"Mar. 17", @"passage": @"Mat. 26"},
-                     @{@"day": @"Mar. 18", @"passage": @"1 Cor. 10-11"},
-                     @{@"day": @"Mar. 19", @"passage": @"Gen. 31-33"},
-                     @{@"day": @"Mar. 20", @"passage": @"1 Sam. 5-12"},
-                     @{@"day": @"Mar. 21", @"passage": @"Ps. 34-36"},
-                     @{@"day": @"Mar. 22", @"passage": @"Job 32-34"},
-                     @{@"day": @"Mar. 23", @"passage": @"Isa. 53-57"},
-                     @{@"day": @"Mar. 24", @"passage": @"Mat. 27-28"},
-                     @{@"day": @"Mar. 25", @"passage": @"1 Cor. 12-14"},
-                     @{@"day": @"Mar. 26", @"passage": @"Gen. 34-36"},
-                     @{@"day": @"Mar. 27", @"passage": @"1 Sam. 13-15"},
-                     @{@"day": @"Mar. 28", @"passage": @"Ps. 37"},
-                     @{@"day": @"Mar. 29", @"passage": @"Job 35-36"},
-                     @{@"day": @"Mar. 30", @"passage": @"Isa. 58-62"},
-                     @{@"day": @"Mar. 31", @"passage": @"Mark 1-3"},
-                     @{@"day": @"Apr. 1", @"passage": @"1 Cor. 15-16"},
-                     @{@"day": @"Apr. 2", @"passage": @"Gen. 37-39"},
-                     @{@"day": @"Apr. 3", @"passage": @"1 Sam. 16-20"},
-                     @{@"day": @"Apr. 4", @"passage": @"Ps. 38-39"},
-                     @{@"day": @"Apr. 5", @"passage": @"Job 37"},
-                     @{@"day": @"Apr. 6", @"passage": @"Isa. 63-66"},
-                     @{@"day": @"Apr. 7", @"passage": @"Mark 4-5"},
-                     @{@"day": @"Apr. 8", @"passage": @"2 Cor. 1-3"},
-                     @{@"day": @"Apr. 9", @"passage": @"Gen. 40-42"},
-                     @{@"day": @"Apr. 10", @"passage": @"1 Sam. 21-25"},
-                     @{@"day": @"Apr. 11", @"passage": @"Ps. 40-41"},
-                     @{@"day": @"Apr. 12", @"passage": @"Job 38"},
-                     @{@"day": @"Apr. 13", @"passage": @"Jer. 1-4"},
-                     @{@"day": @"Apr. 14", @"passage": @"Mark 6-7"},
-                     @{@"day": @"Apr. 15", @"passage": @"2 Cor. 4-7"},
-                     @{@"day": @"Apr. 16", @"passage": @"Gen. 43-45"},
-                     @{@"day": @"Apr. 17", @"passage": @"1 Sam. 26-31"},
-                     @{@"day": @"Apr. 18", @"passage": @"Ps. 42-44"},
-                     @{@"day": @"Apr. 19", @"passage": @"Job 39"},
-                     @{@"day": @"Apr. 20", @"passage": @"Jer. 5-9"},
-                     @{@"day": @"Apr. 21", @"passage": @"Mark 8-9"},
-                     @{@"day": @"Apr. 22", @"passage": @"2 Cor. 8-10"},
-                     @{@"day": @"Apr. 23", @"passage": @"Gen. 46-47"},
-                     @{@"day": @"Apr. 24", @"passage": @"2 Sam. 1-5"},
-                     @{@"day": @"Apr. 25", @"passage": @"Ps. 45-48"},
-                     @{@"day": @"Apr. 26", @"passage": @"Job 40-42"},
-                     @{@"day": @"Apr. 27", @"passage": @"Jer. 10-13"},
-                     @{@"day": @"Apr. 28", @"passage": @"Mark 10-11"},
-                     @{@"day": @"Apr. 29", @"passage": @"2 Cor. 11-13"},
-                     @{@"day": @"Apr. 30", @"passage": @"Gen. 48-50"},
-                     @{@"day": @"May 1", @"passage": @"2 Sam. 6-10"},
-                     @{@"day": @"May 2", @"passage": @"Ps. 49-50"},
-                     @{@"day": @"May 3", @"passage": @"Prov. 1-2"},
-                     @{@"day": @"May 4", @"passage": @"Jer. 14-17"},
-                     @{@"day": @"May 5", @"passage": @"Mark 12-13"},
-                     @{@"day": @"May 6", @"passage": @"Gal. 1-3"},
-                     @{@"day": @"May 7", @"passage": @"Exod. 1-2"},
-                     @{@"day": @"May 8", @"passage": @"2 Sam. 11-14"},
-                     @{@"day": @"May 9", @"passage": @"Ps. 51-54"},
-                     @{@"day": @"May 10", @"passage": @"Prov. 3-4"},
-                     @{@"day": @"May 11", @"passage": @"Jer. 18-22"},
-                     @{@"day": @"May 12", @"passage": @"Mark 14-16"},
-                     @{@"day": @"May 13", @"passage": @"Gal. 4-6"},
-                     @{@"day": @"May 14", @"passage": @"Exod. 3-4"},
-                     @{@"day": @"May 15", @"passage": @"2 Sam. 15-19"},
-                     @{@"day": @"May 16", @"passage": @"Ps. 55-57"},
-                     @{@"day": @"May 17", @"passage": @"Prov. 5-7"},
-                     @{@"day": @"May 18", @"passage": @"Jer. 23-27"},
-                     @{@"day": @"May 19", @"passage": @"Luke 1-2"},
-                     @{@"day": @"May 20", @"passage": @"Eph. 1-3"},
-                     @{@"day": @"May 21", @"passage": @"Exod. 5-7"},
-                     @{@"day": @"May 22", @"passage": @"2 Sam. 20-24"},
-                     @{@"day": @"May 23", @"passage": @"Ps. 58-60"},
-                     @{@"day": @"May 24", @"passage": @"Prov. 8-9"},
-                     @{@"day": @"May 25", @"passage": @"Jer. 28-31"},
-                     @{@"day": @"May 26", @"passage": @"Luke 3-4"},
-                     @{@"day": @"May 27", @"passage": @"Eph. 4-6"},
-                     @{@"day": @"May 28", @"passage": @"Exod. 8-10"},
-                     @{@"day": @"May 29", @"passage": @"1 Kin. 1-4"},
-                     @{@"day": @"May 30", @"passage": @"Ps. 61-64"},
-                     @{@"day": @"May 31", @"passage": @"Prov. 10"},
-                     @{@"day": @"Jun. 1", @"passage": @"Jer. 32-36"},
-                     @{@"day": @"Jun. 2", @"passage": @"Luke 5-6"},
-                     @{@"day": @"Jun. 3", @"passage": @"Phil. 1-2"},
-                     @{@"day": @"Jun. 4", @"passage": @"Exod. 11-13"},
-                     @{@"day": @"Jun. 5", @"passage": @"1 Kin. 5-7"},
-                     @{@"day": @"Jun. 6", @"passage": @"Ps. 65-67"},
-                     @{@"day": @"Jun. 7", @"passage": @"Prov. 11"},
-                     @{@"day": @"Jun. 8", @"passage": @"Jer. 37-43"},
-                     @{@"day": @"Jun. 9", @"passage": @"Luke 7-8"},
-                     @{@"day": @"Jun. 10", @"passage": @"Phil. 3-4"},
-                     @{@"day": @"Jun. 11", @"passage": @"Exod. 14-16"},
-                     @{@"day": @"Jun. 12", @"passage": @"1 Kin. 8-11"},
-                     @{@"day": @"Jun. 13", @"passage": @"Ps. 68-69"},
-                     @{@"day": @"Jun. 14", @"passage": @"Prov. 12"},
-                     @{@"day": @"Jun. 15", @"passage": @"Jer. 44-48"},
-                     @{@"day": @"Jun. 16", @"passage": @"Luke 9-10"},
-                     @{@"day": @"Jun. 17", @"passage": @"Col. 1-2"},
-                     @{@"day": @"Jun. 18", @"passage": @"Exod. 17-20"},
-                     @{@"day": @"Jun. 19", @"passage": @"1 Kin. 12-16"},
-                     @{@"day": @"Jun. 20", @"passage": @"Ps. 70-72"},
-                     @{@"day": @"Jun. 21", @"passage": @"Prov. 13"},
-                     @{@"day": @"Jun. 22", @"passage": @"Jer. 49-50"},
-                     @{@"day": @"Jun. 23", @"passage": @"Luke 11-12"},
-                     @{@"day": @"Jun. 24", @"passage": @"Col. 3-4"},
-                     @{@"day": @"Jun. 25", @"passage": @"Exod. 21-24"},
-                     @{@"day": @"Jun. 26", @"passage": @"1 Kin. 17-20"},
-                     @{@"day": @"Jun. 27", @"passage": @"Ps. 73-74"},
-                     @{@"day": @"Jun. 28", @"passage": @"Prov. 14"},
-                     @{@"day": @"Jun. 29", @"passage": @"Jer. 51-52"},
-                     @{@"day": @"Jun. 30", @"passage": @"Luke 13-14"},
-                     @{@"day": @"Jul. 1", @"passage": @"1 Th. 1-3"},
-                     @{@"day": @"Jul. 2", @"passage": @"Exod. 25-30"},
-                     @{@"day": @"Jul. 3", @"passage": @"1 Kin. 21-22"},
-                     @{@"day": @"Jul. 4", @"passage": @"Ps. 75-77"},
-                     @{@"day": @"Jul. 5", @"passage": @"Prov. 15"},
-                     @{@"day": @"Jul. 6", @"passage": @"Lamentations"},
-                     @{@"day": @"Jul. 7", @"passage": @"Luke 15-16"},
-                     @{@"day": @"Jul. 8", @"passage": @"1 Th. 4-5"},
-                     @{@"day": @"Jul. 9", @"passage": @"Exod. 31-34"},
-                     @{@"day": @"Jul. 10", @"passage": @"2 Kin. 1-4"},
-                     @{@"day": @"Jul. 11", @"passage": @"Ps. 78"},
-                     @{@"day": @"Jul. 12", @"passage": @"Prov. 16"},
-                     @{@"day": @"Jul. 13", @"passage": @"Eze. 1-6"},
-                     @{@"day": @"Jul. 14", @"passage": @"Luke 17-18"},
-                     @{@"day": @"Jul. 15", @"passage": @"2 Thess."},
-                     @{@"day": @"Jul. 16", @"passage": @"Exod. 35-40"},
-                     @{@"day": @"Jul. 17", @"passage": @"2 Kin. 5-8"},
-                     @{@"day": @"Jul. 18", @"passage": @"Ps. 79-81"},
-                     @{@"day": @"Jul. 19", @"passage": @"Prov. 17"},
-                     @{@"day": @"Jul. 20", @"passage": @"Eze. 7-12"},
-                     @{@"day": @"Jul. 21", @"passage": @"Luke 19-20"},
-                     @{@"day": @"Jul. 22", @"passage": @"1 Tim. 1-3"},
-                     @{@"day": @"Jul. 23", @"passage": @"Lev. 1-8"},
-                     @{@"day": @"Jul. 24", @"passage": @"2 Kin. 9-12"},
-                     @{@"day": @"Jul. 25", @"passage": @"Ps. 82-85"},
-                     @{@"day": @"Jul. 26", @"passage": @"Prov. 18"},
-                     @{@"day": @"Jul. 27", @"passage": @"Eze. 13-17"},
-                     @{@"day": @"Jul. 28", @"passage": @"Luke 21-22"},
-                     @{@"day": @"Jul. 29", @"passage": @"1 Tim. 4-6"},
-                     @{@"day": @"Jul. 30", @"passage": @"Lev. 9-15"},
-                     @{@"day": @"Jul. 31", @"passage": @"2 Kin. 13-16"},
-                     @{@"day": @"Aug. 1", @"passage": @"Ps. 86-88"},
-                     @{@"day": @"Aug. 2", @"passage": @"Prov. 19"},
-                     @{@"day": @"Aug. 3", @"passage": @"Eze. 18-21"},
-                     @{@"day": @"Aug. 4", @"passage": @"Luke 23-24"},
-                     @{@"day": @"Aug. 5", @"passage": @"2 Timothy"},
-                     @{@"day": @"Aug. 6", @"passage": @"Lev. 16-22"},
-                     @{@"day": @"Aug. 7", @"passage": @"2 Kin. 17-20"},
-                     @{@"day": @"Aug. 8", @"passage": @"Ps. 89"},
-                     @{@"day": @"Aug. 9", @"passage": @"Prov. 20"},
-                     @{@"day": @"Aug. 10", @"passage": @"Eze. 22-25"},
-                     @{@"day": @"Aug. 11", @"passage": @"John 1-2"},
-                     @{@"day": @"Aug. 12", @"passage": @"Titus"},
-                     @{@"day": @"Aug. 13", @"passage": @"Lev. 23-27"},
-                     @{@"day": @"Aug. 14", @"passage": @"2 Kin. 21-25"},
-                     @{@"day": @"Aug. 15", @"passage": @"Ps. 90-93"},
-                     @{@"day": @"Aug. 16", @"passage": @"Prov. 21"},
-                     @{@"day": @"Aug. 17", @"passage": @"Eze. 26-30"},
-                     @{@"day": @"Aug. 18", @"passage": @"John 3-4"},
-                     @{@"day": @"Aug. 19", @"passage": @"Philemon"},
-                     @{@"day": @"Aug. 20", @"passage": @"Num. 1-4"},
-                     @{@"day": @"Aug. 21", @"passage": @"1 Chr. 1-4"},
-                     @{@"day": @"Aug. 22", @"passage": @"Ps. 94-96"},
-                     @{@"day": @"Aug. 23", @"passage": @"Prov. 22"},
-                     @{@"day": @"Aug. 24", @"passage": @"Eze. 31-34"},
-                     @{@"day": @"Aug. 25", @"passage": @"John 5-6"},
-                     @{@"day": @"Aug. 26", @"passage": @"Heb. 1-3"},
-                     @{@"day": @"Aug. 27", @"passage": @"Num. 5-9"},
-                     @{@"day": @"Aug. 28", @"passage": @"1 Chr. 5-9"},
-                     @{@"day": @"Aug. 29", @"passage": @"Ps. 97-101"},
-                     @{@"day": @"Aug. 30", @"passage": @"Prov. 23"},
-                     @{@"day": @"Aug. 31", @"passage": @"Eze. 35-39"},
-                     @{@"day": @"Sep. 1", @"passage": @"John 7-8"},
-                     @{@"day": @"Sep. 2", @"passage": @"Heb. 4-7"},
-                     @{@"day": @"Sep. 3", @"passage": @"Num. 10-12"},
-                     @{@"day": @"Sep. 4", @"passage": @"1 Chr. 10-13"},
-                     @{@"day": @"Sep. 5", @"passage": @"Ps. 102-103"},
-                     @{@"day": @"Sep. 6", @"passage": @"Prov. 24"},
-                     @{@"day": @"Sep. 7", @"passage": @"Eze. 40-43"},
-                     @{@"day": @"Sep. 8", @"passage": @"John 9-10"},
-                     @{@"day": @"Sep. 9", @"passage": @"Heb. 8-9"},
-                     @{@"day": @"Sep. 10", @"passage": @"Num. 13-14"},
-                     @{@"day": @"Sep. 11", @"passage": @"1 Chr. 14-17"},
-                     @{@"day": @"Sep. 12", @"passage": @"Ps. 104-105"},
-                     @{@"day": @"Sep. 13", @"passage": @"Prov. 25"},
-                     @{@"day": @"Sep. 14", @"passage": @"Eze. 44-48"},
-                     @{@"day": @"Sep. 15", @"passage": @"John 11-12"},
-                     @{@"day": @"Sep. 16", @"passage": @"Heb. 10-11"},
-                     @{@"day": @"Sep. 17", @"passage": @"Num. 15-17"},
-                     @{@"day": @"Sep. 18", @"passage": @"1 Chr. 18-22"},
-                     @{@"day": @"Sep. 19", @"passage": @"Ps. 106"},
-                     @{@"day": @"Sep. 20", @"passage": @"Prov. 26"},
-                     @{@"day": @"Sep. 21", @"passage": @"Dan. 1-4"},
-                     @{@"day": @"Sep. 22", @"passage": @"John 13-14"},
-                     @{@"day": @"Sep. 23", @"passage": @"Heb. 12-13"},
-                     @{@"day": @"Sep. 24", @"passage": @"Num. 18-20"},
-                     @{@"day": @"Sep. 25", @"passage": @"1 Chr. 23-26"},
-                     @{@"day": @"Sep. 26", @"passage": @"Ps. 107-108"},
-                     @{@"day": @"Sep. 27", @"passage": @"Prov. 27"},
-                     @{@"day": @"Sep. 28", @"passage": @"Dan. 5-8"},
-                     @{@"day": @"Sep. 29", @"passage": @"John 15-16"},
-                     @{@"day": @"Sep. 30", @"passage": @"James 1-2"},
-                     @{@"day": @"Oct. 1", @"passage": @"Num. 21-24"},
-                     @{@"day": @"Oct. 2", @"passage": @"1 Chr. 27-29"},
-                     @{@"day": @"Oct. 3", @"passage": @"Ps. 109-113"},
-                     @{@"day": @"Oct. 4", @"passage": @"Prov. 28"},
-                     @{@"day": @"Oct. 5", @"passage": @"Dan. 9-12"},
-                     @{@"day": @"Oct. 6", @"passage": @"John 17-19"},
-                     @{@"day": @"Oct. 7", @"passage": @"James 3-5"},
-                     @{@"day": @"Oct. 8", @"passage": @"Num. 25-27"},
-                     @{@"day": @"Oct. 9", @"passage": @"2 Chr. 1-7"},
-                     @{@"day": @"Oct. 10", @"passage": @"Ps. 114-118"},
-                     @{@"day": @"Oct. 11", @"passage": @"Prov. 29"},
-                     @{@"day": @"Oct. 12", @"passage": @"Hos. 1-7"},
-                     @{@"day": @"Oct. 13", @"passage": @"John 20-21"},
-                     @{@"day": @"Oct. 14", @"passage": @"1 Pet. 1-2"},
-                     @{@"day": @"Oct. 15", @"passage": @"Num. 28-31"},
-                     @{@"day": @"Oct. 16", @"passage": @"2 Chr. 8-12"},
-                     @{@"day": @"Oct. 17", @"passage": @"Ps. 119:1-96"},
-                     @{@"day": @"Oct. 18", @"passage": @"Prov. 30"},
-                     @{@"day": @"Oct. 19", @"passage": @"Hos. 8-14"},
-                     @{@"day": @"Oct. 20", @"passage": @"Acts 1-2"},
-                     @{@"day": @"Oct. 21", @"passage": @"1 Pet. 3-5"},
-                     @{@"day": @"Oct. 22", @"passage": @"Num. 32-36"},
-                     @{@"day": @"Oct. 23", @"passage": @"2 Chr. 13-20"},
-                     @{@"day": @"Oct. 24", @"passage": @"Ps. 119:97-176"},
-                     @{@"day": @"Oct. 25", @"passage": @"Prov. 31"},
-                     @{@"day": @"Oct. 26", @"passage": @"Joel"},
-                     @{@"day": @"Oct. 27", @"passage": @"Acts 3-4"},
-                     @{@"day": @"Oct. 28", @"passage": @"2 Peter"},
-                     @{@"day": @"Oct. 29", @"passage": @"Deut. 1-3"},
-                     @{@"day": @"Oct. 30", @"passage": @"2 Chr. 21-26"},
-                     @{@"day": @"Oct. 31", @"passage": @"Ps. 120-124"},
-                     @{@"day": @"Nov. 1", @"passage": @"Ecc. 1-2"},
-                     @{@"day": @"Nov. 2", @"passage": @"Amos 1-5"},
-                     @{@"day": @"Nov. 3", @"passage": @"Acts 5-7"},
-                     @{@"day": @"Nov. 4", @"passage": @"1 Jn. 1-3"},
-                     @{@"day": @"Nov. 5", @"passage": @"Deut. 4-5"},
-                     @{@"day": @"Nov. 6", @"passage": @"2 Chr. 27-32"},
-                     @{@"day": @"Nov. 7", @"passage": @"Ps. 125-129"},
-                     @{@"day": @"Nov. 8", @"passage": @"Ecc. 3-4"},
-                     @{@"day": @"Nov. 9", @"passage": @"Amos 6-9"},
-                     @{@"day": @"Nov. 10", @"passage": @"Acts 8-9"},
-                     @{@"day": @"Nov. 11", @"passage": @"1 Jn. 4-5"},
-                     @{@"day": @"Nov. 12", @"passage": @"Deut. 6-9"},
-                     @{@"day": @"Nov. 13", @"passage": @"2 Chr. 33-36"},
-                     @{@"day": @"Nov. 14", @"passage": @"Ps. 130-132"},
-                     @{@"day": @"Nov. 15", @"passage": @"Ecc. 5-6"},
-                     @{@"day": @"Nov. 16", @"passage": @"Obad., Jon."},
-                     @{@"day": @"Nov. 17", @"passage": @"Acts 10-12"},
-                     @{@"day": @"Nov. 18", @"passage": @"2 Jn., 3 Jn."},
-                     @{@"day": @"Nov. 19", @"passage": @"Deut. 10-13"},
-                     @{@"day": @"Nov. 20", @"passage": @"Ezra 1-6"},
-                     @{@"day": @"Nov. 21", @"passage": @"Ps. 133-135"},
-                     @{@"day": @"Nov. 22", @"passage": @"Ecc. 7-8"},
-                     @{@"day": @"Nov. 23", @"passage": @"Micah"},
-                     @{@"day": @"Nov. 24", @"passage": @"Acts 13-14"},
-                     @{@"day": @"Nov. 25", @"passage": @"Jude"},
-                     @{@"day": @"Nov. 26", @"passage": @"Deut. 14-17"},
-                     @{@"day": @"Nov. 27", @"passage": @"Ezra 7-10"},
-                     @{@"day": @"Nov. 28", @"passage": @"Ps. 136-138"},
-                     @{@"day": @"Nov. 29", @"passage": @"Ecc. 9-10"},
-                     @{@"day": @"Nov. 30", @"passage": @"Nah., Hab."},
-                     @{@"day": @"Dec. 1", @"passage": @"Acts 15-17"},
-                     @{@"day": @"Dec. 2", @"passage": @"Rev. 1-4"},
-                     @{@"day": @"Dec. 3", @"passage": @"Deut. 18-22"},
-                     @{@"day": @"Dec. 4", @"passage": @"Neh. 1-5"},
-                     @{@"day": @"Dec. 5", @"passage": @"Ps. 139-141"},
-                     @{@"day": @"Dec. 6", @"passage": @"Ecc. 11-12"},
-                     @{@"day": @"Dec. 7", @"passage": @"Zeph., Hagg."},
-                     @{@"day": @"Dec. 8", @"passage": @"Acts 18-20"},
-                     @{@"day": @"Dec. 9", @"passage": @"Rev. 5-9"},
-                     @{@"day": @"Dec. 10", @"passage": @"Deut. 23-27"},
-                     @{@"day": @"Dec. 11", @"passage": @"Neh. 6-10"},
-                     @{@"day": @"Dec. 12", @"passage": @"Ps. 142-144"},
-                     @{@"day": @"Dec. 13", @"passage": @"Song 1-2"},
-                     @{@"day": @"Dec. 14", @"passage": @"Zech. 1-8"},
-                     @{@"day": @"Dec. 15", @"passage": @"Acts 21-23"},
-                     @{@"day": @"Dec. 16", @"passage": @"Rev. 10-14"},
-                     @{@"day": @"Dec. 17", @"passage": @"Deut. 28-29"},
-                     @{@"day": @"Dec. 18", @"passage": @"Neh. 11-13"},
-                     @{@"day": @"Dec. 19", @"passage": @"Ps. 145-147"},
-                     @{@"day": @"Dec. 20", @"passage": @"Song 3-5"},
-                     @{@"day": @"Dec. 21", @"passage": @"Zech. 9-14"},
-                     @{@"day": @"Dec. 22", @"passage": @"Acts 24-26"},
-                     @{@"day": @"Dec. 23", @"passage": @"Rev. 15-19"},
-                     @{@"day": @"Dec. 24", @"passage": @"Deut. 30-31"},
-                     @{@"day": @"Dec. 25", @"passage": @"Esther"},
-                     @{@"day": @"Dec. 26", @"passage": @"Ps. 148-150"},
-                     @{@"day": @"Dec. 27", @"passage": @"Song 6-8"},
-                     @{@"day": @"Dec. 28", @"passage": @"Malachi"},
-                     @{@"day": @"Dec. 29", @"passage": @"Acts 27-28"},
-                     @{@"day": @"Dec. 30", @"passage": @"Rev. 20-22"},
-                     @{@"day": @"Dec. 31", @"passage": @"Deut. 32-34"},
-                     ];
+                [[Reading alloc] initWithDay:@"Jan. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:1
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:7
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:6
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:12
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:8
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:6
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:11
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:6
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:9
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:18
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:12
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:16
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:12
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:11
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:23
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:15
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:15
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:27
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:14
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:18
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:6
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:22
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:18
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:31
+                                    endingChapter:35],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:17
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:14
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:21
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:10
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:24
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:20
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:36
+                                    endingChapter:40],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:19
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:24
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:17
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:27
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:23
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:41
+                                    endingChapter:44],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:21
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:26
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRuth]],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:30
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:25
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:45
+                                    endingChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:24
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:7
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:29
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:32
+                                    endingChapter:33],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:29
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:49
+                                    endingChapter:52],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:31
+                                    endingChapter:33],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:5
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:34
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:32
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:53
+                                    endingChapter:57],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:27
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:12
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:34
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:37],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:35
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:58
+                                    endingChapter:62],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:37
+                                    endingChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:16
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:38
+                                    endingChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                       oneChapter:37],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:63
+                                    endingChapter:66],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:40
+                                    endingChapter:42],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:21
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:40
+                                    endingChapter:41],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                       oneChapter:38],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:6
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:4
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:43
+                                    endingChapter:45],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:26
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:42
+                                    endingChapter:44],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                       oneChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:5
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:46
+                                    endingChapter:47],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:45
+                                    endingChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:40
+                                    endingChapter:42],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:10
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:48
+                                    endingChapter:50],
+                ]],
+                [[Reading alloc] initWithDay:@"May 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:6
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"May 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:49
+                                    endingChapter:50],
+                ]],
+                [[Reading alloc] initWithDay:@"May 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"May 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:14
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"May 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"May 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGalatians]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"May 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"May 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:11
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"May 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:51
+                                    endingChapter:54],
+                ]],
+                [[Reading alloc] initWithDay:@"May 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"May 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:18
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"May 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:14
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"May 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGalatians]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"May 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"May 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:15
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"May 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:55
+                                    endingChapter:57],
+                ]],
+                [[Reading alloc] initWithDay:@"May 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"May 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:23
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"May 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"May 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEphesians]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"May 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"May 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:20
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"May 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:58
+                                    endingChapter:60],
+                ]],
+                [[Reading alloc] initWithDay:@"May 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"May 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:28
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"May 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"May 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEphesians]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"May 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"May 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"May 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:61
+                                    endingChapter:64],
+                ]],
+                [[Reading alloc] initWithDay:@"May 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:32
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPhilippians]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:65
+                                    endingChapter:67],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:37
+                                    endingChapter:43],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPhilippians]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:14
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:8
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:68
+                                    endingChapter:69],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:44
+                                    endingChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexColossians]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:17
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:12
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:70
+                                    endingChapter:72],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:49
+                                    endingChapter:50],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexColossians]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:21
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:17
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:73
+                                    endingChapter:74],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:51
+                                    endingChapter:52],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexThessalonians1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:25
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:21
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:75
+                                    endingChapter:77],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLamentations]],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexThessalonians1]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:31
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:78],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:1
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:17
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexThessalonians2]],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:35
+                                    endingChapter:40],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:79
+                                    endingChapter:81],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:7
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:19
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:1
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:82
+                                    endingChapter:85],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:13
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:21
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy1]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:9
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:13
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:86
+                                    endingChapter:88],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:18
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:23
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy2]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:16
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:17
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:89],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:22
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTitus]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:23
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:21
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:90
+                                    endingChapter:93],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:26
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPhilemon]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:94
+                                    endingChapter:96],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:31
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:5
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:5
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:97
+                                    endingChapter:101],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:35
+                                    endingChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:4
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:10
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:10
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:102
+                                    endingChapter:103],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:40
+                                    endingChapter:43],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:14
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:104
+                                    endingChapter:105],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:44
+                                    endingChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:15
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:18
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:106],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:18
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:23
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:107
+                                    endingChapter:108],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJames]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:21
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:27
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:109
+                                    endingChapter:113],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:17
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJames]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:25
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:1
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:114
+                                    endingChapter:118],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHosea]
+                                  startingChapter:1
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:20
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPeter1]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:28
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:8
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:119
+                                    startingVerse:1
+                                      endingVerse:96],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHosea]
+                                  startingChapter:8
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPeter1]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:32
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:13
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:119
+                                    startingVerse:97
+                                      endingVerse:176],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                       oneChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoel]],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPeter2]],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:21
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:120
+                                    endingChapter:124],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexAmos]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:27
+                                    endingChapter:32],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:125
+                                    endingChapter:129],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexAmos]
+                                  startingChapter:6
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn1]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:6
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:33
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:130
+                                    endingChapter:132],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexObadiah]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJonah]],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:10
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn2]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn3]],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:10
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzra]
+                                  startingChapter:1
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:133
+                                    endingChapter:135],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMicah]],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJude]],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:14
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzra]
+                                  startingChapter:7
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:136
+                                    endingChapter:138],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNahum]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHabakkuk]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:15
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:18
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:139
+                                    endingChapter:141],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZephaniah]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHaggai]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:18
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:5
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:23
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:6
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:142
+                                    endingChapter:144],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSongOfSolomon]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZechariah]
+                                  startingChapter:1
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:21
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:10
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:28
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:145
+                                    endingChapter:147],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSongOfSolomon]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZechariah]
+                                  startingChapter:9
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:24
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:15
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:30
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEsther]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:148
+                                    endingChapter:150],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSongOfSolomon]
+                                  startingChapter:6
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMalachi]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:27
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:20
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:32
+                                    endingChapter:34],
+                ]],
+            ];
+#pragma mark Sequential
         case BRReadingTypeSequential:
             return @[
-                     @{@"day": @"Jan. 1", @"passage": @"Gen. 1-3"},
-                     @{@"day": @"Jan. 2", @"passage": @"Gen. 4-7"},
-                     @{@"day": @"Jan. 3", @"passage": @"Gen. 8-11"},
-                     @{@"day": @"Jan. 4", @"passage": @"Gen. 12-15"},
-                     @{@"day": @"Jan. 5", @"passage": @"Gen. 16-19"},
-                     @{@"day": @"Jan. 6", @"passage": @"Gen. 20-23"},
-                     @{@"day": @"Jan. 7", @"passage": @"Gen. 24-26"},
-                     @{@"day": @"Jan. 8", @"passage": @"Gen. 27-28"},
-                     @{@"day": @"Jan. 9", @"passage": @"Gen. 29-30"},
-                     @{@"day": @"Jan. 10", @"passage": @"Gen. 31-33"},
-                     @{@"day": @"Jan. 11", @"passage": @"Gen. 34-36"},
-                     @{@"day": @"Jan. 12", @"passage": @"Gen. 37-39"},
-                     @{@"day": @"Jan. 13", @"passage": @"Gen. 40-41"},
-                     @{@"day": @"Jan. 14", @"passage": @"Gen. 42-44"},
-                     @{@"day": @"Jan. 15", @"passage": @"Gen. 45-47"},
-                     @{@"day": @"Jan. 16", @"passage": @"Gen. 48-50"},
-                     @{@"day": @"Jan. 17", @"passage": @"Exod. 1-4"},
-                     @{@"day": @"Jan. 18", @"passage": @"Exod. 5-7"},
-                     @{@"day": @"Jan. 19", @"passage": @"Exod. 8-10"},
-                     @{@"day": @"Jan. 20", @"passage": @"Exod. 11-12"},
-                     @{@"day": @"Jan. 21", @"passage": @"Exod. 13-15"},
-                     @{@"day": @"Jan. 22", @"passage": @"Exod. 16-18"},
-                     @{@"day": @"Jan. 23", @"passage": @"Exod. 19-23"},
-                     @{@"day": @"Jan. 24", @"passage": @"Exod. 24-27"},
-                     @{@"day": @"Jan. 25", @"passage": @"Exod. 28-30"},
-                     @{@"day": @"Jan. 26", @"passage": @"Exod. 31-34"},
-                     @{@"day": @"Jan. 27", @"passage": @"Exod. 35-37"},
-                     @{@"day": @"Jan. 28", @"passage": @"Exod. 38-40"},
-                     @{@"day": @"Jan. 29", @"passage": @"Lev. 1-4"},
-                     @{@"day": @"Jan. 30", @"passage": @"Lev. 5-7"},
-                     @{@"day": @"Jan. 31", @"passage": @"Lev. 8-11"},
-                     @{@"day": @"Feb. 1", @"passage": @"Lev. 12-14"},
-                     @{@"day": @"Feb. 2", @"passage": @"Lev. 15-18"},
-                     @{@"day": @"Feb. 3", @"passage": @"Lev. 19-22"},
-                     @{@"day": @"Feb. 4", @"passage": @"Lev. 23-25"},
-                     @{@"day": @"Feb. 5", @"passage": @"Lev. 26-27"},
-                     @{@"day": @"Feb. 6", @"passage": @"Num. 1-3"},
-                     @{@"day": @"Feb. 7", @"passage": @"Num. 4-6"},
-                     @{@"day": @"Feb. 8", @"passage": @"Num. 7-8"},
-                     @{@"day": @"Feb. 9", @"passage": @"Num. 9-11"},
-                     @{@"day": @"Feb. 10", @"passage": @"Num. 12-14"},
-                     @{@"day": @"Feb. 11", @"passage": @"Num. 15-18"},
-                     @{@"day": @"Feb. 12", @"passage": @"Num. 19-21"},
-                     @{@"day": @"Feb. 13", @"passage": @"Num. 22-24"},
-                     @{@"day": @"Feb. 14", @"passage": @"Num. 25-27"},
-                     @{@"day": @"Feb. 15", @"passage": @"Num. 28-31"},
-                     @{@"day": @"Feb. 16", @"passage": @"Num. 32-36"},
-                     @{@"day": @"Feb. 17", @"passage": @"Deut. 1-3"},
-                     @{@"day": @"Feb. 18", @"passage": @"Deut. 4-6"},
-                     @{@"day": @"Feb. 19", @"passage": @"Deut. 7-10"},
-                     @{@"day": @"Feb. 20", @"passage": @"Deut. 11-14"},
-                     @{@"day": @"Feb. 21", @"passage": @"Deut. 15-18"},
-                     @{@"day": @"Feb. 22", @"passage": @"Deut. 19-22"},
-                     @{@"day": @"Feb. 23", @"passage": @"Deut. 23-27"},
-                     @{@"day": @"Feb. 24", @"passage": @"Deut. 28-30"},
-                     @{@"day": @"Feb. 25", @"passage": @"Deut. 31-34"},
-                     @{@"day": @"Feb. 26", @"passage": @"Josh. 1-4"},
-                     @{@"day": @"Feb. 27", @"passage": @"Josh. 5-8"},
-                     @{@"day": @"Feb. 28", @"passage": @"Josh. 9-12"},
-                     @{@"day": @"Mar. 1", @"passage": @"Josh. 13-17"},
-                     @{@"day": @"Mar. 2", @"passage": @"Josh. 18-21"},
-                     @{@"day": @"Mar. 3", @"passage": @"Josh. 22-24"},
-                     @{@"day": @"Mar. 4", @"passage": @"Judg. 1-3"},
-                     @{@"day": @"Mar. 5", @"passage": @"Judg. 4-5"},
-                     @{@"day": @"Mar. 6", @"passage": @"Judg. 6-8"},
-                     @{@"day": @"Mar. 7", @"passage": @"Judg. 9-12"},
-                     @{@"day": @"Mar. 8", @"passage": @"Judg. 13-16"},
-                     @{@"day": @"Mar. 9", @"passage": @"Judg. 17-21"},
-                     @{@"day": @"Mar. 10", @"passage": @"Ruth"},
-                     @{@"day": @"Mar. 11", @"passage": @"1 Sam. 1-3"},
-                     @{@"day": @"Mar. 12", @"passage": @"1 Sam. 4-7"},
-                     @{@"day": @"Mar. 13", @"passage": @"1 Sam. 8-11"},
-                     @{@"day": @"Mar. 14", @"passage": @"1 Sam. 12-14"},
-                     @{@"day": @"Mar. 15", @"passage": @"1 Sam. 15-17"},
-                     @{@"day": @"Mar. 16", @"passage": @"1 Sam. 18-20"},
-                     @{@"day": @"Mar. 17", @"passage": @"1 Sam. 21-24"},
-                     @{@"day": @"Mar. 18", @"passage": @"1 Sam. 25-27"},
-                     @{@"day": @"Mar. 19", @"passage": @"1 Sam. 28-31"},
-                     @{@"day": @"Mar. 20", @"passage": @"2 Sam. 1-3"},
-                     @{@"day": @"Mar. 21", @"passage": @"2 Sam. 4-7"},
-                     @{@"day": @"Mar. 22", @"passage": @"2 Sam. 8-12"},
-                     @{@"day": @"Mar. 23", @"passage": @"2 Sam. 13-15"},
-                     @{@"day": @"Mar. 24", @"passage": @"2 Sam. 16-18"},
-                     @{@"day": @"Mar. 25", @"passage": @"2 Sam. 19-21"},
-                     @{@"day": @"Mar. 26", @"passage": @"2 Sam. 22-24"},
-                     @{@"day": @"Mar. 27", @"passage": @"1 Kin. 1-2"},
-                     @{@"day": @"Mar. 28", @"passage": @"1 Kin. 3-6"},
-                     @{@"day": @"Mar. 29", @"passage": @"1 Kin. 7-8"},
-                     @{@"day": @"Mar. 30", @"passage": @"1 Kin. 9-11"},
-                     @{@"day": @"Mar. 31", @"passage": @"1 Kin. 12-14"},
-                     @{@"day": @"Apr. 1", @"passage": @"1 Kin. 15-19"},
-                     @{@"day": @"Apr. 2", @"passage": @"1 Kin. 20-22"},
-                     @{@"day": @"Apr. 3", @"passage": @"2 Kin. 1-4"},
-                     @{@"day": @"Apr. 4", @"passage": @"2 Kin. 5-8"},
-                     @{@"day": @"Apr. 5", @"passage": @"2 Kin. 9-12"},
-                     @{@"day": @"Apr. 6", @"passage": @"2 Kin. 13-15"},
-                     @{@"day": @"Apr. 7", @"passage": @"2 Kin. 16-20"},
-                     @{@"day": @"Apr. 8", @"passage": @"2 Kin. 21-25"},
-                     @{@"day": @"Apr. 9", @"passage": @"1 Chr. 1-4"},
-                     @{@"day": @"Apr. 10", @"passage": @"1 Chr. 5-7"},
-                     @{@"day": @"Apr. 11", @"passage": @"1 Chr. 8-12"},
-                     @{@"day": @"Apr. 12", @"passage": @"1 Chr. 13-17"},
-                     @{@"day": @"Apr. 13", @"passage": @"1 Chr. 18-22"},
-                     @{@"day": @"Apr. 14", @"passage": @"1 Chr. 23-26"},
-                     @{@"day": @"Apr. 15", @"passage": @"1 Chr. 27-29"},
-                     @{@"day": @"Apr. 16", @"passage": @"2 Chr. 1-5"},
-                     @{@"day": @"Apr. 17", @"passage": @"2 Chr. 6-8"},
-                     @{@"day": @"Apr. 18", @"passage": @"2 Chr. 9-12"},
-                     @{@"day": @"Apr. 19", @"passage": @"2 Chr. 13-17"},
-                     @{@"day": @"Apr. 20", @"passage": @"2 Chr. 18-21"},
-                     @{@"day": @"Apr. 21", @"passage": @"2 Chr. 22-25"},
-                     @{@"day": @"Apr. 22", @"passage": @"2 Chr. 26-29"},
-                     @{@"day": @"Apr. 23", @"passage": @"2 Chr. 30-32"},
-                     @{@"day": @"Apr. 24", @"passage": @"2 Chr. 33-36"},
-                     @{@"day": @"Apr. 25", @"passage": @"Ezra 1-4"},
-                     @{@"day": @"Apr. 26", @"passage": @"Ezra 5-7"},
-                     @{@"day": @"Apr. 27", @"passage": @"Ezra 8-10"},
-                     @{@"day": @"Apr. 28", @"passage": @"Neh. 1-4"},
-                     @{@"day": @"Apr. 29", @"passage": @"Neh. 5-7"},
-                     @{@"day": @"Apr. 30", @"passage": @"Neh. 8-10"},
-                     @{@"day": @"May 1", @"passage": @"Neh. 11-13"},
-                     @{@"day": @"May 2", @"passage": @"Esth. 1-5"},
-                     @{@"day": @"May 3", @"passage": @"Esth. 6-10"},
-                     @{@"day": @"May 4", @"passage": @"Job 1-5"},
-                     @{@"day": @"May 5", @"passage": @"Job 6-10"},
-                     @{@"day": @"May 6", @"passage": @"Job 11-15"},
-                     @{@"day": @"May 7", @"passage": @"Job 16-20"},
-                     @{@"day": @"May 8", @"passage": @"Job 21-25"},
-                     @{@"day": @"May 9", @"passage": @"Job 26-31"},
-                     @{@"day": @"May 10", @"passage": @"Job 32-37"},
-                     @{@"day": @"May 11", @"passage": @"Job 38-42"},
-                     @{@"day": @"May 12", @"passage": @"Ps. 1-5"},
-                     @{@"day": @"May 13", @"passage": @"Ps. 6-9"},
-                     @{@"day": @"May 14", @"passage": @"Ps. 10-16"},
-                     @{@"day": @"May 15", @"passage": @"Ps. 17-18"},
-                     @{@"day": @"May 16", @"passage": @"Ps. 19-22"},
-                     @{@"day": @"May 17", @"passage": @"Ps. 23-27"},
-                     @{@"day": @"May 18", @"passage": @"Ps. 28-31"},
-                     @{@"day": @"May 19", @"passage": @"Ps. 32-35"},
-                     @{@"day": @"May 20", @"passage": @"Ps. 36-38"},
-                     @{@"day": @"May 21", @"passage": @"Ps. 39-41"},
-                     @{@"day": @"May 22", @"passage": @"Ps. 42-45"},
-                     @{@"day": @"May 23", @"passage": @"Ps. 46-49"},
-                     @{@"day": @"May 24", @"passage": @"Ps. 50-53"},
-                     @{@"day": @"May 25", @"passage": @"Ps. 54-56"},
-                     @{@"day": @"May 26", @"passage": @"Ps. 57-59"},
-                     @{@"day": @"May 27", @"passage": @"Ps. 60-63"},
-                     @{@"day": @"May 28", @"passage": @"Ps. 64-67"},
-                     @{@"day": @"May 29", @"passage": @"Ps. 68-69"},
-                     @{@"day": @"May 30", @"passage": @"Ps. 70-72"},
-                     @{@"day": @"May 31", @"passage": @"Ps. 73-74"},
-                     @{@"day": @"Jun. 1", @"passage": @"Ps. 75-77"},
-                     @{@"day": @"Jun. 2", @"passage": @"Ps. 78"},
-                     @{@"day": @"Jun. 3", @"passage": @"Ps. 79-82"},
-                     @{@"day": @"Jun. 4", @"passage": @"Ps. 83-86"},
-                     @{@"day": @"Jun. 5", @"passage": @"Ps. 87-88"},
-                     @{@"day": @"Jun. 6", @"passage": @"Ps. 89"},
-                     @{@"day": @"Jun. 7", @"passage": @"Ps. 90-93"},
-                     @{@"day": @"Jun. 8", @"passage": @"Ps. 94-99"},
-                     @{@"day": @"Jun. 9", @"passage": @"Ps. 100-103"},
-                     @{@"day": @"Jun. 10", @"passage": @"Ps. 104-105"},
-                     @{@"day": @"Jun. 11", @"passage": @"Ps. 106"},
-                     @{@"day": @"Jun. 12", @"passage": @"Ps. 107-109"},
-                     @{@"day": @"Jun. 13", @"passage": @"Ps. 110-115"},
-                     @{@"day": @"Jun. 14", @"passage": @"Ps. 116-118"},
-                     @{@"day": @"Jun. 15", @"passage": @"Ps. 119"},
-                     @{@"day": @"Jun. 16", @"passage": @"Ps. 120-131"},
-                     @{@"day": @"Jun. 17", @"passage": @"Ps. 132-137"},
-                     @{@"day": @"Jun. 18", @"passage": @"Ps. 138-141"},
-                     @{@"day": @"Jun. 19", @"passage": @"Ps. 142-145"},
-                     @{@"day": @"Jun. 20", @"passage": @"Ps. 146-150"},
-                     @{@"day": @"Jun. 21", @"passage": @"Prov. 1-4"},
-                     @{@"day": @"Jun. 22", @"passage": @"Prov. 5-9"},
-                     @{@"day": @"Jun. 23", @"passage": @"Prov. 10-11"},
-                     @{@"day": @"Jun. 24", @"passage": @"Prov. 12-13"},
-                     @{@"day": @"Jun. 25", @"passage": @"Prov. 14-15"},
-                     @{@"day": @"Jun. 26", @"passage": @"Prov. 16-17"},
-                     @{@"day": @"Jun. 27", @"passage": @"Prov. 18-19"},
-                     @{@"day": @"Jun. 28", @"passage": @"Prov. 20-21"},
-                     @{@"day": @"Jun. 29", @"passage": @"Prov. 22-24"},
-                     @{@"day": @"Jun. 30", @"passage": @"Prov. 25-26"},
-                     @{@"day": @"Jul. 1", @"passage": @"Prov. 27-28"},
-                     @{@"day": @"Jul. 2", @"passage": @"Prov. 29-31"},
-                     @{@"day": @"Jul. 3", @"passage": @"Ecc. 1-3"},
-                     @{@"day": @"Jul. 4", @"passage": @"Ecc. 4-8"},
-                     @{@"day": @"Jul. 5", @"passage": @"Ecc. 9-12"},
-                     @{@"day": @"Jul. 6", @"passage": @"Song 1-4"},
-                     @{@"day": @"Jul. 7", @"passage": @"Song 5-8"},
-                     @{@"day": @"Jul. 8", @"passage": @"Isa. 1-4"},
-                     @{@"day": @"Jul. 9", @"passage": @"Isa. 5-7"},
-                     @{@"day": @"Jul. 10", @"passage": @"Isa. 8-11"},
-                     @{@"day": @"Jul. 11", @"passage": @"Isa. 12-17"},
-                     @{@"day": @"Jul. 12", @"passage": @"Isa. 18-24"},
-                     @{@"day": @"Jul. 13", @"passage": @"Isa. 25-29"},
-                     @{@"day": @"Jul. 14", @"passage": @"Isa. 30-35"},
-                     @{@"day": @"Jul. 15", @"passage": @"Isa. 36-40"},
-                     @{@"day": @"Jul. 16", @"passage": @"Isa. 41-44"},
-                     @{@"day": @"Jul. 17", @"passage": @"Isa. 45-49"},
-                     @{@"day": @"Jul. 18", @"passage": @"Isa. 50-55"},
-                     @{@"day": @"Jul. 19", @"passage": @"Isa. 56-61"},
-                     @{@"day": @"Jul. 20", @"passage": @"Isa. 62-66"},
-                     @{@"day": @"Jul. 21", @"passage": @"Jer. 1-3"},
-                     @{@"day": @"Jul. 22", @"passage": @"Jer. 4-6"},
-                     @{@"day": @"Jul. 23", @"passage": @"Jer. 7-10"},
-                     @{@"day": @"Jul. 24", @"passage": @"Jer. 11-15"},
-                     @{@"day": @"Jul. 25", @"passage": @"Jer. 16-20"},
-                     @{@"day": @"Jul. 26", @"passage": @"Jer. 21-25"},
-                     @{@"day": @"Jul. 27", @"passage": @"Jer. 26-30"},
-                     @{@"day": @"Jul. 28", @"passage": @"Jer. 31-33"},
-                     @{@"day": @"Jul. 29", @"passage": @"Jer. 34-39"},
-                     @{@"day": @"Jul. 30", @"passage": @"Jer. 40-46"},
-                     @{@"day": @"Jul. 31", @"passage": @"Jer. 47-49"},
-                     @{@"day": @"Aug. 1", @"passage": @"Jer. 50-52"},
-                     @{@"day": @"Aug. 2", @"passage": @"Lamentations"},
-                     @{@"day": @"Aug. 3", @"passage": @"Eze. 1-7"},
-                     @{@"day": @"Aug. 4", @"passage": @"Eze. 8-15"},
-                     @{@"day": @"Aug. 5", @"passage": @"Eze. 16-19"},
-                     @{@"day": @"Aug. 6", @"passage": @"Eze. 20-23"},
-                     @{@"day": @"Aug. 7", @"passage": @"Eze. 24-28"},
-                     @{@"day": @"Aug. 8", @"passage": @"Eze. 29-33"},
-                     @{@"day": @"Aug. 9", @"passage": @"Eze. 34-39"},
-                     @{@"day": @"Aug. 10", @"passage": @"Eze. 40-43"},
-                     @{@"day": @"Aug. 11", @"passage": @"Eze. 44-48"},
-                     @{@"day": @"Aug. 12", @"passage": @"Dan. 1-3"},
-                     @{@"day": @"Aug. 13", @"passage": @"Dan. 4-6"},
-                     @{@"day": @"Aug. 14", @"passage": @"Dan. 7-9"},
-                     @{@"day": @"Aug. 15", @"passage": @"Dan. 10-12"},
-                     @{@"day": @"Aug. 16", @"passage": @"Hos. 1-4"},
-                     @{@"day": @"Aug. 17", @"passage": @"Hos. 5-9"},
-                     @{@"day": @"Aug. 18", @"passage": @"Hos. 10-14"},
-                     @{@"day": @"Aug. 19", @"passage": @"Joel"},
-                     @{@"day": @"Aug. 20", @"passage": @"Amos 1-5"},
-                     @{@"day": @"Aug. 21", @"passage": @"Amos 6-9"},
-                     @{@"day": @"Aug. 22", @"passage": @"Obad., Jon."},
-                     @{@"day": @"Aug. 23", @"passage": @"Mic. 1-4"},
-                     @{@"day": @"Aug. 24", @"passage": @"Mic. 5-7"},
-                     @{@"day": @"Aug. 25", @"passage": @"Nahum"},
-                     @{@"day": @"Aug. 26", @"passage": @"Habakkuk"},
-                     @{@"day": @"Aug. 27", @"passage": @"Zeph., Hagg."},
-                     @{@"day": @"Aug. 28", @"passage": @"Zech. 1-6"},
-                     @{@"day": @"Aug. 29", @"passage": @"Zech. 7-10"},
-                     @{@"day": @"Aug. 30", @"passage": @"Zech. 11-14"},
-                     @{@"day": @"Aug. 31", @"passage": @"Malachi"},
-                     @{@"day": @"Sep. 1", @"passage": @"Mat. 1-2"},
-                     @{@"day": @"Sep. 2", @"passage": @"Mat. 3-4"},
-                     @{@"day": @"Sep. 3", @"passage": @"Mat. 5-7"},
-                     @{@"day": @"Sep. 4", @"passage": @"Mat. 8-9"},
-                     @{@"day": @"Sep. 5", @"passage": @"Mat. 10-11"},
-                     @{@"day": @"Sep. 6", @"passage": @"Mat. 12-13"},
-                     @{@"day": @"Sep. 7", @"passage": @"Mat. 14-15"},
-                     @{@"day": @"Sep. 8", @"passage": @"Mat. 16-18"},
-                     @{@"day": @"Sep. 9", @"passage": @"Mat. 19-20"},
-                     @{@"day": @"Sep. 10", @"passage": @"Mat. 21-22"},
-                     @{@"day": @"Sep. 11", @"passage": @"Mat. 23-25"},
-                     @{@"day": @"Sep. 12", @"passage": @"Mat. 26-28"},
-                     @{@"day": @"Sep. 13", @"passage": @"Mark 1-2"},
-                     @{@"day": @"Sep. 14", @"passage": @"Mark 3-4"},
-                     @{@"day": @"Sep. 15", @"passage": @"Mark 5-6"},
-                     @{@"day": @"Sep. 16", @"passage": @"Mark 7-8"},
-                     @{@"day": @"Sep. 17", @"passage": @"Mark 9-10"},
-                     @{@"day": @"Sep. 18", @"passage": @"Mark 11-12"},
-                     @{@"day": @"Sep. 19", @"passage": @"Mark 13-14"},
-                     @{@"day": @"Sep. 20", @"passage": @"Mark 15-16"},
-                     @{@"day": @"Sep. 21", @"passage": @"Luke 1"},
-                     @{@"day": @"Sep. 22", @"passage": @"Luke 2"},
-                     @{@"day": @"Sep. 23", @"passage": @"Luke 3-4"},
-                     @{@"day": @"Sep. 24", @"passage": @"Luke 5-6"},
-                     @{@"day": @"Sep. 25", @"passage": @"Luke 7-8"},
-                     @{@"day": @"Sep. 26", @"passage": @"Luke 9-10"},
-                     @{@"day": @"Sep. 27", @"passage": @"Luke 11"},
-                     @{@"day": @"Sep. 28", @"passage": @"Luke 12"},
-                     @{@"day": @"Sep. 29", @"passage": @"Luke 13-14"},
-                     @{@"day": @"Sep. 30", @"passage": @"Luke 15-16"},
-                     @{@"day": @"Oct. 1", @"passage": @"Luke 17-18"},
-                     @{@"day": @"Oct. 2", @"passage": @"Luke 19-20"},
-                     @{@"day": @"Oct. 3", @"passage": @"Luke 21-22"},
-                     @{@"day": @"Oct. 4", @"passage": @"Luke 23-24"},
-                     @{@"day": @"Oct. 5", @"passage": @"John 1-2"},
-                     @{@"day": @"Oct. 6", @"passage": @"John 3-4"},
-                     @{@"day": @"Oct. 7", @"passage": @"John 5-6"},
-                     @{@"day": @"Oct. 8", @"passage": @"John 7-8"},
-                     @{@"day": @"Oct. 9", @"passage": @"John 9-10"},
-                     @{@"day": @"Oct. 10", @"passage": @"John 11-12"},
-                     @{@"day": @"Oct. 11", @"passage": @"John 13-14"},
-                     @{@"day": @"Oct. 12", @"passage": @"John 15-17"},
-                     @{@"day": @"Oct. 13", @"passage": @"John 18-19"},
-                     @{@"day": @"Oct. 14", @"passage": @"John 20-21"},
-                     @{@"day": @"Oct. 15", @"passage": @"Acts 1-2"},
-                     @{@"day": @"Oct. 16", @"passage": @"Acts 3-4"},
-                     @{@"day": @"Oct. 17", @"passage": @"Acts 5-6"},
-                     @{@"day": @"Oct. 18", @"passage": @"Acts 7"},
-                     @{@"day": @"Oct. 19", @"passage": @"Acts 8-9"},
-                     @{@"day": @"Oct. 20", @"passage": @"Acts 10"},
-                     @{@"day": @"Oct. 21", @"passage": @"Acts 11-12"},
-                     @{@"day": @"Oct. 22", @"passage": @"Acts 13-14"},
-                     @{@"day": @"Oct. 23", @"passage": @"Acts 15-16"},
-                     @{@"day": @"Oct. 24", @"passage": @"Acts 17-18"},
-                     @{@"day": @"Oct. 25", @"passage": @"Acts 19-20"},
-                     @{@"day": @"Oct. 26", @"passage": @"Acts 21-23"},
-                     @{@"day": @"Oct. 27", @"passage": @"Acts 24-26"},
-                     @{@"day": @"Oct. 28", @"passage": @"Acts 27-28"},
-                     @{@"day": @"Oct. 29", @"passage": @"Rom. 1-2"},
-                     @{@"day": @"Oct. 30", @"passage": @"Rom. 3-4"},
-                     @{@"day": @"Oct. 31", @"passage": @"Rom. 5-6"},
-                     @{@"day": @"Nov. 1", @"passage": @"Rom. 7-8"},
-                     @{@"day": @"Nov. 2", @"passage": @"Rom. 9-10"},
-                     @{@"day": @"Nov. 3", @"passage": @"Rom. 11-14"},
-                     @{@"day": @"Nov. 4", @"passage": @"Rom. 15-16"},
-                     @{@"day": @"Nov. 5", @"passage": @"1 Cor. 1-2"},
-                     @{@"day": @"Nov. 6", @"passage": @"1 Cor. 3-4"},
-                     @{@"day": @"Nov. 7", @"passage": @"1 Cor. 5-6"},
-                     @{@"day": @"Nov. 8", @"passage": @"1 Cor. 7-8"},
-                     @{@"day": @"Nov. 9", @"passage": @"1 Cor. 9-10"},
-                     @{@"day": @"Nov. 10", @"passage": @"1 Cor. 11-12"},
-                     @{@"day": @"Nov. 11", @"passage": @"1 Cor. 13-14"},
-                     @{@"day": @"Nov. 12", @"passage": @"1 Cor. 15-16"},
-                     @{@"day": @"Nov. 13", @"passage": @"2 Cor. 1-2"},
-                     @{@"day": @"Nov. 14", @"passage": @"2 Cor. 3-5"},
-                     @{@"day": @"Nov. 15", @"passage": @"2 Cor. 6-7"},
-                     @{@"day": @"Nov. 16", @"passage": @"2 Cor. 8-9"},
-                     @{@"day": @"Nov. 17", @"passage": @"2 Cor. 10-11"},
-                     @{@"day": @"Nov. 18", @"passage": @"2 Cor. 12-13"},
-                     @{@"day": @"Nov. 19", @"passage": @"Gal. 1-2"},
-                     @{@"day": @"Nov. 20", @"passage": @"Gal. 3-4"},
-                     @{@"day": @"Nov. 21", @"passage": @"Gal. 5-6"},
-                     @{@"day": @"Nov. 22", @"passage": @"Eph. 1-2"},
-                     @{@"day": @"Nov. 23", @"passage": @"Eph. 3-4"},
-                     @{@"day": @"Nov. 24", @"passage": @"Eph. 5-6"},
-                     @{@"day": @"Nov. 25", @"passage": @"Phil. 1-2"},
-                     @{@"day": @"Nov. 26", @"passage": @"Phil. 3-4"},
-                     @{@"day": @"Nov. 27", @"passage": @"Col. 1-2"},
-                     @{@"day": @"Nov. 28", @"passage": @"Col. 3-4"},
-                     @{@"day": @"Nov. 29", @"passage": @"1 Th. 1-3"},
-                     @{@"day": @"Nov. 30", @"passage": @"1 Th. 4-5"},
-                     @{@"day": @"Dec. 1", @"passage": @"2 Thess."},
-                     @{@"day": @"Dec. 2", @"passage": @"1 Tim. 1-3"},
-                     @{@"day": @"Dec. 3", @"passage": @"1 Tim. 4-6"},
-                     @{@"day": @"Dec. 4", @"passage": @"2 Tim. 1-2"},
-                     @{@"day": @"Dec. 5", @"passage": @"2 Tim. 3-4"},
-                     @{@"day": @"Dec. 6", @"passage": @"Titus"},
-                     @{@"day": @"Dec. 7", @"passage": @"Philemon"},
-                     @{@"day": @"Dec. 8", @"passage": @"Heb. 1-2"},
-                     @{@"day": @"Dec. 9", @"passage": @"Heb. 3-4"},
-                     @{@"day": @"Dec. 10", @"passage": @"Heb. 5-7"},
-                     @{@"day": @"Dec. 11", @"passage": @"Heb. 8-9"},
-                     @{@"day": @"Dec. 12", @"passage": @"Heb. 10-11"},
-                     @{@"day": @"Dec. 13", @"passage": @"Heb. 12-13"},
-                     @{@"day": @"Dec. 14", @"passage": @"James 1-2"},
-                     @{@"day": @"Dec. 15", @"passage": @"James 3-5"},
-                     @{@"day": @"Dec. 16", @"passage": @"1 Pet. 1-3"},
-                     @{@"day": @"Dec. 17", @"passage": @"1 Pet. 4-5"},
-                     @{@"day": @"Dec. 18", @"passage": @"2 Peter"},
-                     @{@"day": @"Dec. 19", @"passage": @"1 Jn. 1-2"},
-                     @{@"day": @"Dec. 20", @"passage": @"1 Jn. 3-5"},
-                     @{@"day": @"Dec. 21", @"passage": @"2 Jn., 3 Jn."},
-                     @{@"day": @"Dec. 22", @"passage": @"Jude"},
-                     @{@"day": @"Dec. 23", @"passage": @"Rev. 1-3"},
-                     @{@"day": @"Dec. 24", @"passage": @"Rev. 4-6"},
-                     @{@"day": @"Dec. 25", @"passage": @"Rev. 7-9"},
-                     @{@"day": @"Dec. 26", @"passage": @"Rev. 10-11"},
-                     @{@"day": @"Dec. 27", @"passage": @"Rev. 12-13"},
-                     @{@"day": @"Dec. 28", @"passage": @"Rev. 14-15"},
-                     @{@"day": @"Dec. 29", @"passage": @"Rev. 16-17"},
-                     @{@"day": @"Dec. 30", @"passage": @"Rev. 18-20"},
-                     @{@"day": @"Dec. 31", @"passage": @"Rev. 21-22"},
-                     ];
+                [[Reading alloc] initWithDay:@"Jan. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:4
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:8
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:12
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:16
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:20
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:24
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:27
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:29
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:31
+                                    endingChapter:33],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:34
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:37
+                                    endingChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:40
+                                    endingChapter:41],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:42
+                                    endingChapter:44],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:45
+                                    endingChapter:47],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:48
+                                    endingChapter:50],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:19
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:24
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:28
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:31
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:35
+                                    endingChapter:37],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:38
+                                    endingChapter:40],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:8
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:12
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:15
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:19
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:23
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:26
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:9
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:12
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:15
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:25
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:28
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:32
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:7
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:11
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:15
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:19
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:23
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:28
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:31
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:13
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:18
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:6
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:13
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:17
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRuth]],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:4
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:8
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:12
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:15
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:18
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:21
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:25
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:28
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:4
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:8
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:3
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:9
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:12
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:15
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:20
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:16
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:21
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:8
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:13
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:18
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:23
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:27
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:6
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:13
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:18
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:22
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:26
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:30
+                                    endingChapter:32],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:33
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzra]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzra]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzra]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"May 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"May 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEsther]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"May 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEsther]
+                                  startingChapter:6
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"May 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"May 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:6
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"May 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:11
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"May 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:16
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"May 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:21
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"May 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:26
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"May 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:32
+                                    endingChapter:37],
+                ]],
+                [[Reading alloc] initWithDay:@"May 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:38
+                                    endingChapter:42],
+                ]],
+                [[Reading alloc] initWithDay:@"May 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"May 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:6
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"May 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:10
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"May 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:17
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"May 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:19
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"May 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:23
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"May 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:28
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"May 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:32
+                                    endingChapter:35],
+                ]],
+                [[Reading alloc] initWithDay:@"May 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:36
+                                    endingChapter:38],
+                ]],
+                [[Reading alloc] initWithDay:@"May 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:39
+                                    endingChapter:41],
+                ]],
+                [[Reading alloc] initWithDay:@"May 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:42
+                                    endingChapter:45],
+                ]],
+                [[Reading alloc] initWithDay:@"May 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:46
+                                    endingChapter:49],
+                ]],
+                [[Reading alloc] initWithDay:@"May 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:50
+                                    endingChapter:53],
+                ]],
+                [[Reading alloc] initWithDay:@"May 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:54
+                                    endingChapter:56],
+                ]],
+                [[Reading alloc] initWithDay:@"May 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:57
+                                    endingChapter:59],
+                ]],
+                [[Reading alloc] initWithDay:@"May 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:60
+                                    endingChapter:63],
+                ]],
+                [[Reading alloc] initWithDay:@"May 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:64
+                                    endingChapter:67],
+                ]],
+                [[Reading alloc] initWithDay:@"May 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:68
+                                    endingChapter:69],
+                ]],
+                [[Reading alloc] initWithDay:@"May 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:70
+                                    endingChapter:72],
+                ]],
+                [[Reading alloc] initWithDay:@"May 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:73
+                                    endingChapter:74],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:75
+                                    endingChapter:77],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:78],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:79
+                                    endingChapter:82],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:83
+                                    endingChapter:86],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:87
+                                    endingChapter:88],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:89],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:90
+                                    endingChapter:93],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:94
+                                    endingChapter:99],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:100
+                                    endingChapter:103],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:104
+                                    endingChapter:105],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:106],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:107
+                                    endingChapter:109],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:110
+                                    endingChapter:115],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:116
+                                    endingChapter:118],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:119],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:120
+                                    endingChapter:131],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:132
+                                    endingChapter:137],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:138
+                                    endingChapter:141],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:142
+                                    endingChapter:145],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:146
+                                    endingChapter:150],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:5
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:14
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:16
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:18
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:20
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:25
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:27
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:29
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:4
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSongOfSolomon]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSongOfSolomon]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:8
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:12
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:18
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:25
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:30
+                                    endingChapter:35],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:36
+                                    endingChapter:40],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:41
+                                    endingChapter:44],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:45
+                                    endingChapter:49],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:50
+                                    endingChapter:55],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:56
+                                    endingChapter:61],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:62
+                                    endingChapter:66],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:7
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:11
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:16
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:21
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:26
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:31
+                                    endingChapter:33],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:34
+                                    endingChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:40
+                                    endingChapter:46],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:47
+                                    endingChapter:49],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:50
+                                    endingChapter:52],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLamentations]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:1
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:8
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:16
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:20
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:24
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:29
+                                    endingChapter:33],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:34
+                                    endingChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:40
+                                    endingChapter:43],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:44
+                                    endingChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:7
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:10
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHosea]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHosea]
+                                  startingChapter:5
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHosea]
+                                  startingChapter:10
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoel]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexAmos]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexAmos]
+                                  startingChapter:6
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexObadiah]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJonah]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMicah]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMicah]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNahum]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHabakkuk]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZephaniah]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHaggai]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZechariah]
+                                  startingChapter:1
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZechariah]
+                                  startingChapter:7
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZechariah]
+                                  startingChapter:11
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMalachi]],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:14
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:16
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:19
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:21
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:23
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:26
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:1],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:17
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:19
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:21
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:23
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:15
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:18
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:20
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                       oneChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                       oneChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:17
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:19
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:21
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:24
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:27
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:11
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:6
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGalatians]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGalatians]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGalatians]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEphesians]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEphesians]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEphesians]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPhilippians]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPhilippians]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexColossians]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexColossians]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexThessalonians1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexThessalonians1]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexThessalonians2]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy1]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy2]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy1]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTitus]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPhilemon]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJames]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJames]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPeter1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPeter1]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPeter2]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn1]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn1]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn2]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn3]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJude]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:7
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:10
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:14
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:16
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:18
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:21
+                                    endingChapter:22],
+                ]],
+            ];
+        case BRReadingTypeChronological:
+            return @[
+                [[Reading alloc] initWithDay:@"Jan. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:4
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:8
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:6
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:10
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:14
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:17
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:21
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:24
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:29
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:33
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:35
+                                    endingChapter:37],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:38
+                                    endingChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJob]
+                                  startingChapter:40
+                                    endingChapter:42],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:12
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:25
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:27
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:30
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:32
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:35
+                                    endingChapter:37],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:38
+                                    endingChapter:40],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:41
+                                    endingChapter:42],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:43
+                                    endingChapter:45],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:46
+                                    endingChapter:47],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGenesis]
+                                  startingChapter:48
+                                    endingChapter:50],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jan. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:7
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:10
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:25
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:28
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:30
+                                    endingChapter:32],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:33
+                                    endingChapter:35],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:36
+                                    endingChapter:38],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexExodus]
+                                  startingChapter:39
+                                    endingChapter:40],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:14
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:22
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:24
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLeviticus]
+                                  startingChapter:26
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:5
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                       oneChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Feb. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:14
+                                    endingChapter:15],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:90],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:16
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:18
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:21
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:23
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:26
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:28
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:31
+                                    endingChapter:32],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:33
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNumbers]
+                                  startingChapter:35
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:14
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:17
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:21
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:24
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:28
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:30
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDeuteronomy]
+                                  startingChapter:32
+                                    endingChapter:34],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:91],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:9
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:12
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoshua]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Mar. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:6
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:8
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:10
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJudges]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRuth]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:4
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:15
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:18
+                                    endingChapter:20],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@11, @59]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:21
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@7, @27, @31, @34, @52]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@56, @120, @140, @141, @142]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:25
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@17, @35, @54, @63]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel1]
+                                  startingChapter:28
+                                    endingChapter:31],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@121, @123, @124, @125, @128, @129, @130]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@6, @8, @9, @10, @14, @16, @19, @21]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@43, @44, @45, @49, @84, @85, @87]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@73, @77, @78]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                       oneChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@81, @88, @92, @93]],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:7
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Apr. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:102
+                                    endingChapter:104],
+                ]],
+                [[Reading alloc] initWithDay:@"May 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                       oneChapter:5],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"May 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:133],
+                ]],
+                [[Reading alloc] initWithDay:@"May 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:106
+                                    endingChapter:107],
+                ]],
+                [[Reading alloc] initWithDay:@"May 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:13
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"May 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@1, @2, @15, @22, @23, @24, @47, @68]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@89, @96, @100, @101, @105, @132]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:6
+                                    endingChapter:7],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                       oneChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"May 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@25, @29, @33, @36, @39]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:8
+                                    endingChapter:9],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                       oneChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"May 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@50, @53, @60, @75]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                       oneChapter:10],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                       oneChapter:19],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"May 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@65, @66, @67, @69, @70]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:11
+                                    endingChapter:12],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                       oneChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"May 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@32, @51, @86, @122]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"May 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@3, @4, @12, @13, @28, @55]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"May 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@26, @40, @58, @61, @62, @64]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"May 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@5, @38, @41, @42]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                  startingChapter:22
+                                    endingChapter:23],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:57],
+                ]],
+                [[Reading alloc] initWithDay:@"May 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@95, @97, @98, @99]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSamuel2]
+                                       oneChapter:24],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:21
+                                    endingChapter:22],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"May 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:108
+                                    endingChapter:110],
+                ]],
+                [[Reading alloc] initWithDay:@"May 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:23
+                                    endingChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"May 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@131, @138, @139, @143, @144, @145]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles1]
+                                  startingChapter:26
+                                    endingChapter:29],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:127],
+                ]],
+                [[Reading alloc] initWithDay:@"May 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:111
+                                    endingChapter:118],
+                ]],
+                [[Reading alloc] initWithDay:@"May 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:1
+                                    endingChapter:2],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@37, @71, @94]],
+                ]],
+                [[Reading alloc] initWithDay:@"May 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:119],
+                ]],
+                [[Reading alloc] initWithDay:@"May 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:3
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:1],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:72],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexSongOfSolomon]],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:7
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:10
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:16
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:19
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:22
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:5
+                                    endingChapter:6],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:2
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                       oneChapter:7],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                       oneChapter:8],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:6
+                                    endingChapter:7],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:136],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@134, @146, @147, @148, @149, @150]],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                       oneChapter:9],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:25
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:27
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:1
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEcclesiastes]
+                                  startingChapter:7
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:10
+                                    endingChapter:11],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexProverbs]
+                                  startingChapter:30
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:10
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                       oneChapter:15],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:13
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                       oneChapter:16],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:17
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                  startingChapter:20
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings1]
+                                       oneChapter:22],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Jun. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:19
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexObadiah]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                  startingChapter:82
+                                    endingChapter:83],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:9
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:12
+                                    endingChapter:13],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                       oneChapter:14],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJonah]],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                       oneChapter:15],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexAmos]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexAmos]
+                                  startingChapter:6
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:27],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMicah]],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:28],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:16
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:13
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:18
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:23
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                       oneChapter:18],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:29
+                                    endingChapter:31],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHosea]
+                                  startingChapter:1
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHosea]
+                                  startingChapter:8
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:28
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:31
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:35
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:37
+                                    endingChapter:39],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:76],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:40
+                                    endingChapter:43],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:44
+                                    endingChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                       oneChapter:19],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@46, @80, @135]],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:49
+                                    endingChapter:53],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:54
+                                    endingChapter:58],
+                ]],
+                [[Reading alloc] initWithDay:@"Jul. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:59
+                                    endingChapter:63],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexIsaiah]
+                                  startingChapter:64
+                                    endingChapter:66],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:20
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:32
+                                    endingChapter:33],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNahum]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:22
+                                    endingChapter:23],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                  startingChapter:34
+                                    endingChapter:35],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZephaniah]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:7
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:10
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:14
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:18
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:23
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:26
+                                    endingChapter:29],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:30
+                                    endingChapter:31],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:32
+                                    endingChapter:34],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:35
+                                    endingChapter:37],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:38
+                                    endingChapter:40],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                 multipleChapters:@[@74, @79]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexKings2]
+                                  startingChapter:24
+                                    endingChapter:25],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexChronicles2]
+                                       oneChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHabakkuk]],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:41
+                                    endingChapter:45],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:46
+                                    endingChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:49
+                                    endingChapter:50],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJeremiah]
+                                  startingChapter:51
+                                    endingChapter:52],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLamentations]
+                                  startingChapter:1
+                                    endingChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLamentations]
+                                  startingChapter:3
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:9
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:13
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Aug. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:16
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:18
+                                    endingChapter:20],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:21
+                                    endingChapter:22],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:23
+                                    endingChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:25
+                                    endingChapter:27],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:28
+                                    endingChapter:30],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:31
+                                    endingChapter:33],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:34
+                                    endingChapter:36],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:37
+                                    endingChapter:39],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:40
+                                    endingChapter:42],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:43
+                                    endingChapter:45],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzekiel]
+                                  startingChapter:46
+                                    endingChapter:48],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJoel]],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:7
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexDaniel]
+                                  startingChapter:10
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzra]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzra]
+                                  startingChapter:4
+                                    endingChapter:6],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:137],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHaggai]],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZechariah]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZechariah]
+                                  startingChapter:5
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexZechariah]
+                                  startingChapter:10
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEsther]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEsther]
+                                  startingChapter:6
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEzra]
+                                  startingChapter:7
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:6
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexNehemiah]
+                                  startingChapter:11
+                                    endingChapter:13],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPsalms]
+                                       oneChapter:126],
+                ]],
+                [[Reading alloc] initWithDay:@"Sep. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMalachi]],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:1],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                       oneChapter:1],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:1],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:3],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:1],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:4],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:2
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:8],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:2],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                       oneChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:12],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:3],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:5
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:9],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:13],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                  startingChapter:4
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:14],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:6],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                       oneChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:15],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:16],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:17],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:12
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:14
+                                    endingChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:16
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                       oneChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Oct. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:19],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                  startingChapter:20
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 2" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:11],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                       oneChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:22],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:23],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                  startingChapter:20
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:24],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:25],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:26],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:22],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                       oneChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:14
+                                    endingChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:27],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:15],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:23],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:18
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMatthew]
+                                       oneChapter:28],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexMark]
+                                       oneChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexLuke]
+                                       oneChapter:24],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn]
+                                  startingChapter:20
+                                    endingChapter:21],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:7
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:9
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:11
+                                    endingChapter:12],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:13
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJames]],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGalatians]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexGalatians]
+                                  startingChapter:4
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                       oneChapter:17],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexThessalonians1]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexThessalonians2]],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:18
+                                    endingChapter:19],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Nov. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:5
+                                    endingChapter:8],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:9
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 1" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:12
+                                    endingChapter:14],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 3" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians1]
+                                  startingChapter:15
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 4" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:1
+                                    endingChapter:4],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 5" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:5
+                                    endingChapter:9],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 6" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexCorinthians2]
+                                  startingChapter:10
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 7" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:1
+                                    endingChapter:3],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 8" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:4
+                                    endingChapter:7],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 9" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:8
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 10" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 11" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRomans]
+                                  startingChapter:14
+                                    endingChapter:16],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 12" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:20
+                                    endingChapter:23],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 13" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:24
+                                    endingChapter:26],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 14" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexActs]
+                                  startingChapter:27
+                                    endingChapter:28],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 15" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexColossians]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPhilemon]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 16" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexEphesians]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 17" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPhilippians]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 18" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy1]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 19" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTitus]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 20" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPeter1]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 21" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:1
+                                    endingChapter:6],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 22" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:7
+                                    endingChapter:10],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 23" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexHebrews]
+                                  startingChapter:11
+                                    endingChapter:13],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 24" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexTimothy2]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 25" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexPeter2]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJude]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 26" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn1]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 27" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn2]],
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexJohn3]],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 28" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:1
+                                    endingChapter:5],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 29" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:6
+                                    endingChapter:11],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 30" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:12
+                                    endingChapter:18],
+                ]],
+                [[Reading alloc] initWithDay:@"Dec. 31" passages:@[
+                    [[Passage alloc] initWithBook:[[Book alloc] initWithIndex:BookIndexRevelation]
+                                  startingChapter:19
+                                    endingChapter:22],
+                ]],
+            ];
     };
 }
 

@@ -108,7 +108,7 @@
 -(void) scrollToFirstUnread
 {
     for( NSInteger i = 0; i < [readings count]; i++ ) {
-        BRReading *reading = readings[i];
+        Reading *reading = readings[i];
         if( !reading.read ) {
             [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]
                                   atScrollPosition:UITableViewScrollPositionMiddle
@@ -135,17 +135,17 @@
 {
     BRTableCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
 
-    BRReading *day = readings[indexPath.row];
+    Reading *day = readings[indexPath.row];
     [cell populateWithReading:day firstDay:[BRReadingManager firstDay]];
 
-    [cell setSelectionHandler:^(BRReading *reading, UIImpactFeedbackGenerator *feedbackGenerator) {
+    [cell setSelectionHandler:^(Reading *reading, UIImpactFeedbackGenerator *feedbackGenerator) {
         [feedbackGenerator impactOccurred];
         UIStoryboard *storyboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
         BRReadingViewController *readingVC = (BRReadingViewController*)[storyboard instantiateViewControllerWithIdentifier:@"BRReadingViewController"];
         if( readingVC ) {
             readingVC.reading = reading;
             [self presentViewController:readingVC animated:YES completion:nil];
-            readingVC.markReadAction = ^(BRReading *reading) {
+            readingVC.markReadAction = ^(Reading *reading) {
                 [BRReadingManager readingWasRead:reading];
                 [self.tableView reloadData];
             };

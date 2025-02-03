@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21225" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Izj-FN-QYw">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Izj-FN-QYw">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21207"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22504"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -61,7 +61,7 @@
             <objects>
                 <navigationController definesPresentationContext="YES" id="51r-4A-Hmk" sceneMemberID="viewController">
                     <navigationBar key="navigationBar" opaque="NO" contentMode="scaleToFill" id="gxY-Nl-Lea">
-                        <rect key="frame" x="0.0" y="47" width="375" height="44"/>
+                        <rect key="frame" x="0.0" y="50" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="backgroundColor" red="0.88627450980392153" green="0.84705882352941175" blue="0.71764705882352942" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <color key="tintColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -81,20 +81,20 @@
             <objects>
                 <viewController storyboardIdentifier="BRReadingViewController" modalPresentationStyle="overFullScreen" id="Dam-S0-pXj" customClass="BRReadingViewController" customModule="bible_reading" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="2MR-Nb-ssV">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="755"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="802"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <visualEffectView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MRk-Ly-XNd">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="755"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="802"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="xrL-KM-rmb">
-                                    <rect key="frame" x="0.0" y="0.0" width="375" height="755"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="802"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="KzL-ax-1ip">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="755"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="802"/>
                                             <subviews>
                                                 <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" showsHorizontalScrollIndicator="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" translatesAutoresizingMaskIntoConstraints="NO" id="JiH-3z-tfU">
-                                                    <rect key="frame" x="10" y="57" width="355" height="648"/>
+                                                    <rect key="frame" x="10" y="10" width="355" height="742"/>
                                                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                     <attributedString key="attributedText"/>
                                                     <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -104,7 +104,7 @@
                                                     </connections>
                                                 </textView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3mQ-a7-ssX">
-                                                    <rect key="frame" x="328" y="715" width="37" height="30"/>
+                                                    <rect key="frame" x="328" y="762" width="37" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="OZ0-Zb-JcV"/>
                                                     </constraints>
@@ -117,7 +117,7 @@
                                                     </connections>
                                                 </button>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FTi-do-Mlv">
-                                                    <rect key="frame" x="10" y="715" width="37" height="30"/>
+                                                    <rect key="frame" x="10" y="762" width="37" height="30"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="30" id="sAo-Md-cCm"/>
                                                     </constraints>
@@ -133,7 +133,7 @@
                                                     </connections>
                                                 </button>
                                                 <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" animating="YES" style="whiteLarge" translatesAutoresizingMaskIntoConstraints="NO" id="iWP-Zi-h4y">
-                                                    <rect key="frame" x="169" y="359" width="37" height="37"/>
+                                                    <rect key="frame" x="169" y="382.66666666666669" width="37" height="37"/>
                                                     <color key="color" red="0.92156862750000001" green="0.25490196079999999" blue="0.027450980390000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                 </activityIndicatorView>
                                             </subviews>
@@ -444,7 +444,7 @@
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="dcw-QI-Cb0">
-                                                    <rect key="frame" x="16" y="7.6666666666666679" width="169" height="30.000000000000004"/>
+                                                    <rect key="frame" x="16" y="7.6666666666666679" width="314" height="30.000000000000004"/>
                                                     <color key="backgroundColor" systemColor="tertiarySystemBackgroundColor"/>
                                                     <constraints>
                                                         <constraint firstAttribute="height" constant="29" id="mUr-o8-5U3"/>
@@ -452,6 +452,7 @@
                                                     <segments>
                                                         <segment title="Sequential"/>
                                                         <segment title="Topical"/>
+                                                        <segment title="Chronological"/>
                                                     </segments>
                                                     <color key="tintColor" red="0.91972148418426514" green="0.25468263030052185" blue="0.026138082146644592" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                                     <color key="selectedSegmentTintColor" red="0.92156862745098034" green="0.25490196078431371" blue="0.027450980392156862" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -705,7 +706,7 @@
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGray6Color">
-            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.94901960780000005" green="0.94901960780000005" blue="0.96862745100000003" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tertiarySystemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

@@ -88,10 +88,10 @@ static const CGFloat dragOvershoot = 60.;
     return [self dateFromString:string inYear:[NSString stringWithFormat:@"%d", (int)year]];
 }
 
--(void) populateWithReading:(BRReading*)reading_ firstDay:(NSString*)firstDay
+-(void) populateWithReading:(Reading*)reading_ firstDay:(NSString*)firstDay
 {
     reading = reading_;
-    readingLabel.text = reading.passage;
+    readingLabel.text = [reading displayText];
 
     NSDate *firstDate = [self dateFromString:firstDay yearOffset:0 firstDate:nil];
     NSInteger yearOffset = 0;

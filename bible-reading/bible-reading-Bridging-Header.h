@@ -3,3 +3,4 @@
 //
 
 #import "BRReadingManager.h"
+#import "BRReading.h"

@@ -7,11 +7,12 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "BRReading.h"
+
+@class Reading;
 
 @interface BRTableCell : UITableViewCell
 {
-    BRReading *reading;
+    Reading *reading;
 
     CGPoint touchStart;
     UITouch *movingTouch;
@@ -24,8 +25,8 @@
     __weak IBOutlet NSLayoutConstraint *containerTrailingConstraint;
 }
 
-@property (nonatomic, strong) void (^selectionHandler)(BRReading*, UIImpactFeedbackGenerator*);
+@property (nonatomic, strong) void (^selectionHandler)(Reading*, UIImpactFeedbackGenerator*);
 
--(void) populateWithReading:(BRReading*)reading firstDay:(NSString*)firstDay;
+-(void) populateWithReading:(Reading*)reading firstDay:(NSString*)firstDay;
 
 @end
